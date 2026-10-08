@@ -1,0 +1,14 @@
+name: Build TV_Matcher.exe
+on: [workflow_dispatch, push]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r app/requirements.txt
+      - run: python -m PyInstaller --noconfirm --onefile --windowed --name TV_Matcher tv_matcher.py
+        working-directory: app
+      - uses: actions/upload-artifact@v4
+        with: { name: TV_Matcher, path: app/dist/TV_Matcher.exe }
