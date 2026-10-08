@@ -319,6 +319,8 @@ def _tec_equivalenti(a: str, b: str, gruppi) -> bool:
 def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
     """Come confronta() ma ogni criterio si accende/spegne da P (vedi PARAMETRI_DEFAULT).
     Ritorna (ok, motivo, punteggio): punteggio più basso = più vicino."""
+    if not cand.codice:
+        return False, "codice modello non leggibile", 0
     if stesso_modello(amz, cand):
         return False, "stesso modello (escluso)", 0
     if P["stessa_marca"]["attivo"] and cand.marca != amz.marca:

@@ -2,7 +2,7 @@
 Usato sia dall'exe/CLI (motore.py) sia dal runner del sito (web_runner.py)."""
 import re
 
-from regole import analizza, confronta_param, unisci_parametri
+from regole import analizza, confronta_param, stesso_modello, unisci_parametri
 
 ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
          "nessun_simile": "Nessun modello simile", "errore": "Ricerca non riuscita"}
@@ -100,6 +100,7 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False):
                 break
         scelti, codici = [], set()
         for url, (score, c, im, motivo) in sorted(validi.items(), key=lambda x: x[1][0]):
+            nome_pag = ""
             if len(scelti) >= max_m:
                 break
             if c.codice in codici:
@@ -130,9 +131,13 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False):
                 if full.anno:
                     motivo = "ok"
                 im = og or im
+                nome_pag = titolo_pag.strip()
+                # il codice sulla pagina prodotto è il più affidabile: se c'è, vince
+                if cp.codice and cp.marca == c.marca and cp.pollici == c.pollici and not stesso_modello(info, cp):
+                    c.codice = cp.codice
             codici.add(c.codice)
             scelti.append({"modello": c.codice, "url": url, "img": im, "nota": "" if motivo == "ok" else motivo,
-                           "titolo": c.testo[:160], **info_dict(c)})
+                           "titolo": (nome_pag or c.testo)[:160], **info_dict(c)})
         out["match"][r["nome"]] = scelti
         if scelti:
             esito = "trovato"

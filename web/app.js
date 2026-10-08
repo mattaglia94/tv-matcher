@@ -501,7 +501,7 @@
     box.innerHTML = `
       <section class="scheda">
         <h2>Tutto pronto</h2>
-        <p class="tenue" style="margin-top:6px">Il motore gira su GitHub: puoi chiudere la pagina, cambiare dispositivo o perdere la connessione. Ritrovi la ricerca in <a href="#/esecuzioni">Ricerche</a>.</p>
+        <p class="tenue" style="margin-top:6px">Il motore gira su GitHub: puoi chiudere la pagina, cambiare dispositivo o perdere la connessione. Ritrovi la ricerca nello <a href="#/esecuzioni">Storico</a>.</p>
         <label class="campo" style="margin-top:20px">Nome della ricerca<input type="text" id="nomeRicerca" maxlength="80" value="${esc(b.nome)}"></label>
         <div class="riepilogo">
           <div><strong>${coperti.length}</strong><span class="tenue piccolo">ASIN da confrontare${coperti.length < b.asin.length ? ` (${b.asin.length - coperti.length} senza marketplace)` : ""}</span></div>
@@ -559,7 +559,7 @@
       let dati;
       try { dati = await api(`stato?id=${encodeURIComponent(id)}`); }
       catch (e) {
-        if (primo) app.innerHTML = `<div class="vuoto vista"><h2>Ricerca non trovata</h2><p class="tenue">${esc(e.message)}. Se l'hai appena avviata, attendi qualche secondo e ricarica.</p><a class="btn" href="#/esecuzioni">Vai alle ricerche</a></div>`;
+        if (primo) app.innerHTML = `<div class="vuoto vista"><h2>Ricerca non trovata</h2><p class="tenue">${esc(e.message)}. Se l'hai appena avviata, attendi qualche secondo e ricarica.</p><a class="btn" href="#/esecuzioni">Vai allo storico</a></div>`;
         return;
       }
       const st = statoRun(dati.stato, dati.github);
@@ -762,6 +762,7 @@
                   <div class="retailer"><span>${esc(ret.nome)}</span>${x.nota ? `<span class="chip attenzione">${esc(x.nota)}</span>` : '<span class="chip ok">simile</span>'}</div>
                   ${foto(x.img, x.modello)}
                   <div class="modello">${esc(x.modello)}</div>
+                  ${x.titolo ? `<p class="titolo-ret" title="${esc(x.titolo)}">${esc(x.titolo)}</p>` : ""}
                   <div class="etichette">${etichetteInfo(x)}</div>
                   <a class="vai" href="${esc(x.url)}" target="_blank" rel="noopener">Apri la pagina prodotto</a>
                   ${altri.length ? `<div class="altri">Anche: ${altri.map((y) => `<a href="${esc(y.url)}" target="_blank" rel="noopener">${esc(y.modello)}</a>`).join(", ")}</div>` : ""}
@@ -812,7 +813,7 @@
   async function vistaStorico() {
     app.innerHTML = `
       <div class="vista">
-        <div class="intestazione"><div><h1>Ricerche</h1><p class="tenue">Tutte le ricerche lanciate dal sito, da qualsiasi dispositivo. Apri una ricerca in corso per seguirne l'avanzamento.</p></div>
+        <div class="intestazione"><div><h1>Storico</h1><p class="tenue">Tutte le ricerche lanciate dal sito, da qualsiasi dispositivo. Apri una ricerca per vederne risultati o avanzamento.</p></div>
           <a class="btn primario" href="#/nuova/1">Nuova ricerca</a></div>
         <div id="listaRun"><div class="attesa"><span class="caricamento"></span></div></div>
       </div>`;
@@ -845,7 +846,7 @@
     { titolo: "Benvenuto in TV Matcher", testo: "Parti da una lista di ASIN Amazon e trova, per ogni retailer europeo, il TV più simile con un codice modello diverso.", colore: "var(--giallo)" },
     { titolo: "Incolla gli ASIN", testo: "Copia da Excel, scrivi uno per riga o carica un file. Il paese si legge dalla riga oppure si sceglie per ogni ASIN.", colore: "var(--ciano)" },
     { titolo: "Scegli marketplace e criteri", testo: "Spunta i retailer su cui cercare e decidi quando due TV sono simili: pollici, tecnologia, fascia, anno e altro.", colore: "var(--verde)" },
-    { titolo: "Avvia e chiudi pure", testo: "La ricerca gira su GitHub per 10–30 minuti. Puoi chiudere il browser: la ritrovi in Ricerche, con i risultati da scaricare in Excel.", colore: "var(--magenta)" },
+    { titolo: "Avvia e chiudi pure", testo: "La ricerca gira su GitHub per 10–30 minuti. Puoi chiudere il browser: la ritrovi nello Storico, con i risultati da scaricare in Excel.", colore: "var(--magenta)" },
   ];
   function tutorial() {
     let i = 0;
@@ -894,14 +895,14 @@
             <li><div><h3>Inserisci gli ASIN</h3><p>Incolla la lista o carica un CSV/Excel. Ogni ASIN ha un paese: lo leggo dalla riga (es. <code>B0F457MQCQ;IT</code>) o uso il paese predefinito. Se Amazon non risponde, scrivi a mano il modello nella colonna facoltativa.</p></div></li>
             <li><div><h3>Scegli i marketplace</h3><p>Spunta i retailer su cui cercare. Puoi modificare un URL, aggiungerne di nuovi o disattivarli: le modifiche valgono per tutti e restano salvate.</p></div></li>
             <li><div><h3>Imposta la somiglianza</h3><p>Accendi i criteri da rispettare. La configurazione standard segue il documento di matching: stessi pollici, stessa famiglia e fascia, anno 2026, PRO separati. Salva le combinazioni che usi spesso come preset.</p></div></li>
-            <li><div><h3>Avvia e attendi</h3><p>Il motore gira su GitHub. Una ricerca da 10 ASIN su 4 retailer richiede circa 20 minuti. Puoi chiudere la pagina: la pillola verde in alto e la sezione Ricerche ti riportano all'avanzamento.</p></div></li>
+            <li><div><h3>Avvia e attendi</h3><p>Il motore gira su GitHub. Una ricerca da 10 ASIN su 4 retailer richiede circa 20 minuti. Puoi chiudere la pagina: la pillola verde in alto e lo Storico ti riportano all'avanzamento.</p></div></li>
             <li><div><h3>Leggi e scarica</h3><p>Per ogni ASIN vedi i modelli simili per retailer con foto e link. "Anno da verificare" segnala i modelli il cui anno non si ricava dal codice. Scarica l'Excel con un foglio per paese più il foglio Dettaglio con tutti i candidati scartati e il motivo.</p></div></li>
           </ol>
           <aside class="scheda faq">
             <h3>Domande frequenti</h3>
             <details><summary>Perché un retailer non trova niente?</summary><p>Il sito può aver cambiato l'indirizzo di ricerca o bloccato l'accesso automatico. Controlla l'URL nel passo Marketplace e guarda il foglio Dettaglio: "ricerca: timeout" o "HTTP 403" indicano un blocco.</p></details>
             <details><summary>Cosa vuol dire "anno da verificare"?</summary><p>Il codice non dichiara l'anno e il titolo non lo riporta. Il modello rispetta gli altri criteri: verifica l'anno sulla pagina prodotto o spegni "Accetta anno non ricavabile".</p></details>
-            <details><summary>Posso lanciare più ricerche insieme?</summary><p>Sì, girano in parallelo su GitHub. Ognuna compare in Ricerche con il suo stato.</p></details>
+            <details><summary>Posso lanciare più ricerche insieme?</summary><p>Sì, girano in parallelo su GitHub. Ognuna compare nello Storico con il suo stato.</p></details>
             <details><summary>Il prezzo viene letto?</summary><p>No: il confronto si basa solo su codice modello, pollici e caratteristiche tecniche.</p></details>
           </aside>
         </div>
