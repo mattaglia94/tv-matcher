@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- schermo "gemello" dietro: il modello simile -->
+  <rect x="17" y="6" width="42" height="32" rx="7" fill="none" stroke="#7B61FF" stroke-width="3.5" opacity=".75"/>
+  <!-- schermo principale con barre del monoscopio -->
+  <clipPath id="s"><rect x="5" y="18" width="42" height="32" rx="7"/></clipPath>
+  <g clip-path="url(#s)">
+    <rect x="5" y="18" width="8.4" height="32" fill="#FFD23F"/>
+    <rect x="13.4" y="18" width="8.4" height="32" fill="#2EE6F0"/>
+    <rect x="21.8" y="18" width="8.4" height="32" fill="#4BE38E"/>
+    <rect x="30.2" y="18" width="8.4" height="32" fill="#FF4FA3"/>
+    <rect x="38.6" y="18" width="8.4" height="32" fill="#7B61FF"/>
+  </g>
+  <rect x="5" y="18" width="42" height="32" rx="7" fill="none" stroke="#F1EEFF" stroke-width="2.5"/>
+  <path d="M19 56h14" stroke="#F1EEFF" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

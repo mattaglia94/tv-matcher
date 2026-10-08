@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TV Matcher</title>
+  <meta name="description" content="Confronta i TV Amazon con modelli simili sui retailer europei">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar" id="topbar" hidden>
+    <a class="marchio" href="#/nuova" aria-label="TV Matcher, nuova ricerca">
+      <img src="logo.svg" alt="" width="34" height="34">
+      <span>TV Matcher</span>
+    </a>
+    <nav class="nav" aria-label="Sezioni">
+      <a href="#/nuova" data-nav="nuova">Nuova ricerca</a>
+      <a href="#/esecuzioni" data-nav="esecuzioni">Ricerche</a>
+      <a href="#/guida" data-nav="guida">Guida</a>
+    </nav>
+    <a class="pill-attiva" id="pillAttiva" href="#/esecuzioni" hidden>
+      <span class="puntino"></span><span id="pillTesto">In corso</span>
+    </a>
+  </header>
+  <main id="app" tabindex="-1"></main>
+  <div class="toast-zona" id="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+  <script src="dati.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

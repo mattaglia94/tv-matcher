@@ -25,6 +25,9 @@ class InfoTV:
     hz: int | None = None
     anno: int | None = None
     regola: str = ""          # quale regola ha classificato
+    dolby_vision: bool = False
+    hdr10plus: bool = False
+    hdmi21: bool = False
     note: list = field(default_factory=list)
 
 
@@ -273,7 +276,92 @@ def analizza(testo: str, codice_noto: str = "") -> InfoTV:
         info.tecnologia = tecnologia_testo(T)
     if info.tecnologia == "OLED" and not info.risoluzione:
         info.risoluzione = "4K"
+    info.dolby_vision = "DOLBY VISION" in T
+    info.hdr10plus = bool(re.search(r"HDR\s?10\s?\+|HDR10 PLUS", T))
+    info.hdmi21 = bool(re.search(r"HDMI\s?2\.1", T))
     return info
+
+
+# ----------------------------------------------------------------- parametri
+PARAMETRI_DEFAULT = {
+    "pollici": {"attivo": True, "tolleranza": 0},
+    "stessa_marca": {"attivo": True},
+    "famiglia": {"attivo": True},
+    "tecnologia": {"attivo": True, "equivalenze": [["MINILED", "NEOQLED"]]},
+    "risoluzione": {"attivo": True},
+    "refresh": {"attivo": True},
+    "anno": {"attivo": True, "valore": 2026, "accetta_ignoto": True},
+    "pro": {"attivo": True},
+    "dolby_vision": {"attivo": False},
+    "hdr10plus": {"attivo": False},
+    "hdmi21": {"attivo": False},
+    "max_match": 1,
+    "verifica_url": True,
+}
+
+
+def unisci_parametri(p: dict | None) -> dict:
+    out = {k: (dict(v) if isinstance(v, dict) else v) for k, v in PARAMETRI_DEFAULT.items()}
+    for k, v in (p or {}).items():
+        if isinstance(v, dict) and isinstance(out.get(k), dict):
+            out[k].update(v)
+        else:
+            out[k] = v
+    return out
+
+
+def _tec_equivalenti(a: str, b: str, gruppi) -> bool:
+    if a == b:
+        return True
+    return any(a in g and b in g for g in (gruppi or []))
+
+
+def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
+    """Come confronta() ma ogni criterio si accende/spegne da P (vedi PARAMETRI_DEFAULT).
+    Ritorna (ok, motivo, punteggio): punteggio più basso = più vicino."""
+    if stesso_modello(amz, cand):
+        return False, "stesso modello (escluso)", 0
+    if P["stessa_marca"]["attivo"] and cand.marca != amz.marca:
+        return False, "marca diversa", 0
+    if not cand.marca:
+        return False, "marca non riconosciuta", 0
+    if P["pollici"]["attivo"]:
+        tol = int(P["pollici"].get("tolleranza") or 0)
+        if cand.pollici is None or amz.pollici is None or abs(cand.pollici - amz.pollici) > tol:
+            return False, f"pollici {cand.pollici}", 0
+    # la famiglia ha senso solo nella stessa marca
+    if P["famiglia"]["attivo"] and cand.marca == amz.marca:
+        if not cand.famiglia or cand.famiglia != amz.famiglia:
+            return False, f"famiglia {cand.famiglia or '?'}", 0
+    if P["tecnologia"]["attivo"]:
+        if not cand.tecnologia or not _tec_equivalenti(amz.tecnologia, cand.tecnologia,
+                                                       P["tecnologia"].get("equivalenze")):
+            return False, f"tecnologia {cand.tecnologia or '?'}", 0
+    if P["pro"]["attivo"] and cand.pro != amz.pro:
+        return False, "PRO vs non-PRO", 0
+    if P["risoluzione"]["attivo"] and amz.risoluzione and cand.risoluzione \
+            and amz.risoluzione != cand.risoluzione:
+        return False, f"risoluzione {cand.risoluzione}", 0
+    if P["refresh"]["attivo"] and classe_hz(amz.hz) and classe_hz(cand.hz) \
+            and classe_hz(amz.hz) != classe_hz(cand.hz):
+        return False, f"refresh {cand.hz}Hz", 0
+    # Dolby Vision / HDR10+ / HDMI 2.1 si controllano sulla pagina prodotto (nucleo.elabora_asin)
+    nota = ""
+    if P["anno"]["attivo"]:
+        target = int(P["anno"].get("valore") or 2026)
+        if cand.anno is not None and cand.anno != target:
+            return False, f"anno {cand.anno}", 0
+        if cand.anno is None:
+            if not P["anno"].get("accetta_ignoto", True):
+                return False, "anno non determinabile", 0
+            nota = "anno da verificare"
+    na = re.findall(r"\d+", amz.core[len(str(amz.pollici or "")):]) or ["0"]
+    nb = re.findall(r"\d+", cand.core[len(str(cand.pollici or "")):]) or ["0"]
+    score = abs(int(na[0]) - int(nb[0]))
+    score += 0 if cand.marca == amz.marca else 1000
+    score += 0 if cand.pollici == amz.pollici else 100 * abs((cand.pollici or 0) - (amz.pollici or 0))
+    score += 5 if nota else 0
+    return True, nota or "ok", score
 
 
 # ----------------------------------------------------------------- matching

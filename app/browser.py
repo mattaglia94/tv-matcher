@@ -28,7 +28,11 @@ JS_LINKS = """
     const card = a.closest('article, li, [class*="product" i], [class*="tile" i], [data-test*="product" i]');
     if (card && card.innerText && card.innerText.length < 600) t += ' ' + card.innerText;
     t = t.replace(/\\s+/g, ' ').trim();
-    if (t.length > 12) out.push({href: a.href, testo: t.slice(0, 600)});
+    let im = a.querySelector('img') || (card && card.querySelector('img'));
+    let src = '';
+    if (im) src = im.currentSrc || im.src || im.getAttribute('data-src') || im.getAttribute('data-lazy') || '';
+    if (src.startsWith('data:')) src = im.getAttribute('data-src') || '';
+    if (t.length > 12) out.push({href: a.href, testo: t.slice(0, 600), img: src});
   });
   return out;
 }
@@ -109,7 +113,7 @@ class Browser:
         self._pausa()
         html = self.page.content()
         if "captcha" in html.lower() and "productTitle" not in html:
-            return {"url": url, "titolo": "", "modello": "", "errore": "captcha Amazon"}
+            return {"url": url, "titolo": "", "modello": "", "img": "", "errore": "captcha Amazon"}
         titolo = ""
         try:
             titolo = self.page.locator("#productTitle").first.inner_text(timeout=5000).strip()
@@ -128,7 +132,13 @@ class Browser:
                     break
         except Exception:
             pass
-        return {"url": url, "titolo": titolo, "modello": modello,
+        img = ""
+        try:
+            el = self.page.locator("#landingImage, #imgTagWrapperId img").first
+            img = el.get_attribute("data-old-hires", timeout=2000) or el.get_attribute("src", timeout=2000) or ""
+        except Exception:
+            pass
+        return {"url": url, "titolo": titolo, "modello": modello, "img": img,
                 "errore": "" if titolo else "titolo non trovato"}
 
     # ------------------------------------------------------------ Retailer
@@ -148,17 +158,27 @@ class Browser:
             if h in visti or not h.startswith("http"):
                 continue
             visti.add(h)
-            out.append({"url": urljoin(url, h), "testo": l["testo"]})
+            out.append({"url": urljoin(url, h), "testo": l["testo"],
+                        "img": urljoin(url, l.get("img") or "") if l.get("img") else ""})
         stato = f"HTTP {r.status}" if r.status >= 400 else "ok"
         return url, out, stato
 
     def verifica(self, url):
-        """Apre la pagina prodotto: ritorna (vivo, titolo pagina+testo principale)."""
+        """Apre la pagina prodotto: ritorna (vivo, titolo+h1, testo pagina, immagine)."""
         r = self._vai(url)
         if r is None or r.status >= 400:
-            return False, ""
+            return False, "", "", ""
         try:
             h1 = " ".join(self.page.locator("h1").all_inner_texts()[:2])
         except Exception:
             h1 = ""
-        return True, f"{self.page.title()} {h1}"
+        try:
+            corpo = self.page.evaluate("() => document.body.innerText.slice(0, 30000)")
+        except Exception:
+            corpo = ""
+        try:
+            img = self.page.evaluate("""() => { const m = document.querySelector('meta[property="og:image"]');
+                                       return m ? m.content : ''; }""")
+        except Exception:
+            img = ""
+        return True, f"{self.page.title()} {h1}", corpo, img

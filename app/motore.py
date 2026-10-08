@@ -7,36 +7,8 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
-from regole import analizza, confronta
-from config_default import AMAZON_DOMINIO, RETAILER
-
-# ------------------------------------------------------------ query di ricerca
-def query_ricerca(info):
-    """Testi di ricerca da provare sul retailer (dal più specifico al più largo)."""
-    m, p, f = info.marca.title(), info.pollici, info.famiglia
-    q = []
-    if info.marca == "LG":
-        if f.startswith("LG-OLED"):
-            lettera = {"ENTRY": "B", "MID": "C", "PREMIUM": "G"}.get(f.split("-")[-1], "")
-            q.append(f"LG OLED {p} {lettera}".strip())
-        elif "QNED" in info.core:
-            q.append(f"LG {p} QNED")
-        elif "NANO" in info.core:
-            q.append(f"LG {p} NANO")
-        else:
-            q.append(f"LG {p} UA7")
-    elif info.marca == "HISENSE":
-        serie = re.sub(r"^\d+", "", info.core)[:2]
-        q.append(f"Hisense {p} {serie}{' PRO' if info.pro else ''}")
-    elif info.marca == "SAMSUNG":
-        t = {"NEOQLED": "Neo QLED", "MINILED": "Mini LED", "OLED": "OLED",
-             "QLED": "QLED", "LED": "Crystal UHD"}.get(info.tecnologia, "")
-        q.append(f"Samsung {p} {t}")
-    else:
-        q.append(f"{m} {p} {info.tecnologia.replace('MINILED', 'Mini LED')}".strip())
-    q.append(f"TV {m} {p}")
-    return q
-
+from config_default import RETAILER
+from nucleo import ESITI
 
 # ------------------------------------------------------------ lettura input
 def leggi_input(percorso):
@@ -89,80 +61,32 @@ def leggi_input(percorso):
 # ------------------------------------------------------------ esecuzione
 def esegui(percorso_input, paese, cartella_out, visibile=False, log=print, stop=lambda: False):
     from browser import Browser
+    from nucleo import elabora_asin
     righe, retailer, imp = leggi_input(percorso_input)
     paese = paese.upper()
-    ret = [(n, u) for (p, n, u, att) in retailer if p == paese and att.startswith("S")]
+    ret = [{"nome": n, "url": u} for (p, n, u, att) in retailer if p == paese and att.startswith("S")]
     righe = [r for r in righe if not r["paese"] or r["paese"] == paese]
-    log(f"{len(righe)} ASIN, {len(ret)} retailer per {paese}: {', '.join(n for n, _ in ret)}")
+    log(f"{len(righe)} ASIN, {len(ret)} retailer per {paese}: {', '.join(r['nome'] for r in ret)}")
     if not righe or not ret:
         raise RuntimeError("Nessun ASIN o nessun retailer attivo per il paese scelto.")
-
+    parametri = {"anno": {"attivo": True, "valore": imp["anno"], "accetta_ignoto": imp["anno_ignoto"]},
+                 "verifica_url": imp["verifica"]}
     br = Browser(visibile=visibile, log=log)
-    risultati, dettaglio = [], []
+    risultati = []
     try:
         for i, r in enumerate(righe, 1):
             if stop():
                 break
             log(f"[{i}/{len(righe)}] {r['asin']}")
-            nota_amz = ""
-            if not r["nome"] or not r["modello"]:
-                a = br.amazon(r["asin"], AMAZON_DOMINIO.get(paese, "amazon.it"))
-                r["nome"] = r["nome"] or a["titolo"]
-                r["modello"] = r["modello"] or a["modello"]
-                nota_amz = a["errore"]
-            info = analizza(r["nome"], r["modello"])
-            r["info"] = info
-            r["modello_out"] = info.codice or r["modello"]
-            log(f"   Amazon: {info.marca} {info.codice} {info.pollici}\" {info.famiglia} "
-                f"{'PRO ' if info.pro else ''}{nota_amz}")
-            dettaglio.append([r["asin"], "Amazon", r["modello_out"], info.famiglia, info.pollici,
-                              info.anno, "", nota_amz or "riferimento", ""])
-            r["match"] = {}
-            if not info.marca or not info.pollici:
-                log("   ⚠ modello Amazon non riconosciuto: compila 'Amazon Model' nel file input")
-                continue
-            for nome_r, url_t in ret:
-                if stop():
-                    break
-                validi = {}
-                for q in query_ricerca(info):
-                    url_s, links, stato = br.cerca(url_t, q)
-                    if stato != "ok":
-                        dettaglio.append([r["asin"], nome_r, "", "", "", "", url_s, f"ricerca: {stato}", q])
-                    for l in links:
-                        c = analizza(l["testo"])
-                        if c.marca != info.marca or c.pollici != info.pollici:
-                            continue
-                        ok, motivo, score = confronta(info, c, imp["anno"], imp["anno_ignoto"])
-                        dettaglio.append([r["asin"], nome_r, c.codice, c.famiglia, c.pollici, c.anno,
-                                          l["url"], ("VALIDO " if ok else "scartato: ") + motivo, q])
-                        if ok and l["url"] not in validi:
-                            validi[l["url"]] = (score, c)
-                    if validi:
-                        break
-                scelta = None
-                for url, (score, c) in sorted(validi.items(), key=lambda x: x[1][0]):
-                    if imp["verifica"]:
-                        vivo, testo_pag = br.verifica(url)
-                        if not vivo:
-                            dettaglio.append([r["asin"], nome_r, c.codice, "", "", "", url, "URL non attivo", ""])
-                            continue
-                        cp = analizza(testo_pag)
-                        if cp.codice and cp.pollici and cp.pollici != info.pollici:
-                            dettaglio.append([r["asin"], nome_r, c.codice, "", "", "", url,
-                                              "pagina prodotto non coerente", ""])
-                            continue
-                    scelta = (c.codice, url)
-                    break
-                r["match"][nome_r] = scelta
-                log(f"   {nome_r}: {scelta[0] if scelta else '—'}")
+            r["paese"] = paese
+            risultati.append(elabora_asin(br, r, ret, parametri, log=log, stop=stop))
     finally:
         br.chiudi()
-    return scrivi_output(righe, [n for n, _ in ret], dettaglio, paese, cartella_out)
+    return scrivi_output(risultati, [r["nome"] for r in ret], paese, cartella_out)
 
 
 # ------------------------------------------------------------ output
-def scrivi_output(righe, nomi_ret, dettaglio, paese, cartella_out):
+def scrivi_output(risultati, nomi_ret, paese, cartella_out):
     wb = Workbook()
     ws = wb.active
     ws.title = f"Matching {paese}"
@@ -182,11 +106,17 @@ def scrivi_output(righe, nomi_ret, dettaglio, paese, cartella_out):
             cell.font = bianco if cell.row == 1 else Font(bold=True)
             cell.fill = blu if cell.row == 1 else azz
             cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-    for r in righe:
-        riga = [r["asin"], r["nome"], r.get("modello_out", "")]
+    for r in risultati:
+        riga = [r["asin"], r["amazon"].get("titolo", ""), r["amazon"].get("modello", "")]
         for n in nomi_ret:
-            m = (r.get("match") or {}).get(n)
-            riga += [m[0], m[1]] if m else ["", ""]
+            m = (r.get("match") or {}).get(n) or []
+            esito = (r.get("esito") or {}).get(n)
+            if m:
+                riga += [" / ".join(x["modello"] for x in m), " ".join(x["url"] for x in m)]
+            elif esito and esito != "trovato":
+                riga += [ESITI[esito], ""]
+            else:
+                riga += ["", ""]
         ws.append(riga)
         rr = ws.max_row
         for i, n in enumerate(nomi_ret):
@@ -206,8 +136,13 @@ def scrivi_output(righe, nomi_ret, dettaglio, paese, cartella_out):
     wd.append(["ASIN", "Fonte", "Modello trovato", "Famiglia", "Pollici", "Anno", "URL", "Esito", "Ricerca"])
     for c in wd[1]:
         c.font, c.fill = bianco, blu
-    for d in dettaglio:
-        wd.append(d)
+    for r in risultati:
+        a = r["amazon"]
+        wd.append([r["asin"], "Amazon", a.get("modello"), a.get("famiglia"), a.get("pollici"), a.get("anno"),
+                   a.get("url"), r.get("errore") or "riferimento", ""])
+        for d in r["dettaglio"]:
+            wd.append([r["asin"], d.get("retailer"), d.get("modello", ""), d.get("famiglia", ""), d.get("pollici", ""),
+                       d.get("anno", ""), d.get("url", ""), d.get("esito", ""), d.get("ricerca", "")])
     wd.auto_filter.ref = wd.dimensions
     for col, w in zip("ABCDEFGHI", (13, 16, 18, 30, 8, 7, 60, 34, 26)):
         wd.column_dimensions[col].width = w

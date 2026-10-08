@@ -1,0 +1,94 @@
+// Dati predefiniti del sito: marketplace, parametri di somiglianza, regole di famiglia.
+window.TVM = {
+  paesi: [
+    { codice: "IT", nome: "Italia", bandiera: "🇮🇹", amazon: "amazon.it" },
+    { codice: "DE", nome: "Germania", bandiera: "🇩🇪", amazon: "amazon.de" },
+    { codice: "FR", nome: "Francia", bandiera: "🇫🇷", amazon: "amazon.fr" },
+    { codice: "ES", nome: "Spagna", bandiera: "🇪🇸", amazon: "amazon.es" },
+    { codice: "UK", nome: "Regno Unito", bandiera: "🇬🇧", amazon: "amazon.co.uk" },
+  ],
+
+  retailer: [
+    ["IT", "MediaWorld", "https://www.mediaworld.it/it/search.html?query={q}"],
+    ["IT", "Euronics", "https://www.euronics.it/search?q={q}"],
+    ["IT", "Unieuro", "https://www.unieuro.it/online/?q={q}"],
+    ["IT", "Expert", "https://www.expert.it/search?q={q}"],
+    ["ES", "MediaMarkt-ES", "https://www.mediamarkt.es/es/search.html?query={q}"],
+    ["ES", "El Corte Inglés", "https://www.elcorteingles.es/search-nwx/1/?s={q}"],
+    ["ES", "Carrefour", "https://www.carrefour.es/?q={q}"],
+    ["ES", "PcComponentes", "https://www.pccomponentes.com/search/?query={q}"],
+    ["ES", "Alcampo", "https://www.compraonline.alcampo.es/search?q={q}"],
+    ["DE", "Euronics-DE", "https://www.euronics.de/search?sSearch={q}"],
+    ["DE", "MediaMarkt", "https://www.mediamarkt.de/de/search.html?query={q}"],
+    ["DE", "Saturn", "https://www.saturn.de/de/search.html?query={q}"],
+    ["DE", "Otto", "https://www.otto.de/suche/{q}/"],
+    ["DE", "Joybuy-DE", "https://www.joybuy.de/search?keyword={q}"],
+    ["UK", "AO.com", "https://ao.com/search?search={q}"],
+    ["UK", "Currys", "https://www.currys.co.uk/search?q={q}"],
+    ["UK", "Very", "https://www.very.co.uk/e/q/{q}.end"],
+    ["UK", "Argos", "https://www.argos.co.uk/search/{q}/"],
+    ["UK", "John Lewis", "https://www.johnlewis.com/search?search-term={q}"],
+    ["UK", "Joybuy-UK", "https://www.joybuy.co.uk/search?keyword={q}"],
+    ["FR", "Boulanger", "https://www.boulanger.com/resultats?tr={q}"],
+    ["FR", "Conforama", "https://www.conforama.fr/recherche-conforama/{q}"],
+    ["FR", "Carrefour-FR", "https://www.carrefour.fr/s?q={q}"],
+    ["FR", "E.Leclerc", "https://www.e.leclerc/recherche?q={q}"],
+    ["FR", "Auchan", "https://www.auchan.fr/recherche?text={q}"],
+    ["FR", "Darty", "https://www.darty.com/nav/recherche?text={q}"],
+    ["FR", "Cdiscount", "https://www.cdiscount.com/search/10/{q}.html"],
+    ["FR", "Fnac", "https://www.fnac.com/SearchResult/ResultList.aspx?Search={q}"],
+    ["FR", "Joybuy-FR", "https://www.joybuy.fr/search?keyword={q}"],
+  ].map(([paese, nome, url]) => ({ paese, nome, url, attivo: true })),
+
+  // Parametri di somiglianza: stessa struttura letta dal motore (app/regole.py)
+  parametriDefault: {
+    pollici: { attivo: true, tolleranza: 0 },
+    stessa_marca: { attivo: true },
+    famiglia: { attivo: true },
+    tecnologia: { attivo: true, equivalenze: [["MINILED", "NEOQLED"]] },
+    risoluzione: { attivo: true },
+    refresh: { attivo: true },
+    anno: { attivo: true, valore: 2026, accetta_ignoto: true },
+    pro: { attivo: true },
+    dolby_vision: { attivo: false },
+    hdr10plus: { attivo: false },
+    hdmi21: { attivo: false },
+    max_match: 1,
+    verifica_url: true,
+  },
+
+  // Descrizione dei parametri per la schermata "Somiglianza"
+  parametriInfo: [
+    { gruppo: "Schermo", voci: [
+      { chiave: "pollici", titolo: "Pollici", testo: "Il modello simile deve avere la stessa diagonale. Con la tolleranza accetti anche diagonali vicine.", controllo: "tolleranza" },
+      { chiave: "tecnologia", titolo: "Tecnologia del pannello", testo: "LED, QLED, Mini-LED, OLED. Le equivalenze rendono intercambiabili due tecnologie (es. Neo QLED Samsung = Mini-LED).", controllo: "equivalenze" },
+      { chiave: "risoluzione", titolo: "Risoluzione", testo: "HD, Full HD, 4K, 8K devono coincidere quando sono indicati su entrambi i prodotti." },
+      { chiave: "refresh", titolo: "Frequenza di aggiornamento", testo: "Stessa classe: 50/60 Hz, 100/120 Hz, 144 Hz e oltre." },
+    ]},
+    { gruppo: "Modello", voci: [
+      { chiave: "stessa_marca", titolo: "Stessa marca", testo: "Cerca solo modelli della stessa marca dell'ASIN. Spegnilo per trovare alternative di altre marche con la stessa tecnologia." },
+      { chiave: "famiglia", titolo: "Stessa famiglia e fascia", testo: "Usa le regole di serie di LG, Hisense e Samsung (es. NANO = UHD Premium, E7 = QLED Entry). Per le altre marche confronta la serie del codice.", controllo: "regole" },
+      { chiave: "pro", titolo: "Separazione PRO", testo: "Un modello PRO si confronta solo con un altro PRO." },
+      { chiave: "anno", titolo: "Anno di lancio", testo: "Solo modelli dell'anno indicato. L'anno si ricava dal codice (Samsung: H = 2026, LG OLED: C6 = 2026) o dal titolo.", controllo: "anno" },
+    ]},
+    { gruppo: "Caratteristiche", nota: "Si leggono dalla pagina prodotto: servono la verifica pagina accesa e qualche secondo in più per prodotto.", voci: [
+      { chiave: "dolby_vision", titolo: "Dolby Vision", testo: "Se l'ASIN Amazon lo supporta, anche il modello simile deve supportarlo." },
+      { chiave: "hdr10plus", titolo: "HDR10+", testo: "Se l'ASIN Amazon lo supporta, anche il modello simile deve supportarlo." },
+      { chiave: "hdmi21", titolo: "HDMI 2.1", testo: "Se l'ASIN Amazon ha HDMI 2.1, anche il modello simile deve averlo." },
+    ]},
+  ],
+
+  tecnologie: ["LED", "QLED", "MINILED", "NEOQLED", "OLED"],
+  nomeTecnologia: { LED: "LED", QLED: "QLED", MINILED: "Mini-LED", NEOQLED: "Neo QLED", OLED: "OLED" },
+
+  regole: {
+    LG: [["UA7", "UHD Entry"], ["NANO", "UHD Premium"], ["OLEDB", "OLED Entry"], ["OLEDC", "OLED Mid"], ["OLEDG", "OLED Premium"],
+         ["QNED80 / 81 / 82 / 84", "QLED Entry"], ["QNED85 / 86", "Mini-LED Entry"], ["QNED92 / 93", "Mini-LED Premium"]],
+    Hisense: [["A4", "LED HD/FHD"], ["A5", "QLED HD/FHD"], ["E6 / A6", "LED 4K Entry"], ["E7", "QLED Entry 1"], ["A7", "QLED Entry 2"],
+              ["E7 PRO", "QLED Premium"], ["E8", "Mini-LED Super Entry"], ["U7", "Mini-LED Entry"], ["U7 PRO", "Mini-LED Mid"], ["U8", "Mini-LED Premium"]],
+    Samsung: [["U6 / U7", "UHD Super Entry"], ["U8", "UHD Entry"], ["QN <80", "Neo QLED 4K Super Entry"], ["QN 80–89", "Neo QLED 4K Entry"],
+              ["QN 90–94", "Neo QLED 4K Mid"], ["QN >94", "Neo QLED 4K Premium"], ["QN 3 cifre", "Neo QLED 8K (Entry <800, Mid 800–949, Premium 990)"],
+              ["M + numero", "Mini-LED (stesse fasce di QN)"], ["S <90", "OLED Entry"], ["S 90–93", "OLED Mid"], ["S 94–98", "OLED Premium"],
+              ["S >98", "OLED Super Premium"], ["Q6 / Q7", "QLED 4K Entry"], ["Q8 / Q9", "QLED 4K Premium"]],
+  },
+};
