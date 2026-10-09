@@ -28,7 +28,7 @@ POLLICI = [43, 50, 55, 65, 75]
 ESCLUDI = re.compile(r"halterung|staffa|supporto|soporte|support mural|wall mount|bracket|telecomando|fernbedienung|"
                      r"remote|télécommande|mando|cavo|kabel|cable|câble|cover|custodia|stick|soundbar|barra de sonido|"
                      r"protector|schutz|\bmonitor\b|proiettore|beamer|projector|ricambio|ersatz|replacement|\bstand\b|piedistallo|"
-                     r"standfuß|\bpied\b|\bpieds\b", re.I)
+                     r"standfuß|\bpied\b|\bpieds\b|tira de led|strip led|led strip|barre|bande|rétroéclairage|retroillumin|backlight|hintergrundbeleucht|retroilumin", re.I)
 
 JS_RISULTATI = r"""
 () => [...document.querySelectorAll('div[data-component-type="s-search-result"][data-asin]')].map(d => ({

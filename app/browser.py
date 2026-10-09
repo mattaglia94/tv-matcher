@@ -352,9 +352,12 @@ class Browser:
         visti, out = set(), []
         for l in links:
             h = l["href"].split("#")[0]
-            if h in visti or not h.startswith("http"):
-                continue
-            visti.add(h)
+            base = h.split("?")[0].rstrip("/")
+            if not re.search(r"\d{5,}|\.html$", base):  # il prodotto potrebbe essere nei parametri: chiave completa
+                base = h
+            if base in visti or not h.startswith("http") or re.search(r"\.(pdf|jpe?g|png|webp)$", base, re.I):
+                continue  # stessa pagina con parametri diversi, o allegati (etichetta energetica, foto)
+            visti.add(base)
             out.append({"url": urljoin(url, h), "testo": l["testo"],
                         "img": urljoin(url, l.get("img") or "") if l.get("img") else ""})
         stato = f"HTTP {r.status}" if r.status >= 400 else "ok"

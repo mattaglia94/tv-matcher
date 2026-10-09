@@ -126,11 +126,11 @@ def trova_risoluzione(t: str) -> str:
     T = _norm(t)
     if re.search(r"\b8K\b", T):
         return "8K"
-    if re.search(r"\b(4K|UHD|ULTRA HD|2160P)\b", T):
+    if re.search(r"\b(4K|UHD|ULTRA[\s-]?HD|2160P|3840\s?X\s?2160)\b", T):
         return "4K"
-    if re.search(r"\b(FULL HD|FHD|1080P)\b", T):
+    if re.search(r"\b(FULL[\s-]?HD|FHD|1080P|1080\s?PIXEL|1920\s?X\s?1080)", T):
         return "FHD"
-    if re.search(r"\b(HD READY|HD|720P)\b", T):
+    if re.search(r"\b(HD[\s-]?READY|720P|1366\s?X\s?768)\b", T) or re.search(r"(?<!MPEG4 )(?<!MPEG-4 )\bHD\b(?![+-])", T):
         return "HD"
     return ""
 
@@ -171,6 +171,9 @@ def trova_anno_testo(t: str) -> int | None:
     return int(m[0]) if m else None
 
 
+_RANGO_TEC = {"LED": 1, "QLED": 2, "MINILED": 3, "NEOQLED": 3, "OLED": 4}
+
+
 def tecnologia_testo(t: str) -> str:
     T = _norm(t)
     if "OLED" in T and "QLED" not in T:
@@ -181,7 +184,7 @@ def tecnologia_testo(t: str) -> str:
         return "NEOQLED"
     if "QLED" in T or "QNED" in T:
         return "QLED"
-    if "LED" in T or "LCD" in T:
+    if "LED" in T or "LCD" in T or "CRYSTAL UHD" in T:
         return "LED"
     return ""
 
@@ -194,9 +197,10 @@ _LG_FAM = [  # (regex sul codice, tecnologia, famiglia)
     (r"QNED9[23]", "MINILED", "LG-MINILED-PREMIUM"),
     (r"QNED8[56]", "MINILED", "LG-MINILED-ENTRY"),
     (r"QNED8[0124]", "QLED", "LG-QLED-ENTRY"),
-    (r"QNED7", "MINILED", "LG-MINILED-ENTRY"),
+    (r"QNED7", "QLED", "LG-QLED-ENTRY"),
     (r"NANO|NU\d", "LED", "LG-UHD-PREMIUM"),
     (r"UA7", "LED", "LG-UHD-ENTRY"),
+    (r"U[A-Z]\d", "LED", "LG-UHD-ENTRY"),
 ]
 
 
@@ -212,7 +216,7 @@ def _lg(T: str, info: InfoTV):
         anno_cifra = int(m.group(3))
         info.anno = 2020 + anno_cifra if anno_cifra <= 9 else None
     else:
-        m = re.search(r"\b(\d{2,3})((?:QNED|NANO|NU|UA|UT|UR|UQ)\d{1,2})([A-Z0-9]*)", T)
+        m = re.search(r"\b(\d{2,3})((?:QNED|NANO|NU|UA|UT|UR|UQ|U[A-Z])\d{1,2})([A-Z0-9]*)", T)
         if not m:
             return False
         info.codice = m.group(0)
@@ -286,12 +290,19 @@ def _samsung_fascia(n: int, tre_cifre: bool):
 def _samsung(T: str, info: InfoTV):
     # QE65QN90FATXZT, UE55U8000F, QE65S90F, QE55Q7F, TQ65QN80H
     m = re.search(r"\b(?:QE|UE|GQ|GU|TQ|TU|QN|MRE|MR)?(\d{2,3})(QN|LS|Q|S|U|M|R)(\d{1,4})([A-Z]?)([A-Z0-9]*)", T)
-    if not m:
-        return False
+    if m:
+        pol, lett, num, anno_l = m.group(1), m.group(2), m.group(3), m.group(4)
+        info.pollici = int(pol)
+    else:
+        # codice senza pollici, es. "Crystal UHD U8075F", "DU7179", "The Frame LS03F", "Q7F5"
+        m = re.search(r"\bD?(QN|LS|Q|S|U)(\d{1,4})([A-H])(\d{0,3})\b", T)
+        if not m or not info.pollici or (m.group(1) == "S" and len(m.group(2)) < 2):
+            return False
+        pol, lett, num, anno_l = str(info.pollici), m.group(1), m.group(2), m.group(3)
+        if lett == "U" and len(num) == 4 and m.group(0).startswith("D"):
+            anno_l = "D"  # DU7179 = gamma 2024
     info.codice = m.group(0)
-    info.pollici = int(m.group(1))
-    lett, num, anno_l = m.group(2), m.group(3), m.group(4)
-    info.core = f"{m.group(1)}{lett}{num}{anno_l}"
+    info.core = f"{pol}{lett}{num}{anno_l}"
     info.anno = SAMSUNG_ANNO.get(anno_l)
     n = int(num)
     tre = len(num) == 3
@@ -595,8 +606,15 @@ def analizza(testo: str, codice_noto: str = "", marca_nota: str = "", prezzo: fl
         info.pollici = pollici_testo
     if info.anno is None:
         info.anno = anno_t
+    t_tit = tecnologia_testo(T)
     if not info.tecnologia:
-        info.tecnologia = tecnologia_testo(T)
+        info.tecnologia = t_tit
+    elif _RANGO_TEC.get(t_tit, 0) > _RANGO_TEC.get(info.tecnologia, 0) and info.tecnologia != "OLED" and t_tit != "OLED":
+        # il titolo dichiara una tecnologia superiore a quella del catalogo (es. "QLED" su una serie registrata LED)
+        info.note.append(f"tecnologia dal titolo {t_tit} (catalogo {info.tecnologia})")
+        info.tecnologia = t_tit
+    if info.risoluzione == "HD" and info.pollici and info.pollici >= 43 and not re.search(r"HD[\s-]?READY|720P|1366", T):
+        info.risoluzione = ""  # "HD Smart TV" su un 55": quasi sempre è un 4K, lo dirà la scheda
     if not info.fascia and info.famiglia:
         info.fascia = fascia_da_famiglia(info.famiglia)
         info.fascia_fonte = "regole" if info.fascia else ""
@@ -612,8 +630,8 @@ def analizza(testo: str, codice_noto: str = "", marca_nota: str = "", prezzo: fl
         info.famiglia = info.famiglia if info.famiglia and not info.famiglia.endswith("-") else f"{info.marca}-{info.tecnologia}-{info.fascia}"
     if not info.risoluzione and info.pollici and info.pollici <= 32:
         info.risoluzione = "HD"  # sotto i 32" non esistono TV 4K: titolo senza risoluzione = HD/Full HD
-    if info.tecnologia == "OLED" and not info.risoluzione:
-        info.risoluzione = "4K"
+    if not info.risoluzione and (info.tecnologia == "OLED" or info.pollici and info.pollici >= 50):
+        info.risoluzione = "4K"  # sopra i 50" (e negli OLED) il Full HD non si vende più: titolo muto = 4K
     info.dolby_vision = "DOLBY VISION" in T
     info.hdr10plus = bool(re.search(r"HDR\s?10\s?\+|HDR10 PLUS", T))
     info.hdmi21 = bool(re.search(r"HDMI\s?2\.1", T))
@@ -679,18 +697,20 @@ def leggi_scheda(scheda: dict | None) -> dict:
     v = _voce(scheda, "risoluzione")
     if v:
         V = _norm(v)
-        r = ("8K" if re.search(r"7680|8K", V) else "4K" if re.search(r"3840|4K|UHD|2160", V)
-             else "FHD" if re.search(r"1920|FULL HD|FHD|1080", V) else "HD" if re.search(r"1366|1280|HD|720", V) else "")
+        r = ("8K" if re.search(r"7680|8K", V) else "4K" if re.search(r"3840|4K|UHD|ULTRA[\s-]?HD|2160", V)
+             else "FHD" if re.search(r"1920|FULL[\s-]?HD|FHD|1080", V) else "HD" if re.search(r"1366|1280|HD|720", V) else "")
         if r:
             out["risoluzione"] = r
-    v = _voce(scheda, "tecnologia")
-    if v and tecnologia_testo(v):
-        out["tecnologia"] = tecnologia_testo(v)
+    # tecnologia: la voce generica ("LED") e quelle sulla retroilluminazione ("Mini LED"): vale la più precisa
+    cand = [tecnologia_testo(v) for v in [_voce(scheda, "tecnologia")] + [
+        v for k, v in scheda.items() if re.search(r"retroillumin|backlight|hintergrundbeleucht|rétroéclairage|retroilumin|"
+                                                  r"tipo di pannello|panel type|paneltyp|type de dalle|tipo de panel", k)] if v]
+    cand = [c for c in cand if c]
+    if cand:
+        out["tecnologia"] = max(cand, key=lambda c: _RANGO_TEC.get(c, 0))
     v = _voce(scheda, "hz")
-    if v:
-        nums = [int(x) for x in re.findall(r"\b(\d{2,3})\s*HZ", _norm(v)) if 50 <= int(x) <= 300]
-        if nums:
-            out["hz"] = max(nums)
+    if v and trova_hz(v if re.search(r"HZ", v, re.I) else f"{v} Hz"):
+        out["hz"] = trova_hz(v if re.search(r"HZ", v, re.I) else f"{v} Hz")
     for k in ("marca", "modello"):
         v = _voce(scheda, k)
         if v:
@@ -703,13 +723,16 @@ def leggi_scheda(scheda: dict | None) -> dict:
 
 
 def arricchisci(info: InfoTV, dati: dict) -> InfoTV:
-    """I dati della scheda tecnica prevalgono su quelli dedotti dal titolo (anno, risoluzione, frequenza);
+    """I dati della scheda tecnica prevalgono su quelli dedotti dal titolo (risoluzione, frequenza; l'anno solo se il
+    titolo non lo dice: nelle schede è spesso sbagliato);
     pollici e tecnologia la integrano solo se mancano (la tecnologia del Catalogo resta la più stabile)."""
     if not dati:
         return info
-    for k in ("anno", "risoluzione", "hz"):
+    for k in ("risoluzione", "hz"):
         if dati.get(k):
             setattr(info, k, dati[k])
+    if dati.get("anno") and not trova_anno_testo(_norm(info.testo)):  # l'anno nel titolo vale più della scheda
+        info.anno = dati["anno"]
     if dati.get("pollici") and not info.pollici:
         info.pollici = dati["pollici"]
     if dati.get("tecnologia") and not info.tecnologia:

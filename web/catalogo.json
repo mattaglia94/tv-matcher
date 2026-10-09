@@ -311,9 +311,9 @@
     },
     {
      "serie": "QNED7",
-     "tecnologia": "MINILED",
+     "tecnologia": "QLED",
      "fascia": "ENTRY",
-     "descrizione": "QNED evo Mini LED 70",
+     "descrizione": "QNED evo QNED 70",
      "famiglia": "MINILED-ENTRY"
     },
     {
@@ -614,6 +614,18 @@
      "descrizione": "T8 QLED"
     },
     {
+     "serie": "Q6C",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "Q6C QD-Mini LED (2025)"
+    },
+    {
+     "serie": "Q7C",
+     "tecnologia": "MINILED",
+     "fascia": "MID",
+     "descrizione": "Q7C QD-Mini LED (2025)"
+    },
+    {
      "serie": "Q6",
      "tecnologia": "QLED",
      "fascia": "ENTRY",
@@ -702,6 +714,12 @@
      "tecnologia": "QLED",
      "fascia": "MID",
      "descrizione": "A400 / NXTVISION (design)"
+    },
+    {
+     "serie": "PF",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "PF650 Fire TV 4K"
     }
    ]
   },

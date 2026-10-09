@@ -339,15 +339,20 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
             hz_pag = sp.get("hz")
             if P["refresh"]["attivo"] and info.hz and hz_pag and classe_hz(hz_pag) != classe_hz(info.hz):
                 mancanti.append(f"frequenza {info.hz} Hz (pagina: {hz_pag} Hz)")
-            if P["tecnologia"]["attivo"] and sp.get("tecnologia") and c.fascia_fonte != "catalogo" and info.tecnologia and \
-                    sp["tecnologia"] != info.tecnologia and not _tec_equivalenti(info.tecnologia, sp["tecnologia"],
-                                                                                P["tecnologia"].get("equivalenze")):
-                mancanti.append(f"tecnologia {info.tecnologia} (pagina: {sp['tecnologia']})")
+            # la voce "tecnologia" delle schede è spesso generica o sbagliata (un QLED è anche "LED", un LED a volte
+            # "Mini LED"): si scarta solo se una è OLED e l'altra no, oppure se anche il titolo della pagina la contraddice
+            tec_pag = sp.get("tecnologia")
+            if tec_pag and cp.tecnologia and cp.tecnologia != tec_pag and "OLED" not in (tec_pag, cp.tecnologia):
+                tec_pag = cp.tecnologia
+            if P["tecnologia"]["attivo"] and tec_pag and c.fascia_fonte != "catalogo" and info.tecnologia and \
+                    tec_pag != info.tecnologia and not _tec_equivalenti(info.tecnologia, tec_pag, P["tecnologia"].get("equivalenze")) and \
+                    ("OLED" in (tec_pag, info.tecnologia) or (cp.tecnologia and cp.tecnologia != info.tecnologia)):
+                mancanti.append(f"tecnologia {info.tecnologia} (pagina: {tec_pag})")
             if mancanti:
                 out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
                                          "esito": "scartato: " + ", ".join(mancanti)})
                 continue
-            anno_pag = sp.get("anno") or cp.anno or c.anno
+            anno_pag = cp.anno or sp.get("anno") or c.anno  # l'anno scritto nel titolo è più affidabile della scheda
             # anno su idealo solo se serve davvero (Stretto: un anno sconosciuto escluderebbe il modello)
             if not anno_pag and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True) and c.codice:
                 anno_pag = anno_da_idealo(br, c, paese, log)

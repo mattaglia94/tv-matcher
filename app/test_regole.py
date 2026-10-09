@@ -27,7 +27,7 @@ RICONOSCIMENTO = [
     ("TCL 65C7L SQD Mini LED", ("TCL", "MINILED", "MID")),
     ("TCL 55C655 QLED", ("TCL", "QLED", "ENTRY")),
     ("TCL 75T6C QLED 4K 2026", ("TCL", "QLED", "ENTRY")),
-    ("TCL 43S5L Smart TV QLED FHD 43", ("TCL", "LED", "BASE")),
+    ("TCL 43S5L Smart TV QLED FHD 43", ("TCL", "QLED", "BASE")),
     ("Hisense 75E7Q 4K QLED 2025", ("HISENSE", "QLED", "ENTRY")),
     ("Hisense 65E7NQ PRO", ("HISENSE", "QLED", "MID")),
     ("Hisense 65U7Q PRO Mini LED", ("HISENSE", "MINILED", "PREMIUM")),
@@ -222,7 +222,40 @@ def main():
             print(f"✗ somiglianza ({modo}): {amz_t[:45]} ↔ {cand_t[:45]}\n    atteso {'simile' if atteso else 'scartato'}, motivo: {motivo}")
     tot = len(RICONOSCIMENTO) + len(SOMIGLIANZA) + len(PAGINE) + len(CASI_ASIN) + len(SCHEDE)
     print(f"{tot - errori}/{tot} casi corretti")
+    errori += banco_amazon()
     sys.exit(1 if errori else 0)
+
+
+# Banco Amazon: ~200 TV reali (IT/DE/FR/ES/UK, 40-75", brand principali) raccolte da app/banco.py.
+# Ciò che il motore capisce dal solo titolo, confrontato con la scheda tecnica Amazon. Soglie minime: non si torna indietro.
+SOGLIE_BANCO = {"marca": 99, "pollici": 100, "risoluzione": 97, "tecnologia": 90}
+
+
+def banco_amazon():
+    import json
+    import os
+    from regole import leggi_prezzo
+    f = os.path.join(os.path.dirname(os.path.abspath(__file__)), "banco_campioni.json")
+    if not os.path.exists(f):
+        return 0
+    righe = json.load(open(f, encoding="utf-8"))
+    ok, tot = {k: 0 for k in SOGLIE_BANCO}, {k: 0 for k in SOGLIE_BANCO}
+    for r in righe:
+        i = analizza(r["titolo"], prezzo=leggi_prezzo(r.get("prezzo") or ""))
+        for k in SOGLIE_BANCO:
+            vero = r["scheda"].get(k)
+            if not vero:
+                continue
+            tot[k] += 1
+            mio = getattr(i, k)
+            ok[k] += mio == vero or (k == "tecnologia" and {mio, vero} <= {"MINILED", "NEOQLED"})
+    errori = 0
+    for k, soglia in SOGLIE_BANCO.items():
+        perc = 100 * ok[k] / (tot[k] or 1)
+        segno = "✓" if perc >= soglia else "✗"
+        errori += perc < soglia
+        print(f"{segno} banco Amazon {k}: {perc:.0f}% su {tot[k]} TV (minimo {soglia}%)")
+    return errori
 
 
 if __name__ == "__main__":
