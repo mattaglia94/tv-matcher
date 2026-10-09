@@ -510,20 +510,23 @@ def stima_fascia(prezzo: float | None, pollici: int | None, tecnologia: str = ""
 
 
 def leggi_prezzo(t: str) -> float | None:
-    m = re.search(r"(?<![\d.,])(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})?|\d+(?:\.\d{2})?)\s?[€£]|[€£]\s?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)", t or "")
-    if not m:
-        return None
-    x = (m.group(1) or m.group(2)).replace(" ", "")
-    if re.search(r",\d{2}$", x):
-        x = x.replace(".", "").replace(",", ".")
-    elif re.search(r"\.\d{2}$", x):  # formato inglese 1,099.00
-        x = x.replace(",", "")
-    else:
-        x = x.replace(",", "").replace(".", "") if re.search(r"[.,]\d{3}$", x) else x
-    try:
-        return float(x)
-    except ValueError:
-        return None
+    """Primo prezzo in € o £ del testo ("1.299,00 €", "€ 549", "£1,099.00"). Un anno seguito da € ("2025 € 399")
+    non è un prezzo."""
+    for m in re.finditer(r"(?<![\d.,])(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})?|\d+(?:\.\d{2})?)\s?[€£]|[€£]\s?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?|\d+)", t or ""):
+        x = (m.group(1) or m.group(2)).replace(" ", "")
+        if re.fullmatch(r"20[1-3]\d", x):
+            continue
+        if re.search(r",\d{2}$", x):
+            x = x.replace(".", "").replace(",", ".")
+        elif re.search(r"\.\d{2}$", x):  # formato inglese 1,099.00
+            x = x.replace(",", "")
+        else:
+            x = x.replace(",", "").replace(".", "") if re.search(r"[.,]\d{3}$", x) else x
+        try:
+            return float(x)
+        except ValueError:
+            continue
+    return None
 
 
 # fascia comune per le marche con regole proprie (LG, Hisense, Samsung): ricavata dalla famiglia
