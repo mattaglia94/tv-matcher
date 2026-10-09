@@ -610,7 +610,14 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
     score += 100 * abs((cand.pollici or 0) - (amz.pollici or 0))
     if P["famiglia"]["attivo"]:
         if not concorrente:
-            if not cand.famiglia or cand.famiglia != amz.famiglia:
+            # stessa famiglia = alternativa ideale; famiglia diversa ma stessa fascia = simile, segnalato.
+            # Così una piccola differenza di classificazione non fa perdere un modello ovviamente simile.
+            if cand.famiglia and cand.famiglia == amz.famiglia:
+                pass
+            elif amz.fascia and cand.fascia == amz.fascia:
+                note.append(f"altra serie, stessa fascia {cand.fascia.lower()}")
+                score += 30
+            else:
                 return False, f"famiglia {cand.famiglia or '?'}", 0
         elif amz.fascia:
             if not cand.fascia:
