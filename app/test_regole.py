@@ -54,6 +54,8 @@ SOMIGLIANZA = [
     ("XIAOMI TV F Pro 32 2025, 32 pollici (81 cm), QLED, Smart TV, Fire TV, HD",
      "Xiaomi TV A 32 TV LED piatto 32 HD", "stessa_marca", False),       # non PRO, LED
     ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED", "Xiaomi TV A Pro 75 2026 QLED 4K", "stessa_marca", True),
+    ("XIAOMI TV F 32 2025, 32 pollici (81 cm), HD, Smart TV, Fire TV", "Xiaomi TV A 32 2026", "stessa_marca", True),
+    ("XIAOMI TV F 50, 50 pollici (127 cm), 4K UHD, Smart TV, Fire TV", "Xiaomi TV A 50 2026 4K", "stessa_marca", True),
     ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED", "XIAOMI TV F Pro 75 QLED", "stessa_marca", False),  # stesso modello
     ("Hisense 55E7Q 4K QLED 2026", "Hisense 55A7Q QLED 4K 2026", "stessa_marca", True),
     ("Hisense 55E7Q 4K QLED 2026", "Hisense 55U7Q Mini LED 2026", "stessa_marca", False),  # altra tecnologia
@@ -74,8 +76,41 @@ SOMIGLIANZA = [
 ]
 
 
+class _BrowserFinto:
+    """Simula Amazon, una pagina di ricerca e una pagina prodotto 'sporca' (menu con 8K, copyright 2025)."""
+    def __init__(self, titolo, risultati, titolo_pagina):
+        self.t, self.ris, self.tp = titolo, risultati, titolo_pagina
+
+    def amazon(self, asin, dominio):
+        return {"titolo": self.t, "modello": "", "img": "", "marca": "", "prezzo": "", "errore": ""}
+
+    def cerca(self, url, q):
+        return url, [{"url": f"https://negozio.it/p{i}", "testo": t} for i, t in enumerate(self.ris)], "ok"
+
+    def verifica(self, url):
+        corpo = "Menu: TV 8K OLED, offerte 2025, Classe energetica 2025 © 2025 negozio"
+        return True, self.tp, corpo, ""
+
+
+PAGINE = [  # (titolo ASIN, risultati di ricerca, titolo pagina prodotto, modalità, modello atteso)
+    ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED", ["Xiaomi A Pro 75 2026 ELA5840EU TV QLED 75 UHD 4K"],
+     "Xiaomi A Pro 75 2026 ELA5840EU TV QLED piatto 75\" UHD 4K", "stessa_marca", "A PRO 75"),
+    ("XIAOMI TV F Pro 32 2025, 32 pollici (81 cm), QLED, Smart TV, Fire TV, HD", ["Xiaomi TV A Pro 32 2026 TV nero"],
+     "Xiaomi - TV A PRO 32 2026 TV, Nero", "stessa_marca", "A PRO 32"),
+]
+
+
 def main():
     errori = 0
+    from nucleo import elabora_asin
+    for amz, ris, tp, modo, atteso in PAGINE:
+        r = elabora_asin(_BrowserFinto(amz, ris, tp), {"asin": "B0TEST0000", "paese": "IT"}, [{"nome": "N", "url": "{q}"}],
+                         {"modalita": modo, "verifica_url": True}, log=lambda m: None)
+        trovati = [m["modello"] for m in r["match"].get("N", [])]
+        if atteso not in trovati:
+            errori += 1
+            motivi = [d["esito"] for d in r["dettaglio"]]
+            print(f"✗ pagina prodotto ({modo}): {amz[:40]} -> atteso {atteso}, trovati {trovati}; {motivi[-3:]}")
     for titolo, atteso in RICONOSCIMENTO:
         i = analizza(titolo)
         ottenuto = (i.marca, i.tecnologia, i.fascia)
@@ -88,7 +123,7 @@ def main():
         if ok != atteso:
             errori += 1
             print(f"✗ somiglianza ({modo}): {amz_t[:45]} ↔ {cand_t[:45]}\n    atteso {'simile' if atteso else 'scartato'}, motivo: {motivo}")
-    tot = len(RICONOSCIMENTO) + len(SOMIGLIANZA)
+    tot = len(RICONOSCIMENTO) + len(SOMIGLIANZA) + len(PAGINE)
     print(f"{tot - errori}/{tot} casi corretti")
     sys.exit(1 if errori else 0)
 

@@ -248,18 +248,22 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
                 mancanti = [n for k, n in (("dolby_vision", "Dolby Vision"), ("hdr10plus", "HDR10+"),
                                            ("hdmi21", "HDMI 2.1"))
                             if P[k]["attivo"] and getattr(info, k) and not getattr(full, k)]
-                if P["risoluzione"]["attivo"] and info.risoluzione and full.risoluzione and \
-                        full.risoluzione != info.risoluzione and not cp.risoluzione == info.risoluzione:
-                    mancanti.append(f"risoluzione {info.risoluzione} (pagina: {full.risoluzione})")
+                # anno e risoluzione SOLO da titolo/intestazione del prodotto: il resto della pagina
+                # contiene menu, banner, copyright ed etichette energetiche con altri anni e risoluzioni
+                ris_pag = cp.risoluzione
+                if P["risoluzione"]["attivo"] and info.risoluzione and ris_pag and ris_pag != info.risoluzione and \
+                        not (P["modalita"] == "concorrente" and {ris_pag, info.risoluzione} <= {"HD", "FHD"}):
+                    mancanti.append(f"risoluzione {info.risoluzione} (pagina: {ris_pag})")
                 if mancanti:
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
                                              "esito": "scartato: manca " + ", ".join(mancanti)})
                     continue
-                if full.anno and P["anno"]["attivo"] and full.anno != int(P["anno"]["valore"]):
+                anno_pag = cp.anno or c.anno
+                if anno_pag and P["anno"]["attivo"] and anno_pag != int(P["anno"]["valore"]):
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                             "esito": f"scartato: anno {full.anno} (da pagina)"})
+                                             "esito": f"scartato: anno {anno_pag} (da pagina)"})
                     continue
-                if full.anno:  # anno letto sulla pagina: non è più "da verificare"
+                if anno_pag:  # anno letto nel titolo della pagina: non è più "da verificare"
                     motivo = ", ".join(x for x in motivo.split(", ") if x != "anno da verificare") or "ok"
                 im = og or im
                 nome_pag = titolo_pag.strip()

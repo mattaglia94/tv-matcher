@@ -326,7 +326,8 @@ def _xiaomi(T: str, info: InfoTV):
     info.codice = f"{serie}{' PRO' if info.pro else ''} {info.pollici}"
     info.core = f"{info.pollici}{serie}{'PRO' if info.pro else ''}"
     # i 32"/40" HD della linea base formano una famiglia a sé; un PRO resta PRO anche se HD
-    info.chiave = serie + ("-HD" if trova_risoluzione(T) in ("HD", "FHD") and serie in ("A", "F") and not info.pro else "")
+    ris = trova_risoluzione(T) or ("HD" if info.pollici and info.pollici <= 32 else "")  # i 32" non sono mai 4K
+    info.chiave = serie + ("-HD" if ris in ("HD", "FHD") and serie in ("A", "F") and not info.pro else "")
     info.tecnologia = tecnologia_testo(T) or ("MINILED" if serie == "S" else "QLED" if (info.pro or serie == "MAX") else "LED")
     fam = {"A": "AF", "F": "AF", "Q": "AF", "S": "S", "MAX": "MAX"}[serie]
     info.famiglia = f"XIAOMI-{info.tecnologia}-{fam}"
@@ -535,6 +536,8 @@ def analizza(testo: str, codice_noto: str = "", marca_nota: str = "", prezzo: fl
     if not info.fascia and prezzo:
         info.fascia = stima_fascia(prezzo, info.pollici, info.tecnologia)
         info.fascia_fonte = "stimata"
+    if not info.risoluzione and info.pollici and info.pollici <= 32:
+        info.risoluzione = "HD"  # sotto i 32" non esistono TV 4K: titolo senza risoluzione = HD/Full HD
     if info.tecnologia == "OLED" and not info.risoluzione:
         info.risoluzione = "4K"
     info.dolby_vision = "DOLBY VISION" in T
