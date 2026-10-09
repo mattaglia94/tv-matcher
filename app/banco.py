@@ -27,13 +27,14 @@ MARCHE = {
 POLLICI = [43, 50, 55, 65, 75]
 ESCLUDI = re.compile(r"halterung|staffa|supporto|soporte|support mural|wall mount|bracket|telecomando|fernbedienung|"
                      r"remote|télécommande|mando|cavo|kabel|cable|câble|cover|custodia|stick|soundbar|barra de sonido|"
-                     r"protector|schutz|monitor|proiettore|beamer|projector|ricambio|ersatz|replacement|stand|piedistallo|"
-                     r"standfuß|pied", re.I)
+                     r"protector|schutz|\bmonitor\b|proiettore|beamer|projector|ricambio|ersatz|replacement|\bstand\b|piedistallo|"
+                     r"standfuß|\bpied\b|\bpieds\b", re.I)
 
 JS_RISULTATI = r"""
 () => [...document.querySelectorAll('div[data-component-type="s-search-result"][data-asin]')].map(d => ({
   asin: d.getAttribute('data-asin'),
-  titolo: (d.querySelector('h2') || {}).innerText || '',
+  titolo: (d.querySelector('[data-cy="title-recipe"] h2, [data-cy="title-recipe"]') || d.querySelector('h2') || {}).innerText
+          || (d.querySelector('h2') || {getAttribute: () => ''}).getAttribute('aria-label') || '').replace(/\s+/g, ' '),
   prezzo: (d.querySelector('.a-price .a-offscreen') || {}).innerText || '',
   sponsor: !!d.querySelector('.puis-sponsored-label-text, .s-sponsored-label-text')
 })).filter(x => x.asin)
@@ -81,7 +82,8 @@ def cerca_motore(br, dom, testo):
 
 def raccogli(paese, per_marca=5):
     from browser import Browser
-    from regole import trova_marca, trova_pollici_testo as trova_pollici
+    from regole import catalogo_predefinito, imposta_catalogo, trova_marca, trova_pollici_testo as trova_pollici
+    imposta_catalogo(catalogo_predefinito())
     from web_runner import Pubblicatore, assicura_branch, leggi_json, REPO, TOKEN
     dom = DOMINIO[paese]
     br = Browser(visibile=False)
@@ -184,8 +186,43 @@ def valuta(file, dettaglio=True):
     return ok, ko, manca, errori
 
 
+def esiti(file):
+    """Statistiche dei run di confronto: per negozio esiti, motivi di scarto, scarti sospetti da controllare."""
+    from collections import Counter, defaultdict
+    per_neg = defaultdict(Counter)
+    motivi = Counter()
+    sospetti = []
+    n_asin = 0
+    for f in file:
+        st = json.load(open(f, encoding="utf-8"))
+        for r in st.get("risultati", []):
+            n_asin += 1
+            am = r.get("amazon", {})
+            for neg, e in (r.get("esito") or {}).items():
+                per_neg[f"{r['paese']} {neg}"][e] += 1
+            for d in r.get("dettaglio", []):
+                e = d.get("esito", "")
+                if e.startswith("scartato"):
+                    m = re.sub(r"[\d.,]+", "#", e.split("(")[0])[:60]
+                    motivi[m] += 1
+                    if d.get("pollici") == am.get("pollici") and not re.search(r"pollici|stesso modello|marca", e):
+                        sospetti.append((r["asin"], am.get("codice") or am.get("modello"), d["retailer"], d.get("modello"), e[:120], d.get("url", "")[:110]))
+    print(f"{n_asin} ASIN")
+    for neg, c in sorted(per_neg.items()):
+        tot = sum(c.values())
+        print(f"  {neg:28} trovati {c.get('trovato', 0) + c.get('ok', 0):3}/{tot:3}  ", dict(c))
+    print("motivi di scarto:")
+    for m, n in motivi.most_common(25):
+        print(f"  {n:4}  {m}")
+    print(f"scarti da controllare (stessi pollici): {len(sospetti)}")
+    for s_ in sospetti[:80]:
+        print(" ", *s_)
+
+
 if __name__ == "__main__":
     if sys.argv[1] == "raccogli":
         raccogli(sys.argv[2].upper())
+    elif sys.argv[1] == "esiti":
+        esiti(sys.argv[2:])
     elif sys.argv[1] == "valuta":
         valuta(sys.argv[2:])
