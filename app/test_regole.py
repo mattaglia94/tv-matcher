@@ -100,8 +100,14 @@ class _BrowserFinto:
                      for i, t in enumerate(self.ris)], "ok"
 
     def verifica(self, url):
+        if self.sch.get("_stato"):  # pagina bloccata dal sito
+            return False, "", "", "", {"_stato": self.sch["_stato"]}
         corpo = "Menu: TV 8K OLED, offerte 2025, Classe energetica 2025 © 2025 negozio"
         return True, self.tp, corpo, "", self.sch
+
+    def idealo_cerca(self, dominio, q):
+        return [{"url": "https://www.idealo.de/preisvergleich/OffersOfProduct/206295504_-a-pro-75-2026-xiaomi.html",
+                 "testo": t} for t in self.sch_a.get("_idealo", [])]
 
 
 PAGINE = [  # (titolo ASIN, risultati di ricerca, titolo pagina prodotto, modalità, modello atteso)
@@ -137,13 +143,21 @@ SCHEDE = [  # (titolo ASIN, scheda Amazon, titolo negozio, scheda negozio, param
     (F75, {}, OTTO75, {"modelljahr": "2026", "auflösung": "1920 x 1080"}, STRETTO, False, None),  # risoluzione diversa
     (F75, {}, OTTO75, {"modelljahr": "2026", "bildschirmdiagonale": "165 cm"}, STRETTO, False, None),  # in realtà un 65"
     (F75, {"anno del modello": "2026"}, OTTO75, {"modelljahr": "2026"}, STRETTO, True, ("anno", 2026)),  # anno ASIN da scheda
+    # Otto blocca la pagina prodotto (HTTP 400): il candidato resta; l'anno si cerca su idealo
+    (F75, {"_idealo": ["Xiaomi A Pro 75 (2026) 4K QLED"]}, OTTO75, {"_stato": 400}, STRETTO, True, None),
+    (F75, {"_idealo": ["Xiaomi A Pro 75 (2025)"]}, OTTO75, {"_stato": 400}, STRETTO, False, None),
+    (F75, {}, OTTO75, {"_stato": 400}, STRETTO, False, None),                    # anno introvabile: Stretto scarta
+    (F75, {}, OTTO75, {"_stato": 400}, {"modalita": "stessa_marca", "verifica_url": True}, True, None),
+    (F75, {}, OTTO75, {"_stato": 404}, {"modalita": "stessa_marca", "verifica_url": True}, False, None),  # prodotto sparito
 ]
 
 
 def main():
     errori = 0
     from nucleo import elabora_asin
+    import nucleo
     for amz, sch_a, neg, sch, par, atteso, campo in SCHEDE:
+        nucleo._ANNI_IDEALO.clear()
         r = elabora_asin(_BrowserFinto(amz, [neg], neg, sch, sch_a), {"asin": "B0TEST0001", "paese": "DE"},
                          [{"nome": "N", "url": "{q}"}], par, log=lambda m: None)
         trovato = bool(r["match"].get("N"))

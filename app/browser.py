@@ -353,9 +353,10 @@ class Browser:
 
     def verifica(self, url):
         """Apre la pagina prodotto: ritorna (vivo, titolo+h1, testo pagina, immagine, scheda tecnica)."""
-        r = self._vai(url)
-        if r is None or r.status >= 400:
-            return False, "", "", "", {}
+        r = self.riscalda(url) or self._vai(url)
+        if r is None or r.status >= 400 or self._in_verifica():
+            stato = None if r is None else (403 if self._in_verifica() else r.status)
+            return False, "", "", "", {"_stato": stato}
         try:
             h1 = " ".join(self.page.locator("h1").all_inner_texts()[:2])
         except Exception:

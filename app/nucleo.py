@@ -66,6 +66,33 @@ def chiave_negozio(nome):
     return re.sub(r"[^a-z0-9]", "", n)
 
 
+_ANNI_IDEALO = {}
+
+
+def anno_da_idealo(br, c, paese, log=print):
+    """Anno di un modello che né il titolo né la scheda riportano: lo cerca su idealo per codice
+    (es. L75MB-APEU -> "Xiaomi A Pro 75 (2026)"). Accetta solo un risultato con stessa marca e diagonale."""
+    dom = IDEALO.get(paese)
+    if not dom or not hasattr(br, "idealo_cerca"):
+        return None
+    chiave = (dom, c.codice)
+    if chiave in _ANNI_IDEALO:
+        return _ANNI_IDEALO[chiave]
+    anno = None
+    try:
+        for l in br.idealo_cerca(dom, c.codice)[:12]:
+            i = analizza(l["testo"])
+            T = l["testo"].upper().replace("-", "")
+            if i.anno and i.marca == c.marca and i.pollici == c.pollici and \
+                    (c.codice.replace("-", "") in T or (i.chiave and i.chiave == c.chiave and i.pro == c.pro)):
+                anno = i.anno
+                break
+    except Exception:
+        anno = None
+    _ANNI_IDEALO[chiave] = anno
+    return anno
+
+
 def ponte_idealo(br, info, r, P, paese, out, max_m, log=print):
     """Il sito del retailer non è leggibile: cerca su idealo i modelli simili e tiene solo
     le offerte di quel retailer. Ogni match riporta 'via' = dominio idealo usato."""
@@ -256,15 +283,24 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
             if P.get("verifica_url", True):
                 res = br.verifica(url)
                 vivo, titolo_pag, corpo, og = res[:4]
-                sp = leggi_scheda(res[4] if len(res) > 4 else {})
+                sch_raw = res[4] if len(res) > 4 else {}
+                sp = leggi_scheda({k: v for k, v in sch_raw.items() if not k.startswith("_")})
                 if not vivo:
-                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url, "esito": "URL non attivo"})
-                    continue
+                    stato_p = sch_raw.get("_stato")
+                    if stato_p in (404, 410):  # prodotto davvero non più in vendita
+                        out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url, "esito": "URL non attivo"})
+                        continue
+                    # pagina bloccata dal sito (anti-bot) o lenta: il prodotto c'è, si usano i dati della ricerca
+                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                             "esito": f"pagina prodotto non apribile ({stato_p or 'timeout'}): uso i dati della ricerca"})
+                    titolo_pag, corpo, og = c.testo, "", ""
+                    motivo = ", ".join(x for x in [motivo if motivo != "ok" else "", "pagina non verificabile"] if x)
                 cp = analizza(titolo_pag)
-                n_voci = len(res[4]) if len(res) > 4 else 0
+                n_voci = len([k for k in sch_raw if not k.startswith("_")])
                 letti = ", ".join(f"{k} {v}" for k, v in sp.items() if k in ("anno", "pollici", "risoluzione", "tecnologia", "hz") and v)
-                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                         "esito": f"scheda tecnica: {letti or 'nessun dato utile'} ({n_voci} voci)"})
+                if vivo:
+                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                             "esito": f"scheda tecnica: {letti or 'nessun dato utile'} ({n_voci} voci)"})
                 pol_pag = sp.get("pollici") or (cp.pollici if cp.codice else None)
                 if pol_pag and P["pollici"]["attivo"] and abs(pol_pag - info.pollici) > int(P["pollici"].get("tolleranza") or 0):
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
@@ -293,6 +329,12 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
                                              "esito": "scartato: " + ", ".join(mancanti)})
                     continue
                 anno_pag = sp.get("anno") or cp.anno or c.anno
+                if not anno_pag and P["anno"]["attivo"] and c.codice:
+                    anno_pag = anno_da_idealo(br, c, paese, log)
+                    if anno_pag:
+                        out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                                 "esito": f"anno {anno_pag} letto su {IDEALO.get(paese, 'idealo')}"})
+                        motivo = ", ".join(x for x in motivo.split(", ") if x and x != "ok") + (", " if motivo not in ("", "ok") else "") + f"anno da {IDEALO.get(paese, 'idealo')}"
                 if anno_pag and P["anno"]["attivo"] and anno_pag != int(P["anno"]["valore"]):
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
                                              "esito": f"scartato: anno {anno_pag} (da pagina)"})
@@ -301,9 +343,9 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
                                              "esito": "scartato: anno non indicato nemmeno nella scheda tecnica"})
                     continue
-                if anno_pag:  # anno letto in scheda o nel titolo: non è più "da verificare"
+                if anno_pag:  # anno letto in scheda, nel titolo o su idealo: non è più "da verificare"
                     c.anno = anno_pag
-                    motivo = ", ".join(x for x in motivo.split(", ") if x != "anno da verificare") or "ok"
+                    motivo = ", ".join(x for x in motivo.split(", ") if x and x != "anno da verificare") or "ok"
                 im = og or im
                 nome_pag = titolo_pag.strip()
                 # il codice sulla pagina prodotto è il più affidabile: se c'è, vince
