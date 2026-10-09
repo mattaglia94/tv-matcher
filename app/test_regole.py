@@ -5,7 +5,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from regole import analizza, confronta_param, unisci_parametri  # noqa: E402
+from regole import analizza, confronta_param, leggi_prezzo, unisci_parametri  # noqa: E402
 
 # titolo -> (marca, tecnologia, fascia)
 RICONOSCIMENTO = [
@@ -50,6 +50,9 @@ RICONOSCIMENTO = [
     ("Sony 65 Bravia 8 A OLED 4K", ("SONY", "OLED", "PREMIUM")),
     ("Panasonic TV-55W90A 4K", ("PANASONIC", "LED", "MID")),
     ("Telefunken Smart TV LED 4K 43\" TE43759S48U4P", ("TELEFUNKEN", "LED", "ENTRY")),
+    ("TV QLED 65 Xiaomi ELA6760EU 4K Fire TV HDR 60 Hz 3HDMI USB", ("XIAOMI", "QLED", "MID")),
+    ("TV MiniLED 65 Xiaomi ELA5674EU 4K Google TV Bluetooth 5.2", ("XIAOMI", "MINILED", "PREMIUM")),
+    ("TV LED 165cm (65\") XIAOMI F65 ELA6186EU 4K Fire TV Bluetooth 5.0 60Hz", ("XIAOMI", "LED", "ENTRY")),
     ("Bang & Olufsen Beovision Contour 55\" OLED", ("BANG & OLUFSEN", "OLED", "TOP")),
 ]
 
@@ -74,6 +77,15 @@ SOMIGLIANZA = [
     ("LG OLED55C64LA 2026", "LG OLED55C65LA 2026", "stessa_marca", True),
     ("LG OLED55C64LA 2026", "LG OLED55B66LA 2026", "stessa_marca", False),  # fascia diversa
     ("TCL 65C7L SQD Mini LED 2026", "TCL 65C8L SQD Mini LED 2026", "stessa_marca", False),
+    # titoli spagnoli senza codice ufficiale: classificati dalle caratteristiche
+    ("Xiaomi TV F 65 Pulgadas 2026, 4K UHD Smart TV Fire OS8 HDR10 L65MC-FAEU",
+     "TV LED 165cm (65\") Xiaomi ELA7001EU 4K Google TV 2026", "stessa_marca", True),
+    ("Xiaomi TV F 65 Pulgadas 2026, 4K UHD Smart TV Fire OS8 HDR10 L65MC-FAEU",
+     "TV MiniLED 65 Xiaomi ELA5674EU 4K Google TV 2026", "stessa_marca", False),
+    ("Xiaomi TV F 65 Pulgadas 2026, 4K UHD Smart TV Fire OS8 HDR10 L65MC-FAEU",
+     "TV LED 165cm (65\") XIAOMI F65 ELA6186EU 4K Fire TV 2026", "stessa_marca", False),       # stesso modello
+    ("Xiaomi TV F 65 Pulgadas 2026, 4K UHD Smart TV Fire OS8 L65MC-FAEU", "Hisense 65 pulgadas LED 4K Smart TV 2026 449 €",
+     "concorrente", True),
     # concorrente
     ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED", "TCL 75T8C QLED 4K 2026", "concorrente", True),
     ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED", "Hisense 75E7Q QLED 4K 2026", "concorrente", True),  # fascia vicina
@@ -200,7 +212,7 @@ def main():
             print(f"✗ riconoscimento: {titolo}\n    atteso {atteso}, ottenuto {ottenuto} (chiave {i.chiave!r}, {i.regola})")
     for amz_t, cand_t, modo, atteso in SOMIGLIANZA:
         P = unisci_parametri({"modalita": modo})
-        ok, motivo, _ = confronta_param(analizza(amz_t), analizza(cand_t), P)
+        ok, motivo, _ = confronta_param(analizza(amz_t), analizza(cand_t, prezzo=leggi_prezzo(cand_t)), P)  # come nel motore
         if ok != atteso:
             errori += 1
             print(f"✗ somiglianza ({modo}): {amz_t[:45]} ↔ {cand_t[:45]}\n    atteso {'simile' if atteso else 'scartato'}, motivo: {motivo}")

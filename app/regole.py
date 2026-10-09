@@ -315,11 +315,14 @@ def _xiaomi(T: str, info: InfoTV):
     Famiglia: A e F (Google TV / Fire TV) sono la stessa fascia; S = Mini LED; MAX = grandi formati."""
     if re.search(r"\bL\d{2,3}M[A-Z]", T):  # codice ufficiale (L65MB-APEU): è il dato più affidabile
         return _xiaomi_codice(T, info)
+    j = re.search(r"(?<![A-Z0-9-])(A|F|S|Q)(\d{2,3})(\s?PRO)?\b", T)    # "XIAOMI F65" (titoli Alcampo/Carrefour)
+    if j and 24 <= int(j.group(2)) <= 115 and not re.search(r"CORTEX", T[max(0, j.start() - 8):j.start()]):
+        T = T[:j.start()] + f"{j.group(1)}{' PRO' if j.group(3) else ''} {j.group(2)}" + T[j.end():]
     m = (re.search(r"\bXIA(\d{2,3})(A|F|S|MAX|Q)(PRO)?\d?\b", T)
          or re.search(r"\b(\d{2,3})(A|F|S|Q)(PRO)?\d?\b", T)           # codici tipo 50APRO2, 32A2 (titoli Unieuro)
          or re.search(r"\b(?:TV\s+)?(A|F|S|MAX|Q\d?)(\s+PRO)?\s*(MINI\s?LED)?\b[^0-9]{0,20}?(\d{2,3})\b", T))
     if not m:
-        return _xiaomi_codice(T, info)
+        return _xiaomi_codice(T, info) or _xiaomi_caratteristiche(T, info)
     if m.re.pattern.startswith("\\bXIA") or m.re.pattern.startswith("\\b(\\d"):
         poll, serie, pro = int(m.group(1)), m.group(2), bool(m.group(3))
     else:
@@ -367,6 +370,39 @@ def _xiaomi_codice(T: str, info: InfoTV):
     info.famiglia = f"XIAOMI-{info.tecnologia}-{serie if serie == 'S' else 'AF'}{'-' + ris if ris in ('HD', 'FHD') and not info.pro else ''}"
     info.chiave = serie + ("-HD" if ris in ("HD", "FHD") and serie in ("A", "F") and not info.pro else "")
     info.regola = "XIAOMI-codice"
+    return True
+
+
+def _pollici_nudi(T: str):
+    """Diagonale scritta senza unità ("QLED 65 Xiaomi"): primo numero da TV, escluse misure in cm/Hz/GB."""
+    for m in re.finditer(r"\b(2[4-9]|[3-9]\d|1[01]\d)\b(?!\s?(?:CM|HZ|GB|W\b|%|MM|\.\d))", T):
+        return int(m.group(1))
+    return None
+
+
+def _xiaomi_caratteristiche(T: str, info: InfoTV):
+    """Xiaomi senza nome di serie né codice ufficiale (es. "TV QLED 65 Xiaomi ELA6760EU Fire TV"):
+    la serie si ricava dalle caratteristiche. Mini LED = S, QLED = Pro, Fire TV = F, Google TV = A."""
+    pol = info.pollici or _pollici_nudi(T)
+    tec = tecnologia_testo(T)
+    if not pol or not tec:
+        return False
+    if re.search(r"\bP1E?\b", T):
+        serie = "P1"
+    elif tec in ("MINILED", "NEOQLED"):
+        serie = "S"
+    else:
+        serie = "F" if "FIRE TV" in T or "FIRE OS" in T else "A"
+    info.pollici = pol
+    info.pro = serie in ("A", "F") and tec == "QLED" or bool(re.search(r"\bPRO\b", T))
+    info.tecnologia = tec
+    info.codice = f"{serie}{' PRO' if info.pro else ''} {pol}"
+    info.core = f"{pol}{serie}{'PRO' if info.pro else ''}"
+    ris = trova_risoluzione(T) or ("HD" if pol <= 32 else "")
+    info.chiave = serie + ("-HD" if ris in ("HD", "FHD") and serie in ("A", "F") and not info.pro else "")
+    info.famiglia = f"XIAOMI-{tec}-{'S' if serie == 'S' else 'AF'}"
+    info.regola = "caratteristiche"
+    info.note.append("caratteristiche")
     return True
 
 
@@ -474,7 +510,7 @@ def stima_fascia(prezzo: float | None, pollici: int | None, tecnologia: str = ""
 
 
 def leggi_prezzo(t: str) -> float | None:
-    m = re.search(r"(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})?|\d+(?:\.\d{2})?)\s?[€£]|[€£]\s?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)", t or "")
+    m = re.search(r"(?<![\d.,])(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})?|\d+(?:\.\d{2})?)\s?[€£]|[€£]\s?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)", t or "")
     if not m:
         return None
     x = (m.group(1) or m.group(2)).replace(" ", "")
@@ -550,6 +586,13 @@ def analizza(testo: str, codice_noto: str = "", marca_nota: str = "", prezzo: fl
     if not info.fascia and prezzo:
         info.fascia = stima_fascia(prezzo, info.pollici, info.tecnologia)
         info.fascia_fonte = "stimata"
+    if not info.codice and info.marca and info.pollici and info.tecnologia and info.fascia:
+        # nessun codice leggibile, ma le caratteristiche bastano: modello "per caratteristiche"
+        info.codice = f"{info.marca.title()} {info.pollici}\" {info.tecnologia}"
+        info.core = f"CAR-{info.pollici}-{info.tecnologia}-{len(info.testo)}"
+        info.regola = "caratteristiche"
+        info.note.append("caratteristiche")
+        info.famiglia = info.famiglia if info.famiglia and not info.famiglia.endswith("-") else f"{info.marca}-{info.tecnologia}-{info.fascia}"
     if not info.risoluzione and info.pollici and info.pollici <= 32:
         info.risoluzione = "HD"  # sotto i 32" non esistono TV 4K: titolo senza risoluzione = HD/Full HD
     if info.tecnologia == "OLED" and not info.risoluzione:
@@ -710,6 +753,7 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
     concorrente = P.get("modalita") == "concorrente"
     if not cand.codice:
         return False, "codice modello non leggibile", 0
+    car = "caratteristiche" in cand.note
     if not cand.marca:
         return False, "marca non riconosciuta", 0
     if concorrente and cand.marca == amz.marca:
@@ -779,6 +823,9 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
         na = re.findall(r"\d+", amz.core[len(str(amz.pollici or "")):]) or ["0"]
         nb = re.findall(r"\d+", cand.core[len(str(cand.pollici or "")):]) or ["0"]
         score += abs(int(na[0]) - int(nb[0]))
+    if car:
+        note.insert(0, "riconosciuto dalle caratteristiche")
+        score += 20
     return True, ", ".join(note) or "ok", score
 
 

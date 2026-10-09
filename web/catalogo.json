@@ -781,6 +781,13 @@
      "fascia": "PREMIUM",
      "descrizione": "TV S Mini LED",
      "famiglia": "S"
+    },
+    {
+     "serie": "P1",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "TV P1E (serie precedente)",
+     "famiglia": "P1"
     }
    ]
   },
