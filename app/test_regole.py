@@ -110,9 +110,26 @@ PAGINE = [  # (titolo ASIN, risultati di ricerca, titolo pagina prodotto, modali
 ]
 
 
+CASI_ASIN = [  # (riga ASIN come la manda il sito, anagrafica, titolo Amazon) -> deve essere riconosciuto
+    ({"asin": "B0F457M449", "paese": "IT", "modello": "F PRO 32"}, {}, "XIAOMI TV F Pro 32 2025, 32 pollici (81 cm), QLED, Smart TV, Fire TV, HD"),
+    ({"asin": "B0F457M449", "paese": "IT", "modello": "F PRO 32"},
+     {"B0F457M449|IT": {"modello": "F PRO 32", "titolo": "XIAOMI TV F Pro 32 2025, 32 pollici (81 cm), QLED, HD"}}, ""),
+    ({"asin": "B0F457M449", "paese": "IT"}, {"B0F457M449|IT": {"modello": "F PRO 32", "titolo": ""}},
+     "XIAOMI TV F Pro 32 2025, 32 pollici (81 cm), QLED, Smart TV, Fire TV, HD"),
+]
+
+
 def main():
     errori = 0
     from nucleo import elabora_asin
+    for riga, ana, titolo in CASI_ASIN:
+        r = elabora_asin(_BrowserFinto(titolo, ["Xiaomi TV A Pro 32 2026 TV nero"], "Xiaomi - TV A PRO 32 2026 TV, Nero"),
+                         dict(riga), [{"nome": "N", "url": "{q}"}], {"modalita": "stessa_marca", "verifica_url": True},
+                         log=lambda m: None, anagrafica=ana)
+        if r["errore"] or "A PRO 32" not in [m["modello"] for m in r["match"].get("N", [])]:
+            errori += 1
+            print(f"✗ ASIN con modello {riga.get('modello')!r} / anagrafica {bool(ana)}: errore {r['errore']!r}, "
+                  f"amazon {r['amazon'].get('marca')} {r['amazon'].get('pollici')}")
     for amz, ris, tp, modo, atteso in PAGINE:
         r = elabora_asin(_BrowserFinto(amz, ris, tp), {"asin": "B0TEST0000", "paese": "IT"}, [{"nome": "N", "url": "{q}"}],
                          {"modalita": modo, "verifica_url": True}, log=lambda m: None)
@@ -133,7 +150,7 @@ def main():
         if ok != atteso:
             errori += 1
             print(f"✗ somiglianza ({modo}): {amz_t[:45]} ↔ {cand_t[:45]}\n    atteso {'simile' if atteso else 'scartato'}, motivo: {motivo}")
-    tot = len(RICONOSCIMENTO) + len(SOMIGLIANZA) + len(PAGINE)
+    tot = len(RICONOSCIMENTO) + len(SOMIGLIANZA) + len(PAGINE) + len(CASI_ASIN)
     print(f"{tot - errori}/{tot} casi corretti")
     sys.exit(1 if errori else 0)
 

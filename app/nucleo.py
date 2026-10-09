@@ -127,17 +127,28 @@ def riconosci_amazon(br, riga, anagrafica=None, log=print):
     Ritorna dict: titolo, modello, img, fonte, nota, marca, prezzo."""
     paese = (riga.get("paese") or "IT").upper()
     nome, modello = riga.get("nome", ""), (riga.get("modello") or "").strip()
-    vuoto = {"titolo": nome, "modello": "", "img": "", "fonte": "", "nota": "", "marca": riga.get("marca", ""), "prezzo": ""}
-    if modello:
+    noto = (anagrafica or {}).get(f"{riga['asin']}|{paese}") or (anagrafica or {}).get(riga["asin"]) or {}
+    vuoto = {"titolo": nome or noto.get("titolo", ""), "modello": "", "img": noto.get("img", ""), "fonte": "", "nota": "",
+             "marca": riga.get("marca", "") or noto.get("marca", ""), "prezzo": ""}
+
+    def basta(titolo, mod, marca):
+        """Il TV è riconoscibile? Serve marca, diagonale e codice (o tecnologia + fascia).
+        Un modello come "F PRO 32" da solo non dice la marca: allora serve anche il titolo."""
+        i = analizza(titolo, mod, marca)
+        return bool(i.marca and i.pollici and (i.codice or (i.tecnologia and i.fascia)))
+
+    if modello and basta(vuoto["titolo"], modello, vuoto["marca"]):
         return {**vuoto, "modello": modello, "fonte": "inserito a mano"}
-    noto = (anagrafica or {}).get(f"{riga['asin']}|{paese}") or (anagrafica or {}).get(riga["asin"])
-    if noto and noto.get("modello"):
-        return {**vuoto, "titolo": noto.get("titolo", ""), "modello": noto["modello"], "img": noto.get("img", ""),
-                "fonte": "anagrafica", "marca": noto.get("marca", "")}
+    if noto.get("modello") and not modello and basta(noto.get("titolo", ""), noto["modello"], noto.get("marca", "")):
+        return {**vuoto, "modello": noto["modello"], "fonte": "anagrafica"}
+    if modello:
+        log(f"   modello '{modello}' non basta a riconoscere il TV: leggo anche la pagina Amazon")
     a = br.amazon(riga["asin"], AMAZON_DOMINIO.get(paese, "amazon.it"))
-    dati = {**vuoto, "titolo": a["titolo"], "modello": a["modello"], "img": a.get("img", ""),
-            "marca": a.get("marca", ""), "prezzo": a.get("prezzo", "")}
-    info = analizza(a["titolo"], a["modello"], dati["marca"], leggi_prezzo(dati["prezzo"]))
+    if modello and not a["modello"]:
+        a = {**a, "modello": modello}  # il modello scritto a mano resta, il titolo Amazon aggiunge marca e diagonale
+    dati = {**vuoto, "titolo": a["titolo"] or vuoto["titolo"], "modello": a["modello"], "img": a.get("img", "") or vuoto["img"],
+            "marca": a.get("marca", "") or vuoto["marca"], "prezzo": a.get("prezzo", "")}
+    info = analizza(dati["titolo"], a["modello"], dati["marca"], leggi_prezzo(dati["prezzo"]))
     if info.marca and info.pollici and info.codice:
         return {**dati, "modello": a["modello"] or info.codice, "fonte": "Amazon"}
     if info.marca and info.pollici and info.tecnologia and info.fascia:
