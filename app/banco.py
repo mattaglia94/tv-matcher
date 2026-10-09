@@ -33,8 +33,8 @@ ESCLUDI = re.compile(r"halterung|staffa|supporto|soporte|support mural|wall moun
 JS_RISULTATI = r"""
 () => [...document.querySelectorAll('div[data-component-type="s-search-result"][data-asin]')].map(d => ({
   asin: d.getAttribute('data-asin'),
-  titolo: (d.querySelector('[data-cy="title-recipe"] h2, [data-cy="title-recipe"]') || d.querySelector('h2') || {}).innerText
-          || (d.querySelector('h2') || {getAttribute: () => ''}).getAttribute('aria-label') || '').replace(/\s+/g, ' '),
+  titolo: ((d.querySelector('[data-cy="title-recipe"]') || d.querySelector('h2') || {}).innerText
+          || ((d.querySelector('h2') || {getAttribute: () => ''}).getAttribute('aria-label')) || '').replace(/\s+/g, ' '),
   prezzo: (d.querySelector('.a-price .a-offscreen') || {}).innerText || '',
   sponsor: !!d.querySelector('.puis-sponsored-label-text, .s-sponsored-label-text')
 })).filter(x => x.asin)
