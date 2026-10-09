@@ -751,7 +751,8 @@ def _tec_equivalenti(a: str, b: str, gruppi) -> bool:
 
 def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
     """Ogni criterio si accende/spegne da P (vedi PARAMETRI_DEFAULT).
-    Modalità "stessa_marca": stessa marca, stessa famiglia, codice diverso.
+    Si confrontano prima le caratteristiche (diagonale, tecnologia, risoluzione, frequenza, anno), poi la fascia.
+    Modalità "stessa_marca": stessa marca, stessa fascia, codice diverso (la stessa famiglia è preferita).
     Modalità "concorrente": altra marca, stessa tecnologia e fascia (±1 ammessa, penalizzata).
     Ritorna (ok, motivo, punteggio): punteggio più basso = più vicino."""
     concorrente = P.get("modalita") == "concorrente"
@@ -773,27 +774,6 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
         if cand.pollici is None or amz.pollici is None or abs(cand.pollici - amz.pollici) > tol:
             return False, f"pollici {cand.pollici}", 0
     score += 100 * abs((cand.pollici or 0) - (amz.pollici or 0))
-    if P["famiglia"]["attivo"]:
-        if not concorrente:
-            # stessa famiglia = alternativa ideale; famiglia diversa ma stessa fascia = simile, segnalato.
-            # Così una piccola differenza di classificazione non fa perdere un modello ovviamente simile.
-            if cand.famiglia and cand.famiglia == amz.famiglia:
-                pass
-            elif amz.fascia and cand.fascia == amz.fascia:
-                note.append(f"altra serie, stessa fascia {cand.fascia.lower()}")
-                score += 30
-            else:
-                return False, f"famiglia {cand.famiglia or '?'}", 0
-        elif amz.fascia:
-            if not cand.fascia:
-                return False, "fascia non determinabile", 0
-            else:
-                d = abs(LIVELLI[cand.fascia] - LIVELLI[amz.fascia])
-                if d > 1:
-                    return False, f"fascia {cand.fascia.lower()}", 0
-                score += 50 * d
-                if d:
-                    note.append(f"fascia {cand.fascia.lower()} (ASIN {amz.fascia.lower()})")
     if P["tecnologia"]["attivo"] and amz.tecnologia:
         if not cand.tecnologia:
             if concorrente:
@@ -823,6 +803,31 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
                 return False, "anno non determinabile", 0
             note.append("anno da verificare")
             score += 5
+    # fascia/famiglia per ultima: le caratteristiche (diagonale, tecnologia, risoluzione, frequenza, anno)
+    # decidono prima; la serie serve solo a preferire l'alternativa più vicina
+    if P["famiglia"]["attivo"]:
+        if not concorrente:
+            # stessa famiglia = alternativa ideale; famiglia diversa ma stessa fascia = simile, segnalato.
+            # Così una piccola differenza di classificazione non fa perdere un modello ovviamente simile.
+            if cand.famiglia and cand.famiglia == amz.famiglia:
+                pass
+            elif amz.fascia and cand.fascia == amz.fascia:
+                note.append(f"altra serie, stessa fascia {cand.fascia.lower()}")
+                score += 30
+            elif amz.fascia and cand.fascia:
+                return False, f"fascia {cand.fascia.lower()} (ASIN {amz.fascia.lower()})", 0
+            else:
+                return False, f"serie diversa e fascia non determinabile ({cand.famiglia or '?'})", 0
+        elif amz.fascia:
+            if not cand.fascia:
+                return False, "fascia non determinabile", 0
+            else:
+                d = abs(LIVELLI[cand.fascia] - LIVELLI[amz.fascia])
+                if d > 1:
+                    return False, f"fascia {cand.fascia.lower()}", 0
+                score += 50 * d
+                if d:
+                    note.append(f"fascia {cand.fascia.lower()} (ASIN {amz.fascia.lower()})")
     if not concorrente:  # vicinanza tra i numeri di serie della stessa marca
         na = re.findall(r"\d+", amz.core[len(str(amz.pollici or "")):]) or ["0"]
         nb = re.findall(r"\d+", cand.core[len(str(cand.pollici or "")):]) or ["0"]
