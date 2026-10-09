@@ -178,8 +178,8 @@ class Browser:
                 r = self.page.goto(url, wait_until="domcontentloaded", timeout=45000)
             except Exception:
                 return None
-        try:
-            self.page.wait_for_load_state("networkidle", timeout=6000)
+        try:  # i siti di e-commerce non sono quasi mai "fermi": breve attesa, non fino al limite
+            self.page.wait_for_load_state("networkidle", timeout=2500)
         except PWTimeout:
             pass
         r = self._attendi_verifica(r)

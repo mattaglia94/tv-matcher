@@ -87,7 +87,8 @@ class Pubblicatore:
         print(f"⚠ salvataggio stato non riuscito ({st})")
 
 
-MAX_PROCESSI = int(os.environ.get("MAX_PROCESSI", "6"))  # browser in parallelo (uno per gruppo di negozi)
+MAX_PROCESSI = int(os.environ.get("MAX_PROCESSI", "8"))  # browser in parallelo in tutto
+PER_NEGOZIO = int(os.environ.get("PER_NEGOZIO", "2"))     # browser contemporanei sullo stesso negozio
 
 
 def lavoratore(retailer_gruppo, P, catalogo, cache, coda_in, coda_out):
@@ -192,17 +193,24 @@ def main():
 
     try:
         # negozi divisi in gruppi: ogni gruppo ha un processo con il suo browser
+        # fino a PER_NEGOZIO browser per negozio (carico cortese per il sito), al massimo MAX_PROCESSI in tutto;
+        # gli ASIN di un negozio si alternano tra i suoi browser
         nomi = [r["nome"] for r in retailer]
-        n_proc = max(1, min(MAX_PROCESSI, len(nomi)))
-        for k in range(n_proc):
-            gruppo = {r["nome"]: r for j, r in enumerate(retailer) if j % n_proc == k}
+        slot = [r for k in range(PER_NEGOZIO) for r in retailer][:max(MAX_PROCESSI, len(nomi))]
+        n_proc = max(1, min(MAX_PROCESSI, len(slot)))
+        gruppi = [dict() for _ in range(n_proc)]
+        for j, r in enumerate(slot):
+            k = j % n_proc
+            gruppi[k][r["nome"]] = r
+            if k not in gruppo_di.setdefault(r["nome"], []):
+                gruppo_di[r["nome"]].append(k)
+        for k, gruppo in enumerate(gruppi):
             qi = ctx.Queue()
             pr = ctx.Process(target=lavoratore, args=(gruppo, P, catalogo, cache, qi, coda_out), daemon=True)
             pr.start()
             processi.append(pr)
             code_in.append(qi)
-            for n in gruppo:
-                gruppo_di[n] = k
+        giro = {n: 0 for n in gruppo_di}
         log(f"Motore avviato: {len(nomi)} negozi su {n_proc} browser in parallelo")
         br = Browser(visibile=False, log=log, cache=cache)  # Amazon: un ASIN alla volta
         for i, a in enumerate(asins, 1):
@@ -223,7 +231,9 @@ def main():
                 stato["avanzamento"]["fatti"] += len(ret)
             else:
                 for r in ret:
-                    code_in[gruppo_di[r["nome"]]].put((idx, info, paese, r["nome"]))
+                    ks = gruppo_di[r["nome"]]
+                    code_in[ks[giro[r["nome"]] % len(ks)]].put((idx, info, paese, r["nome"]))
+                    giro[r["nome"]] += 1
                     attesi += 1
             pub.salva(stato, forza=True)
             raccogli()

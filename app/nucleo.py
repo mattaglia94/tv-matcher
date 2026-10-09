@@ -289,7 +289,7 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
                                      "esito": ("VALIDO " if ok else "scartato: ") + motivo, "ricerca": q})
             if ok and l["url"] not in validi:
                 validi[l["url"]] = (score, c, l.get("img", ""), motivo)
-        if len(validi) >= max_m + 2:  # qualche riserva: la verifica della pagina può scartarne
+        if len(validi) >= max_m + 1:  # una riserva: la verifica della pagina può scartarne
             break
     scelti, codici = [], set()
     for url, (score, c, im, motivo) in sorted(validi.items(), key=lambda x: x[1][0]):
@@ -347,7 +347,8 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
                                          "esito": "scartato: " + ", ".join(mancanti)})
                 continue
             anno_pag = sp.get("anno") or cp.anno or c.anno
-            if not anno_pag and P["anno"]["attivo"] and c.codice:
+            # anno su idealo solo se serve davvero (Stretto: un anno sconosciuto escluderebbe il modello)
+            if not anno_pag and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True) and c.codice:
                 anno_pag = anno_da_idealo(br, c, paese, log)
                 if anno_pag:
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
