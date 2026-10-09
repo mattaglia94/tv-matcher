@@ -19,20 +19,30 @@ Se compare un captcha, spunta "Mostra il browser", risolvilo a mano e il tool ri
 ## Personalizzazione (tutta da Excel, senza toccare il codice)
 - Foglio **Retailer**: paese, nome, URL di ricerca (`{q}` = testo cercato), Attivo SI/NO. Si possono aggiungere o disattivare retailer.
 - Foglio **Impostazioni**:
+  - modalità: STESSA MARCA (alternativa della stessa marca) o CONCORRENTE (modello equivalente di un'altra marca);
   - anno target (2026);
   - se accettare modelli il cui anno non si ricava dal codice (vengono segnalati "anno da verificare");
   - se verificare che ogni URL scelto sia attivo.
 
 ## Regole di matching (`app/regole.py`)
-Un candidato è valido solo se ha:
+Due modalità, scelte per ogni ricerca.
+
+**Alternativa della stessa marca**: un candidato è valido solo se ha
 - stessa marca e stessi pollici;
-- stessa famiglia o fascia (tabelle LG, Hisense e Samsung del documento);
+- stessa famiglia (tabelle LG, Hisense e Samsung del documento; tabella `SERIE` per TCL, Philips, Sony, Panasonic; serie Xiaomi);
 - stessa separazione PRO/non-PRO;
 - stessa risoluzione e stessa classe di refresh (se indicate);
 - anno pari all'anno target;
 - codice diverso da quello Amazon.
 
-Il sistema operativo del TV viene ignorato. Per le altre marche (TCL, Philips…) si applica una regola generica: stessa tecnologia e stessa serie.
+**Concorrente equivalente**: un candidato è valido solo se ha
+- marca diversa e stessi pollici;
+- stessa tecnologia (con le equivalenze, es. Neo QLED = Mini-LED);
+- stessa fascia comune (base, entry, media, premium, top): una fascia di distanza è ammessa ma penalizzata e segnalata;
+- stessa risoluzione, classe di refresh e anno, come sopra.
+
+Tra i candidati validi vince quello col punteggio più basso (diagonale e fascia identiche prima di tutto).
+Il sistema operativo del TV viene ignorato. Le marche senza tabella (Sharp, Grundig…) usano la serie letterale del codice.
 
 Anno dal codice:
 - Samsung: lettera finale (H = 2026, F = 2025);

@@ -42,8 +42,8 @@ window.TVM = {
 
   // Parametri di somiglianza: stessa struttura letta dal motore (app/regole.py)
   parametriDefault: {
+    modalita: "stessa_marca",
     pollici: { attivo: true, tolleranza: 0 },
-    stessa_marca: { attivo: true },
     famiglia: { attivo: true },
     tecnologia: { attivo: true, equivalenze: [["MINILED", "NEOQLED"]] },
     risoluzione: { attivo: true },
@@ -66,9 +66,11 @@ window.TVM = {
       { chiave: "refresh", titolo: "Frequenza di aggiornamento", testo: "Stessa classe: 50/60 Hz, 100/120 Hz, 144 Hz e oltre." },
     ]},
     { gruppo: "Modello", voci: [
-      { chiave: "stessa_marca", titolo: "Stessa marca", testo: "Cerca solo modelli della stessa marca dell'ASIN. Spegnilo per trovare alternative di altre marche con la stessa tecnologia." },
-      { chiave: "famiglia", titolo: "Stessa famiglia e fascia", testo: "Usa le regole di serie di LG, Hisense e Samsung (es. NANO = UHD Premium, E7 = QLED Entry). Per le altre marche confronta la serie del codice.", controllo: "regole" },
-      { chiave: "pro", titolo: "Separazione PRO", testo: "Un modello PRO si confronta solo con un altro PRO." },
+      { chiave: "famiglia", titolo: "Stessa famiglia e fascia",
+        testo: { stessa_marca: "Il modello alternativo deve essere della stessa famiglia (es. Hisense E7 = QLED Entry, LG NANO = UHD Premium).",
+                 concorrente: "Il concorrente deve essere della stessa fascia (base, entry, media, premium, top). Una fascia di distanza è ammessa ma segnalata, e vince sempre la fascia identica." },
+        controllo: "regole" },
+      { chiave: "pro", titolo: "Separazione PRO", testo: "Un modello PRO si confronta solo con un altro PRO.", solo: "stessa_marca" },
       { chiave: "anno", titolo: "Anno di lancio", testo: "Solo modelli dell'anno indicato. L'anno si ricava dal codice (Samsung: H = 2026, LG OLED: C6 = 2026) o dal titolo.", controllo: "anno" },
     ]},
     { gruppo: "Caratteristiche", nota: "Si leggono dalla pagina prodotto: servono la verifica pagina accesa e qualche secondo in più per prodotto.", voci: [
@@ -81,6 +83,12 @@ window.TVM = {
   tecnologie: ["LED", "QLED", "MINILED", "NEOQLED", "OLED"],
   nomeTecnologia: { LED: "LED", QLED: "QLED", MINILED: "Mini-LED", NEOQLED: "Neo QLED", OLED: "OLED" },
 
+  modalita: [
+    { valore: "stessa_marca", titolo: "Alternativa della stessa marca", testo: "Cerca solo TV della stessa marca dell'ASIN, della stessa famiglia ma con codice diverso." },
+    { valore: "concorrente", titolo: "Concorrente equivalente", testo: "Cerca TV di altre marche con stessa diagonale, tecnologia e fascia (es. uno Xiaomi QLED medio → un TCL QLED medio)." },
+  ],
+  nomeFascia: { BASE: "Base", ENTRY: "Entry", MID: "Media", PREMIUM: "Premium", TOP: "Top" },
+
   regole: {
     LG: [["UA7", "UHD Entry"], ["NANO", "UHD Premium"], ["OLEDB", "OLED Entry"], ["OLEDC", "OLED Mid"], ["OLEDG", "OLED Premium"],
          ["QNED80 / 81 / 82 / 84", "QLED Entry"], ["QNED85 / 86", "Mini-LED Entry"], ["QNED92 / 93", "Mini-LED Premium"]],
@@ -90,5 +98,13 @@ window.TVM = {
               ["QN 90–94", "Neo QLED 4K Mid"], ["QN >94", "Neo QLED 4K Premium"], ["QN 3 cifre", "Neo QLED 8K (Entry <800, Mid 800–949, Premium 990)"],
               ["M + numero", "Mini-LED (stesse fasce di QN)"], ["S <90", "OLED Entry"], ["S 90–93", "OLED Mid"], ["S 94–98", "OLED Premium"],
               ["S >98", "OLED Super Premium"], ["Q6 / Q7", "QLED 4K Entry"], ["Q8 / Q9", "QLED 4K Premium"]],
+    TCL: [["X", "Mini-LED Top"], ["C8", "Mini-LED Premium"], ["C7 (C755, C7K)", "Mini-LED Media"], ["C6K", "Mini-LED Entry"],
+          ["C645 / C655", "QLED Entry"], ["T8", "QLED Media"], ["T7 / Q", "QLED Entry"], ["P8", "LED Media"], ["P / V", "LED Entry"]],
+    Philips: [["OLED9", "OLED Top"], ["OLED8", "OLED Premium"], ["OLED7", "OLED Media"], ["PML9", "Mini-LED Premium"],
+              ["PML8", "Mini-LED Media"], ["PUS9 / PQS", "QLED Media"], ["PUS8", "LED Media"], ["PUS7", "LED Entry"]],
+    Sony: [["XR90 (Bravia 9)", "Mini-LED Top"], ["XR80 (Bravia 8)", "OLED Premium"], ["XR70 (Bravia 7)", "Mini-LED Media"],
+           ["A9", "OLED Top"], ["A8 / A7", "OLED Premium"], ["X9", "LED Premium"], ["X8", "LED Media"], ["X7 / S30 (Bravia 3)", "LED Entry"]],
+    Panasonic: [["Z9", "OLED Premium"], ["Z8", "OLED Media"], ["W95", "Mini-LED Premium"], ["W9 / W8", "LED Media"], ["W7", "LED Entry"]],
+    Xiaomi: [["S Mini LED", "Mini-LED Premium"], ["A Pro / F Pro / Max", "QLED Media"], ["A / F", "LED Entry"]],
   },
 };

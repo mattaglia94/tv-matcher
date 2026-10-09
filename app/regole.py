@@ -20,6 +20,7 @@ class InfoTV:
     pollici: int | None = None
     tecnologia: str = ""      # OLED / MINILED / NEOQLED / QLED / LED
     famiglia: str = ""        # chiave di famiglia/fascia (es. HISENSE-QLED-ENTRY-1)
+    fascia: str = ""          # fascia comune a tutte le marche: BASE / ENTRY / MID / PREMIUM / TOP
     pro: bool = False
     risoluzione: str = ""     # 8K / 4K / FHD / HD
     hz: int | None = None
@@ -261,29 +262,114 @@ def _xiaomi(T: str, info: InfoTV):
     info.codice = f"{serie}{' PRO' if info.pro else ''} {info.pollici}"
     info.core = f"{info.pollici}{serie}{'PRO' if info.pro else ''}"
     info.tecnologia = tecnologia_testo(T) or ("MINILED" if serie == "S" else "QLED" if (info.pro or serie == "MAX") else "LED")
-    fascia = {"A": "AF", "F": "AF", "Q": "AF", "S": "S", "MAX": "MAX"}[serie]
-    info.famiglia = f"XIAOMI-{info.tecnologia}-{fascia}"
+    fam = {"A": "AF", "F": "AF", "Q": "AF", "S": "S", "MAX": "MAX"}[serie]
+    info.famiglia = f"XIAOMI-{info.tecnologia}-{fam}"
+    info.fascia = "PREMIUM" if serie == "S" else "MID" if (info.pro or serie == "MAX") else "ENTRY"
     info.regola = "XIAOMI"
     return True
 
 
-# ----------------------------------------------------------------- generica
+# ----------------------------------------------------------------- altre marche: tabelle serie
+# (regex sulla serie = lettere+cifre del codice, tecnologia, fascia). Ordine: dal più specifico.
+# Servono a dare a ogni modello una tecnologia e una fascia stabili, che NON dipendono
+# da quali parole compaiono nel titolo del retailer.
+SERIE = {
+    "TCL": [
+        (r"^X\d", "MINILED", "TOP"),
+        (r"^QM\d", "MINILED", "MID"),
+        (r"^C8", "MINILED", "PREMIUM"),
+        (r"^C7[0-4]\d", "QLED", "MID"),       # C745 e simili (QLED)
+        (r"^C7", "MINILED", "MID"),            # C755, C7K
+        (r"^C6\d\d", "QLED", "ENTRY"),        # C645, C655 (QLED)
+        (r"^C6", "MINILED", "ENTRY"),          # C6K (QD-Mini LED)
+        (r"^T8", "QLED", "MID"),
+        (r"^T\d", "QLED", "ENTRY"),
+        (r"^Q\d", "QLED", "ENTRY"),
+        (r"^P8", "LED", "MID"),
+        (r"^[PV]\d", "LED", "ENTRY"),
+        (r"^S\d", "LED", "BASE"),
+    ],
+    "PHILIPS": [
+        (r"^OLED9", "OLED", "TOP"),
+        (r"^OLED8", "OLED", "PREMIUM"),
+        (r"^OLED", "OLED", "MID"),
+        (r"^PML9", "MINILED", "PREMIUM"),
+        (r"^PML", "MINILED", "MID"),
+        (r"^PQS|^PUS9", "QLED", "MID"),
+        (r"^PUS8", "LED", "MID"),
+        (r"^PUS", "LED", "ENTRY"),
+        (r"^P[FH]S", "LED", "BASE"),
+    ],
+    "SONY": [
+        (r"^XR9", "MINILED", "TOP"),           # Bravia 9
+        (r"^XR8", "OLED", "PREMIUM"),          # Bravia 8
+        (r"^XR7", "MINILED", "MID"),           # Bravia 7
+        (r"^A9", "OLED", "TOP"),
+        (r"^A[78]", "OLED", "PREMIUM"),
+        (r"^X9", "LED", "PREMIUM"),
+        (r"^X8", "LED", "MID"),
+        (r"^X7", "LED", "ENTRY"),
+        (r"^S\d", "LED", "ENTRY"),             # Bravia 3
+        (r"^W\d", "LED", "BASE"),
+    ],
+    "PANASONIC": [
+        (r"^Z9|^MZ", "OLED", "PREMIUM"),
+        (r"^Z", "OLED", "MID"),
+        (r"^W9[5-9]", "MINILED", "PREMIUM"),
+        (r"^W9|^MX9", "LED", "MID"),
+        (r"^W8|^MX8", "LED", "MID"),
+        (r"^W|^MX", "LED", "ENTRY"),
+        (r"^[ML]S", "LED", "BASE"),
+    ],
+}
+
+
 def _generica(T: str, info: InfoTV):
-    """Altre marche (TCL, Philips, Sony...): codice = primo token con pollici+lettere,
-    famiglia = marca + tecnologia + serie letterale (es. TCL C7, PHILIPS PML9)."""
+    """Altre marche (TCL, Philips, Sony...): codice = primo token con pollici+lettere.
+    Se la serie è nella tabella SERIE: famiglia = marca + tecnologia + fascia della tabella;
+    altrimenti famiglia = marca + serie letterale (es. SHARP-GR8), senza la tecnologia del titolo."""
     m = re.search(r"\b(?:[A-Z]{1,4})?(\d{2,3})([A-Z]{1,4})(\d{1,4})([A-Z0-9]*)\b", T)
-    if m:
-        info.codice = m.group(0)
-        info.pollici = info.pollici or int(m.group(1))
-        info.core = m.group(1) + m.group(2) + m.group(3)
-        serie = m.group(2) + m.group(3)[0]
-    else:
-        serie = ""
-    info.tecnologia = tecnologia_testo(T)
+    tec_titolo = tecnologia_testo(T)
     info.pro = " PRO" in T
-    info.famiglia = f"{info.marca}-{info.tecnologia}-{serie}"
     info.regola = "GENERICA"
-    return bool(m)
+    if not m:
+        info.tecnologia = tec_titolo
+        info.famiglia = f"{info.marca}-"
+        return False
+    info.codice = m.group(0)
+    info.pollici = info.pollici or int(m.group(1))
+    info.core = m.group(1) + m.group(2) + m.group(3)
+    chiave = m.group(2) + m.group(3)
+    for rx, tec, fascia in SERIE.get(info.marca, []):
+        if re.search(rx, chiave):
+            info.tecnologia = tec
+            info.fascia = fascia
+            info.famiglia = f"{info.marca}-{tec}-{fascia}"
+            info.regola = f"{info.marca}-tabella"
+            return True
+    info.tecnologia = tec_titolo
+    info.famiglia = f"{info.marca}-{m.group(2)}{m.group(3)[0]}"
+    return True
+
+
+# fascia comune per le marche con regole proprie (LG, Hisense, Samsung): ricavata dalla famiglia
+_FASCIA_FAMIGLIA = {"LG-UHD-PREMIUM": "MID", "LG-MINILED-ENTRY": "MID", "HISENSE-QLED-HD": "BASE",
+                    "HISENSE-LED-HD": "BASE", "HISENSE-MINILED-ENTRY": "MID", "HISENSE-MINILED-MID": "PREMIUM",
+                    "HISENSE-MINILED-PREMIUM": "TOP"}
+LIVELLI = {"BASE": 0, "ENTRY": 1, "MID": 2, "PREMIUM": 3, "TOP": 4}
+
+
+def fascia_da_famiglia(fam: str) -> str:
+    if not fam:
+        return ""
+    if fam in _FASCIA_FAMIGLIA:
+        return _FASCIA_FAMIGLIA[fam]
+    if "8K" in fam or "SUPERPREMIUM" in fam:
+        return "TOP"
+    for tok in ("PREMIUM", "MID", "ENTRY"):  # SUPERENTRY contiene ENTRY
+        if tok in fam:
+            return tok
+    return ""
 
 
 def analizza(testo: str, codice_noto: str = "") -> InfoTV:
@@ -314,6 +400,8 @@ def analizza(testo: str, codice_noto: str = "") -> InfoTV:
         info.anno = anno_t
     if not info.tecnologia:
         info.tecnologia = tecnologia_testo(T)
+    if not info.fascia:
+        info.fascia = fascia_da_famiglia(info.famiglia)
     if info.tecnologia == "OLED" and not info.risoluzione:
         info.risoluzione = "4K"
     info.dolby_vision = "DOLBY VISION" in T
@@ -324,8 +412,8 @@ def analizza(testo: str, codice_noto: str = "") -> InfoTV:
 
 # ----------------------------------------------------------------- parametri
 PARAMETRI_DEFAULT = {
+    "modalita": "stessa_marca",   # "stessa_marca" = alternativa della stessa marca, "concorrente" = altra marca equivalente
     "pollici": {"attivo": True, "tolleranza": 0},
-    "stessa_marca": {"attivo": True},
     "famiglia": {"attivo": True},
     "tecnologia": {"attivo": True, "equivalenze": [["MINILED", "NEOQLED"]]},
     "risoluzione": {"attivo": True},
@@ -342,11 +430,18 @@ PARAMETRI_DEFAULT = {
 
 def unisci_parametri(p: dict | None) -> dict:
     out = {k: (dict(v) if isinstance(v, dict) else v) for k, v in PARAMETRI_DEFAULT.items()}
-    for k, v in (p or {}).items():
+    p = dict(p or {})
+    # compatibilità con le ricerche salvate prima della modalità: "stessa marca" spenta = concorrenti
+    if "modalita" not in p and isinstance(p.get("stessa_marca"), dict):
+        p["modalita"] = "stessa_marca" if p["stessa_marca"].get("attivo", True) else "concorrente"
+    p.pop("stessa_marca", None)
+    for k, v in p.items():
         if isinstance(v, dict) and isinstance(out.get(k), dict):
             out[k].update(v)
         else:
             out[k] = v
+    if out["modalita"] not in ("stessa_marca", "concorrente"):
+        out["modalita"] = "stessa_marca"
     return out
 
 
@@ -357,29 +452,50 @@ def _tec_equivalenti(a: str, b: str, gruppi) -> bool:
 
 
 def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
-    """Come confronta() ma ogni criterio si accende/spegne da P (vedi PARAMETRI_DEFAULT).
+    """Ogni criterio si accende/spegne da P (vedi PARAMETRI_DEFAULT).
+    Modalità "stessa_marca": stessa marca, stessa famiglia, codice diverso.
+    Modalità "concorrente": altra marca, stessa tecnologia e fascia (±1 ammessa, penalizzata).
     Ritorna (ok, motivo, punteggio): punteggio più basso = più vicino."""
+    concorrente = P.get("modalita") == "concorrente"
     if not cand.codice:
         return False, "codice modello non leggibile", 0
-    if stesso_modello(amz, cand):
-        return False, "stesso modello (escluso)", 0
-    if P["stessa_marca"]["attivo"] and cand.marca != amz.marca:
-        return False, "marca diversa", 0
     if not cand.marca:
         return False, "marca non riconosciuta", 0
+    if concorrente and cand.marca == amz.marca:
+        return False, "stessa marca (cerco concorrenti)", 0
+    if not concorrente:
+        if cand.marca != amz.marca:
+            return False, "marca diversa", 0
+        if stesso_modello(amz, cand):
+            return False, "stesso modello (escluso)", 0
+    note, score = [], 0
     if P["pollici"]["attivo"]:
         tol = int(P["pollici"].get("tolleranza") or 0)
         if cand.pollici is None or amz.pollici is None or abs(cand.pollici - amz.pollici) > tol:
             return False, f"pollici {cand.pollici}", 0
-    # la famiglia ha senso solo nella stessa marca
-    if P["famiglia"]["attivo"] and cand.marca == amz.marca:
-        if not cand.famiglia or cand.famiglia != amz.famiglia:
-            return False, f"famiglia {cand.famiglia or '?'}", 0
-    if P["tecnologia"]["attivo"]:
-        if not cand.tecnologia or not _tec_equivalenti(amz.tecnologia, cand.tecnologia,
-                                                       P["tecnologia"].get("equivalenze")):
-            return False, f"tecnologia {cand.tecnologia or '?'}", 0
-    if P["pro"]["attivo"] and cand.pro != amz.pro:
+    score += 100 * abs((cand.pollici or 0) - (amz.pollici or 0))
+    if P["famiglia"]["attivo"]:
+        if not concorrente:
+            if not cand.famiglia or cand.famiglia != amz.famiglia:
+                return False, f"famiglia {cand.famiglia or '?'}", 0
+        elif amz.fascia:
+            if not cand.fascia:
+                note.append("fascia da verificare")
+                score += 40
+            else:
+                d = abs(LIVELLI[cand.fascia] - LIVELLI[amz.fascia])
+                if d > 1:
+                    return False, f"fascia {cand.fascia.lower()}", 0
+                score += 50 * d
+                if d:
+                    note.append(f"fascia {cand.fascia.lower()} (ASIN {amz.fascia.lower()})")
+    if P["tecnologia"]["attivo"] and amz.tecnologia:
+        if not cand.tecnologia:
+            note.append("tecnologia da verificare")
+            score += 30
+        elif not _tec_equivalenti(amz.tecnologia, cand.tecnologia, P["tecnologia"].get("equivalenze")):
+            return False, f"tecnologia {cand.tecnologia}", 0
+    if P["pro"]["attivo"] and not concorrente and cand.pro != amz.pro:
         return False, "PRO vs non-PRO", 0
     if P["risoluzione"]["attivo"] and amz.risoluzione and cand.risoluzione \
             and amz.risoluzione != cand.risoluzione:
@@ -388,7 +504,6 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
             and classe_hz(amz.hz) != classe_hz(cand.hz):
         return False, f"refresh {cand.hz}Hz", 0
     # Dolby Vision / HDR10+ / HDMI 2.1 si controllano sulla pagina prodotto (nucleo.elabora_asin)
-    nota = ""
     if P["anno"]["attivo"]:
         target = int(P["anno"].get("valore") or 2026)
         if cand.anno is not None and cand.anno != target:
@@ -396,14 +511,13 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
         if cand.anno is None:
             if not P["anno"].get("accetta_ignoto", True):
                 return False, "anno non determinabile", 0
-            nota = "anno da verificare"
-    na = re.findall(r"\d+", amz.core[len(str(amz.pollici or "")):]) or ["0"]
-    nb = re.findall(r"\d+", cand.core[len(str(cand.pollici or "")):]) or ["0"]
-    score = abs(int(na[0]) - int(nb[0]))
-    score += 0 if cand.marca == amz.marca else 1000
-    score += 0 if cand.pollici == amz.pollici else 100 * abs((cand.pollici or 0) - (amz.pollici or 0))
-    score += 5 if nota else 0
-    return True, nota or "ok", score
+            note.append("anno da verificare")
+            score += 5
+    if not concorrente:  # vicinanza tra i numeri di serie della stessa marca
+        na = re.findall(r"\d+", amz.core[len(str(amz.pollici or "")):]) or ["0"]
+        nb = re.findall(r"\d+", cand.core[len(str(cand.pollici or "")):]) or ["0"]
+        score += abs(int(na[0]) - int(nb[0]))
+    return True, ", ".join(note) or "ok", score
 
 
 # ----------------------------------------------------------------- matching

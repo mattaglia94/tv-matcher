@@ -7,6 +7,14 @@
   // ------------------------------------------------------------------ utilità
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const clona = (o) => JSON.parse(JSON.stringify(o));
+  // parametri salvati prima della modalità: "stessa marca" spenta = ricerca di concorrenti
+  function normalizzaParametri(p) {
+    const vecchio = p && p.stessa_marca;
+    const out = Object.assign(clona(T.parametriDefault), p || {});
+    if (vecchio && !(p && p.modalita)) out.modalita = vecchio.attivo === false ? "concorrente" : "stessa_marca";
+    delete out.stessa_marca;
+    return out;
+  }
   const paese = (c) => T.paesi.find((p) => p.codice === c) || { codice: c, nome: c, bandiera: "🏳️" };
   const memoria = {
     leggi(k, def) { try { const v = localStorage.getItem("tvm_" + k); return v ? JSON.parse(v) : def; } catch { return def; } },
@@ -39,8 +47,8 @@
   };
   const ESITI = { saltato: "Saltato", trovato: "Trovato", non_presente: "Prodotto non presente", nessun_simile: "Nessun modello simile", errore: "Ricerca non riuscita", illeggibile: "Risultati non leggibili" };
   const ESITI_NOTA = {
-    non_presente: "Nessun TV di questa marca e diagonale nel catalogo del retailer.",
-    nessun_simile: "Ci sono TV della stessa marca e diagonale, ma nessuno rispetta i criteri.",
+    non_presente: "Nessun TV con la marca e la diagonale cercate nel catalogo del retailer.",
+    nessun_simile: "Ci sono TV con la marca e la diagonale cercate, ma nessuno rispetta i criteri.",
     errore: "Il sito non ha risposto o ha bloccato la ricerca: riprova più tardi.",
     illeggibile: "La pagina si è aperta ma non mostrava TV leggibili (probabile blocco): verifica a mano.",
   };
@@ -69,7 +77,7 @@
     polling: null,
     vistaRisultati: memoria.leggi("vista", "schede"),
   };
-  S.bozza.parametri = Object.assign(clona(T.parametriDefault), S.bozza.parametri || {});
+  S.bozza.parametri = normalizzaParametri(S.bozza.parametri);
   const salvaBozza = () => memoria.scrivi("bozza", S.bozza);
   const salvaImpostazioni = rimbalzo(async () => {
     try { await api("impostazioni", { metodo: "PUT", corpo: S.impostazioni }); toast("Impostazioni salvate", "ok"); }
@@ -409,6 +417,8 @@
   }
 
   // ---------------- passo 3: parametri
+  const testoVoce = (v, P) => (typeof v.testo === "string" ? v.testo : v.testo[P.modalita] || "");
+  const nomeModalita = (P) => (T.modalita.find((m) => m.valore === P.modalita) || T.modalita[0]).titolo;
   function passoParametri(box) {
     const P = S.bozza.parametri;
     const preset = S.impostazioni.preset || [];
@@ -442,13 +452,23 @@
           ${S.bozza.preset !== "" && S.bozza.preset !== "__std" && preset[S.bozza.preset] ? '<button class="btn fantasma piccolo pericolo" type="button" id="eliminaPreset">Elimina preset</button>' : ""}
         </div>
       </section>
+      <section class="scheda">
+        <h3>Cosa cerchi?</h3>
+        <div class="modalita" role="radiogroup" aria-label="Modalità di ricerca">
+          ${T.modalita.map((m) => `
+            <label class="modalita-opz ${P.modalita === m.valore ? "scelta" : ""}">
+              <input type="radio" name="modalita" value="${m.valore}" ${P.modalita === m.valore ? "checked" : ""}>
+              <strong>${m.titolo}</strong><span>${m.testo}</span>
+            </label>`).join("")}
+        </div>
+      </section>
       ${T.parametriInfo.map((g) => `
         <section class="scheda gruppo-param">
           <h3>${g.gruppo}</h3>${g.nota ? `<p class="tenue piccolo">${g.nota}</p>` : ""}
-          ${g.voci.map((v) => `
+          ${g.voci.filter((v) => !v.solo || v.solo === P.modalita).map((v) => `
             <div class="param ${P[v.chiave].attivo ? "" : "spento"}">
               ${sw(v.chiave, P[v.chiave].attivo)}
-              <div><h4>${v.titolo}</h4><p>${v.testo}</p>${P[v.chiave].attivo ? controllo(v) : ""}</div>
+              <div><h4>${v.titolo}</h4><p>${testoVoce(v, P)}</p>${P[v.chiave].attivo ? controllo(v) : ""}</div>
             </div>`).join("")}
         </section>`).join("")}
       <section class="scheda">
@@ -465,6 +485,7 @@
       </section>`;
     const cambia = () => { S.bozza.preset = ""; salvaBozza(); passoParametri(box); };
     const imposta = (path, val) => { const [a, b] = path.split("."); if (b) P[a][b] = val; else P[a] = val; };
+    box.querySelectorAll('input[name="modalita"]').forEach((x) => (x.onchange = () => { P.modalita = x.value; cambia(); }));
     box.querySelectorAll("[data-on]").forEach((x) => (x.onchange = () => { P[x.dataset.on].attivo = x.checked; cambia(); }));
     box.querySelectorAll("[data-num]").forEach((x) => (x.onchange = () => { imposta(x.dataset.num, Number(x.value)); cambia(); }));
     box.querySelectorAll("[data-bool]").forEach((x) => (x.onchange = () => { imposta(x.dataset.bool, x.checked); cambia(); }));
@@ -479,7 +500,7 @@
     document.getElementById("selPreset").onchange = (e) => {
       const v = e.target.value;
       if (v === "__std") S.bozza.parametri = clona(T.parametriDefault);
-      else if (v !== "") S.bozza.parametri = Object.assign(clona(T.parametriDefault), clona(preset[Number(v)].parametri));
+      else if (v !== "") S.bozza.parametri = normalizzaParametri(clona(preset[Number(v)].parametri));
       S.bozza.preset = v === "__std" ? "" : v;
       salvaBozza(); passoParametri(box);
     };
@@ -509,7 +530,7 @@
     const coperti = b.asin.filter((a) => ret.some((r) => r.paese === a.paese));
     const coppie = coperti.reduce((n, a) => n + ret.filter((r) => r.paese === a.paese).length, 0);
     const minuti = Math.max(2, Math.round((coperti.length * 12 + coppie * (P.verifica_url ? 45 : 28)) / 60)) + 2;
-    const attivi = T.parametriInfo.flatMap((g) => g.voci).filter((v) => P[v.chiave].attivo);
+    const attivi = T.parametriInfo.flatMap((g) => g.voci).filter((v) => P[v.chiave].attivo && (!v.solo || v.solo === P.modalita));
     if (!b.nome) b.nome = `Ricerca ${new Date().toLocaleDateString("it-IT", { month: "long", year: "numeric" })}`;
     box.innerHTML = `
       <section class="scheda">
@@ -521,6 +542,7 @@
           <div><strong>${ret.length}</strong><span class="tenue piccolo">marketplace in ${[...new Set(ret.map((r) => r.paese))].map((c) => paese(c).bandiera).join(" ")}</span></div>
           <div><strong>~${minuti} min</strong><span class="tenue piccolo">durata stimata</span></div>
         </div>
+        <p class="piccolo tenue">Modalità: <span class="chip info">${nomeModalita(P)}</span></p>
         <p class="piccolo tenue">Criteri attivi: ${attivi.map((v) => `<span class="chip">${v.titolo}${v.chiave === "pollici" && P.pollici.tolleranza ? ` ±${P.pollici.tolleranza}"` : ""}${v.chiave === "anno" ? ` ${P.anno.valore}` : ""}</span>`).join(" ") || "nessuno"}</p>
         <div style="margin-top:26px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
           <button class="btn primario grande" type="button" id="btnAvvia" ${coperti.length ? "" : "disabled"}>${ICONE.play} Avvia la ricerca</button>
@@ -649,7 +671,7 @@
     document.getElementById("btnDuplica").onclick = () => {
       const c = S.statoRun.config;
       if (!c) return toast("Configurazione non ancora disponibile", "errore");
-      S.bozza = { asin: c.asin.map((a) => ({ modello: "", ...a })), nome: "", paeseDefault: c.asin[0]?.paese || "IT", parametri: Object.assign(clona(T.parametriDefault), c.parametri), preset: "" };
+      S.bozza = { asin: c.asin.map((a) => ({ modello: "", ...a })), nome: "", paeseDefault: c.asin[0]?.paese || "IT", parametri: normalizzaParametri(c.parametri), preset: "" };
       salvaBozza();
       toast("Impostazioni caricate: controlla e avvia", "ok");
       location.hash = "#/nuova/1";
@@ -662,7 +684,7 @@
         asin: falliti.map((r) => ({ asin: r.asin, paese: r.paese, modello: "" })),
         mancanti: falliti.map((r) => r.asin),
         nome: `${s.nome || "Ricerca"}: modelli mancanti`, paeseDefault: falliti[0]?.paese || "IT",
-        parametri: Object.assign(clona(T.parametriDefault), s.config?.parametri || {}), preset: "",
+        parametri: normalizzaParametri(s.config?.parametri), preset: "",
       };
       salvaBozza();
       toast("Scrivi il modello accanto a ogni ASIN evidenziato, poi avvia", "ok");
@@ -727,6 +749,7 @@
     const out = [];
     if (a.pollici) out.push(`${a.pollici}"`);
     if (a.tecnologia) out.push(T.nomeTecnologia[a.tecnologia] || a.tecnologia);
+    if (a.fascia) out.push(`Fascia ${T.nomeFascia[a.fascia] || a.fascia}`);
     if (a.risoluzione) out.push(a.risoluzione);
     if (a.anno) out.push(a.anno);
     if (a.pro) out.push("PRO");
@@ -926,7 +949,7 @@
           <ol>
             <li><div><h3>Inserisci gli ASIN</h3><p>Incolla la lista o carica un CSV/Excel. Ogni ASIN ha un paese: lo leggo dalla riga (es. <code>B0F457MQCQ;IT</code>) o uso il paese predefinito. Se Amazon non risponde, scrivi a mano il modello nella colonna facoltativa.</p></div></li>
             <li><div><h3>Scegli i marketplace</h3><p>Spunta i retailer su cui cercare. Puoi modificare un URL, aggiungerne di nuovi o disattivarli: le modifiche valgono per tutti e restano salvate.</p></div></li>
-            <li><div><h3>Imposta la somiglianza</h3><p>Accendi i criteri da rispettare. La configurazione standard segue il documento di matching: stessi pollici, stessa famiglia e fascia, anno 2026, PRO separati. Salva le combinazioni che usi spesso come preset.</p></div></li>
+            <li><div><h3>Imposta la somiglianza</h3><p>Scegli se cerchi un'alternativa della stessa marca o un concorrente equivalente, poi accendi i criteri da rispettare. La configurazione standard segue il documento di matching: stessi pollici, stessa famiglia e fascia, anno 2026, PRO separati. Salva le combinazioni che usi spesso come preset.</p></div></li>
             <li><div><h3>Avvia e attendi</h3><p>Il motore gira su GitHub. Una ricerca da 10 ASIN su 4 retailer richiede circa 20 minuti. Puoi chiudere la pagina: la pillola verde in alto e lo Storico ti riportano all'avanzamento.</p></div></li>
             <li><div><h3>Leggi e scarica</h3><p>Per ogni ASIN vedi i modelli simili per retailer con foto e link. "Anno da verificare" segnala i modelli il cui anno non si ricava dal codice. Scarica l'Excel con un foglio per paese più il foglio Dettaglio con tutti i candidati scartati e il motivo.</p></div></li>
           </ol>

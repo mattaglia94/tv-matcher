@@ -3,6 +3,7 @@ import datetime as dt
 import os
 import re
 
+from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
@@ -43,7 +44,7 @@ def leggi_input(percorso):
             if r and r[0] and r[1] and r[2]:
                 retailer.append((str(r[0]).strip().upper(), str(r[1]).strip(), str(r[2]).strip(),
                                  str(r[3] or "SI").strip().upper()))
-    impost = {"anno": 2026, "anno_ignoto": True, "verifica": True}
+    impost = {"anno": 2026, "anno_ignoto": True, "verifica": True, "modalita": "stessa_marca"}
     if "Impostazioni" in wb.sheetnames:
         for r in wb["Impostazioni"].iter_rows(min_row=2, values_only=True):
             if not r or not r[0]:
@@ -53,6 +54,8 @@ def leggi_input(percorso):
                 impost["anno"] = int(v)
             elif "anno non" in k:
                 impost["anno_ignoto"] = str(v).upper().startswith("S")
+            elif "modalit" in k:
+                impost["modalita"] = "concorrente" if "CONCORR" in str(v).upper() else "stessa_marca"
             elif "verifica" in k:
                 impost["verifica"] = str(v).upper().startswith("S")
     return righe, retailer or list(RETAILER), impost
@@ -70,7 +73,8 @@ def esegui(percorso_input, paese, cartella_out, visibile=False, log=print, stop=
     if not righe or not ret:
         raise RuntimeError("Nessun ASIN o nessun retailer attivo per il paese scelto.")
     parametri = {"anno": {"attivo": True, "valore": imp["anno"], "accetta_ignoto": imp["anno_ignoto"]},
-                 "verifica_url": imp["verifica"]}
+                 "verifica_url": imp["verifica"], "modalita": imp["modalita"]}
+    log("Modalità: " + ("concorrente equivalente" if imp["modalita"] == "concorrente" else "alternativa stessa marca"))
     br = Browser(visibile=visibile, log=log)
     risultati = []
     try:
@@ -175,6 +179,11 @@ def crea_modello_input(percorso):
     wr.column_dimensions["C"].width = 75
     wi = wb.create_sheet("Impostazioni")
     wi.append(["Impostazione", "Valore", "Spiegazione"])
+    wi.append(["Modalità", "STESSA MARCA",
+               "STESSA MARCA = alternativa della stessa marca (codice diverso) · CONCORRENTE = modello equivalente di un'altra marca"])
+    dv = DataValidation(type="list", formula1='"STESSA MARCA,CONCORRENTE"', allow_blank=False)
+    wi.add_data_validation(dv)
+    dv.add("B2")
     wi.append(["Anno target", 2026, "Solo modelli di quest'anno"])
     wi.append(["Accetta anno non determinabile", "SI",
                "SI = accetta modelli il cui anno non si ricava dal codice/titolo (segnalati nel foglio Dettaglio)"])

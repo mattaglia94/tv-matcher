@@ -13,9 +13,19 @@ AMAZON_DOMINIO = {"IT": "amazon.it", "DE": "amazon.de", "FR": "amazon.fr",
                   "ES": "amazon.es", "UK": "amazon.co.uk"}
 
 
+NOMI_TEC = {"MINILED": "Mini LED", "NEOQLED": "Mini LED", "QLED": "QLED", "OLED": "OLED", "LED": "4K"}
+MARCHE_PRINCIPALI = ["Samsung", "LG", "Hisense", "TCL", "Philips", "Sony", "Xiaomi"]
+
+
 def query_ricerca(info, P):
     """Testi di ricerca da provare sul retailer (dal più specifico al più largo)."""
     m, p, f = info.marca.title(), info.pollici, info.famiglia
+    tec = NOMI_TEC.get(info.tecnologia, "")
+    if P.get("modalita") == "concorrente":
+        q = [f"TV {p} {tec}".strip(), f"TV {p} pollici"]
+        # poi le marche concorrenti più diffuse, finché non si trova un match
+        q += [f"{x} {p} {tec}".strip() for x in MARCHE_PRINCIPALI if x.upper() != info.marca][:3]
+        return q
     q = []
     if info.marca == "LG":
         if f.startswith("LG-OLED"):
@@ -38,15 +48,12 @@ def query_ricerca(info, P):
         q.append(f"{m} {p} {info.tecnologia.replace('MINILED', 'Mini LED')}".strip())
     if m:
         q.append(f"TV {m} {p}")
-    if not P["stessa_marca"]["attivo"]:
-        tec = {"MINILED": "Mini LED", "NEOQLED": "Mini LED"}.get(info.tecnologia, info.tecnologia)
-        q.append(f"TV {p} {tec}".strip())
     return q
 
 
 def info_dict(i):
     return {"marca": i.marca, "codice": i.codice, "pollici": i.pollici, "tecnologia": i.tecnologia,
-            "famiglia": i.famiglia, "pro": i.pro, "risoluzione": i.risoluzione, "hz": i.hz,
+            "famiglia": i.famiglia, "fascia": i.fascia, "pro": i.pro, "risoluzione": i.risoluzione, "hz": i.hz,
             "anno": i.anno}
 
 
@@ -86,6 +93,7 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
     """riga: {asin, paese, nome?, modello?}; retailer: [{nome, url}] del paese della riga.
     Ritorna dict con dati Amazon, match per retailer e righe di dettaglio."""
     P = unisci_parametri(parametri)
+    concorrente = P["modalita"] == "concorrente"
     paese = (riga.get("paese") or "IT").upper()
     out = {"asin": riga["asin"], "paese": paese, "amazon": {}, "match": {}, "esito": {}, "dettaglio": [], "errore": ""}
     url_amz = f"https://www.{AMAZON_DOMINIO.get(paese, 'amazon.it')}/dp/{riga['asin']}"
@@ -118,10 +126,11 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
                 if not c.marca or not c.pollici:
                     continue
                 tv_letti += 1
-                if c.marca == info.marca and c.pollici == info.pollici:
-                    pertinenti += 1
-                if P["stessa_marca"]["attivo"] and c.marca != info.marca:
-                    continue
+                if (c.marca != info.marca) == concorrente:
+                    if c.pollici == info.pollici:
+                        pertinenti += 1
+                else:
+                    continue  # stessa marca in modalità concorrente, o altra marca in modalità stessa marca
                 ok, motivo, score = confronta_param(info, c, P)
                 out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "famiglia": c.famiglia,
                                          "pollici": c.pollici, "anno": c.anno, "url": l["url"],

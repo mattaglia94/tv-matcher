@@ -221,6 +221,12 @@ label.campo { display: grid; gap: 6px; font-weight: 600; font-size: .9rem; }
 .gruppo-param + .gruppo-param { margin-top: 26px; }
 .gruppo-param > h3 { margin-bottom: 4px; }
 .gruppo-param > p { margin-bottom: 12px; }
+.modalita { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 14px; }
+.modalita-opz { display: grid; gap: 6px; padding: 16px; border: 1px solid var(--linea); border-radius: var(--r-m); background: var(--notte-2); cursor: pointer; }
+.modalita-opz input { position: absolute; opacity: 0; pointer-events: none; }
+.modalita-opz span { color: var(--tenue); font-size: .9rem; }
+.modalita-opz.scelta { border-color: var(--viola-2); background: var(--pannello-2); box-shadow: inset 0 0 0 1px var(--viola-2); }
+.modalita-opz:has(input:focus-visible) { outline: 2px solid var(--ciano); outline-offset: 2px; }
 .param { display: grid; grid-template-columns: auto 1fr; gap: 16px; padding: 16px; border: 1px solid var(--linea); border-radius: var(--r-m); background: var(--notte-2); }
 .param + .param { margin-top: 10px; }
 .param h4 { margin: 0; font-size: 1rem; }
