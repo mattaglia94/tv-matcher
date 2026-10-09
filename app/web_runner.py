@@ -90,6 +90,7 @@ class Pubblicatore:
 def main():
     from browser import Browser
     from nucleo import elabora_asin
+    from regole import catalogo_predefinito, imposta_catalogo, unisci_catalogo
 
     cfg = json.loads(os.environ.get("CONFIG") or open(sys.argv[1], encoding="utf-8").read())
     asins = cfg.get("asin", [])
@@ -104,6 +105,8 @@ def main():
         assicura_branch()
     pub = Pubblicatore(f"runs/{RUN_ID}/stato.json")
     anagrafica = leggi_json("config/anagrafica_asin.json") or {}
+    # catalogo marche e serie: predefinito + modifiche fatte dal sito
+    imposta_catalogo(unisci_catalogo(catalogo_predefinito(), leggi_json("config/catalogo.json")))
     anagrafica_nuova = {}
     stato = {"id": RUN_ID, "nome": cfg.get("nome", ""), "stato": "in_corso",
              "github_run": os.environ.get("GITHUB_RUN_ID", ""),
@@ -136,6 +139,7 @@ def main():
             if am.get("fonte") in ("Amazon", "inserito a mano", "ricerca web") and am.get("modello") and am.get("pollici"):
                 anagrafica_nuova[f"{a['asin']}|{paese}"] = {
                     "modello": am["modello"], "titolo": am.get("titolo", ""), "img": am.get("img", ""),
+                    "marca": am.get("marca_amazon", ""),
                     "fonte": am["fonte"], "aggiornato": dt.datetime.utcnow().strftime("%Y-%m-%d")}
             if res.get("errore") and not res["match"]:
                 stato["avanzamento"]["fatti"] += len(ret)

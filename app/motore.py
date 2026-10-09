@@ -65,6 +65,11 @@ def leggi_input(percorso):
 def esegui(percorso_input, paese, cartella_out, visibile=False, log=print, stop=lambda: False):
     from browser import Browser
     from nucleo import elabora_asin
+    import json as _json
+    from regole import catalogo_predefinito, imposta_catalogo, unisci_catalogo
+    utente = os.path.join(os.path.dirname(os.path.abspath(percorso_input)), "catalogo_utente.json")
+    imposta_catalogo(unisci_catalogo(catalogo_predefinito(),
+                                     _json.load(open(utente, encoding="utf-8")) if os.path.exists(utente) else None))
     righe, retailer, imp = leggi_input(percorso_input)
     paese = paese.upper()
     ret = [{"nome": n, "url": u} for (p, n, u, att) in retailer if p == paese and att.startswith("S")]

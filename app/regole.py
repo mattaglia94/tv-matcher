@@ -4,11 +4,64 @@ e decidere se due TV sono "simili" (stessa famiglia, stesso pollice, codice dive
 Nessuna AI: solo espressioni regolari e tabelle.
 Le regole di famiglia per LG, Hisense e Samsung seguono il documento di matching.
 """
+import json
+import os
 import re
+import sys
 from dataclasses import dataclass, field
 
-MARCHE = ["LG", "HISENSE", "SAMSUNG", "TCL", "PHILIPS", "SONY", "PANASONIC",
-          "XIAOMI", "TOSHIBA", "SHARP", "METZ", "GRUNDIG", "TELEFUNKEN", "THOMSON", "VIDAA"]
+
+# ----------------------------------------------------------------- catalogo marche e serie
+# Il catalogo predefinito è web/catalogo.json (lo stesso file che mostra il sito).
+# Le modifiche fatte dal sito vengono salvate a parte e passate a imposta_catalogo():
+# una marca modificata sostituisce quella predefinita, una marca con "rimossa": true la toglie.
+def _percorsi_catalogo():
+    qui = os.path.dirname(os.path.abspath(__file__))
+    yield os.path.join(qui, "..", "web", "catalogo.json")
+    yield os.path.join(getattr(sys, "_MEIPASS", qui), "catalogo.json")
+    yield os.path.join(os.path.dirname(sys.executable), "catalogo.json")
+
+
+def catalogo_predefinito() -> dict:
+    for p in _percorsi_catalogo():
+        if os.path.exists(p):
+            with open(p, encoding="utf-8") as f:
+                return json.load(f)
+    return {"marche": []}
+
+
+def unisci_catalogo(base: dict, utente: dict | None) -> dict:
+    out = {k: v for k, v in base.items() if k != "marche"}
+    marche = {m["marca"].upper(): m for m in base.get("marche", [])}
+    for m in (utente or {}).get("marche", []):
+        k = (m.get("marca") or "").upper()
+        if not k:
+            continue
+        if m.get("rimossa"):
+            marche.pop(k, None)
+        else:
+            marche[k] = m
+    out["marche"] = list(marche.values())
+    return out
+
+
+_CAT = {"marche": [], "alias": []}
+
+
+def imposta_catalogo(catalogo: dict):
+    """Prepara il catalogo per la ricerca: marche indicizzate e alias ordinati dal più lungo."""
+    marche, alias = {}, []
+    for m in catalogo.get("marche", []):
+        nome = _norm(m["marca"])
+        marche[nome] = m
+        for a in set([nome] + [_norm(x) for x in m.get("alias", []) if x]):
+            alias.append((a, nome))
+    alias.sort(key=lambda x: -len(x[0]))
+    _CAT.update({"marche": marche, "alias": alias, "fonte": catalogo})
+
+
+def marche_note():
+    return list(_CAT["marche"].keys())
 
 
 @dataclass
@@ -26,6 +79,9 @@ class InfoTV:
     hz: int | None = None
     anno: int | None = None
     regola: str = ""          # quale regola ha classificato
+    chiave: str = ""          # serie ricavata dal codice (es. QN90, OLEDC, C7, BRAVIA 8): si cerca nel catalogo
+    fascia_fonte: str = ""    # catalogo / marca (predefinita della marca) / stimata (dal prezzo)
+    marca_nuova: bool = False # marca non presente nel catalogo (ricavata da Amazon)
     dolby_vision: bool = False
     hdr10plus: bool = False
     hdmi21: bool = False
@@ -39,9 +95,9 @@ def _norm(t: str) -> str:
 
 def trova_marca(t: str) -> str:
     T = _norm(t)
-    for m in MARCHE:
-        if re.search(rf"\b{m}\b", T):
-            return m
+    for a, nome in _CAT["alias"]:
+        if re.search(rf"(?<![A-Z0-9]){re.escape(a)}(?![A-Z0-9])", T):
+            return nome
     return ""
 
 
@@ -137,6 +193,7 @@ def _lg(T: str, info: InfoTV):
         info.pollici = int(m.group(1))
         info.core = f"OLED{m.group(1)}{m.group(2)}{m.group(3)}{m.group(4)[:1]}"  # es. OLED65C64
         key = "OLED" + m.group(2)
+        info.chiave = key
         anno_cifra = int(m.group(3))
         info.anno = 2020 + anno_cifra if anno_cifra <= 9 else None
     else:
@@ -147,6 +204,7 @@ def _lg(T: str, info: InfoTV):
         info.pollici = int(m.group(1))
         info.core = m.group(1) + m.group(2)
         key = m.group(2)
+        info.chiave = key
     for rx, tec, fam in _LG_FAM:
         if re.match(rx, key) or re.search(rx, info.codice):
             info.tecnologia, info.famiglia, info.regola = tec, fam, "LG"
@@ -181,6 +239,7 @@ def _hisense(T: str, info: InfoTV):
     info.pro = bool(re.search(r"PRO\b", T[m.start():m.end() + 6]))
     info.core = m.group(0) + ("PRO" if info.pro else "")
     serie = m.group(2) + m.group(3)
+    info.chiave = serie
     for s, pro, tec, fam in _HIS_FAM:
         if s == serie and (pro is None or pro == info.pro):
             info.tecnologia, info.famiglia, info.regola = tec, fam, "HISENSE"
@@ -211,7 +270,7 @@ def _samsung_fascia(n: int, tre_cifre: bool):
 
 def _samsung(T: str, info: InfoTV):
     # QE65QN90FATXZT, UE55U8000F, QE65S90F, QE55Q7F, TQ65QN80H
-    m = re.search(r"\b(?:QE|UE|GQ|GU|TQ|TU|QN)?(\d{2,3})(QN|Q|S|U|M)(\d{1,4})([A-Z]?)([A-Z0-9]*)", T)
+    m = re.search(r"\b(?:QE|UE|GQ|GU|TQ|TU|QN|MRE|MR)?(\d{2,3})(QN|LS|Q|S|U|M|R)(\d{1,4})([A-Z]?)([A-Z0-9]*)", T)
     if not m:
         return False
     info.codice = m.group(0)
@@ -221,7 +280,11 @@ def _samsung(T: str, info: InfoTV):
     info.anno = SAMSUNG_ANNO.get(anno_l)
     n = int(num)
     tre = len(num) == 3
-    if lett == "QN":
+    info.chiave = ("8K-" if tre and lett in ("QN", "M") else "") + lett + num
+    if lett in ("LS", "R"):
+        info.tecnologia = "QLED" if lett == "LS" else "MINILED"
+        info.famiglia = "SAMSUNG-" + ("LIFESTYLE" if lett == "LS" else "MICRO-RGB")
+    elif lett == "QN":
         info.tecnologia = "NEOQLED"
         info.famiglia = "SAMSUNG-NEOQLED-" + _samsung_fascia(n, tre)
     elif lett == "M":
@@ -262,6 +325,7 @@ def _xiaomi(T: str, info: InfoTV):
     info.pro = pro or " PRO" in T
     info.codice = f"{serie}{' PRO' if info.pro else ''} {info.pollici}"
     info.core = f"{info.pollici}{serie}{'PRO' if info.pro else ''}"
+    info.chiave = serie
     info.tecnologia = tecnologia_testo(T) or ("MINILED" if serie == "S" else "QLED" if (info.pro or serie == "MAX") else "LED")
     fam = {"A": "AF", "F": "AF", "Q": "AF", "S": "S", "MAX": "MAX"}[serie]
     info.famiglia = f"XIAOMI-{info.tecnologia}-{fam}"
@@ -285,82 +349,15 @@ def _xiaomi_codice(T: str, info: InfoTV):
     ris = trova_risoluzione(T)
     info.fascia = "MID" if info.pro else "BASE" if ris in ("HD", "FHD") else "ENTRY"
     info.famiglia = f"XIAOMI-{info.tecnologia}-AF{'-' + ris if ris in ('HD', 'FHD') else ''}"
+    info.chiave = serie + ("-HD" if ris in ("HD", "FHD") else "")
     info.regola = "XIAOMI-codice"
     return True
 
 
-# ----------------------------------------------------------------- altre marche: tabelle serie
-# (regex sulla serie = lettere+cifre del codice, tecnologia, fascia). Ordine: dal più specifico.
-# Servono a dare a ogni modello una tecnologia e una fascia stabili, che NON dipendono
-# da quali parole compaiono nel titolo del retailer.
-SERIE = {
-    "HISENSE": [  # serie non coperte dalle regole del documento (_hisense)
-        (r"^UR9|^UXQ|^UX", "MINILED", "TOP"),
-        (r"^UR8", "MINILED", "PREMIUM"),
-        (r"^Q8", "MINILED", "MID"),
-        (r"^Q[67]", "QLED", "ENTRY"),
-        (r"^S[5-9]", "QLED", "MID"),          # linea Deco/design
-    ],
-    "TCL": [
-        (r"^X\d", "MINILED", "TOP"),
-        (r"^QM\d", "MINILED", "MID"),
-        (r"^C8", "MINILED", "PREMIUM"),
-        (r"^C7[0-4]\d", "QLED", "MID"),       # C745 e simili (QLED)
-        (r"^C7", "MINILED", "MID"),            # C755, C7K
-        (r"^C6\d\d", "QLED", "ENTRY"),        # C645, C655 (QLED)
-        (r"^C6", "MINILED", "ENTRY"),          # C6K (QD-Mini LED)
-        (r"^T8", "QLED", "MID"),
-        (r"^T\d", "QLED", "ENTRY"),
-        (r"^Q\d", "QLED", "ENTRY"),
-        (r"^P8", "LED", "MID"),
-        (r"^[PV]\d", "LED", "ENTRY"),
-        (r"^S\d", "LED", "BASE"),
-    ],
-    "PHILIPS": [
-        (r"^OLED9", "OLED", "TOP"),
-        (r"^OLED8", "OLED", "PREMIUM"),
-        (r"^OLED", "OLED", "MID"),
-        (r"^PML9", "MINILED", "PREMIUM"),
-        (r"^PML", "MINILED", "MID"),
-        (r"^PQS|^PUS9", "QLED", "MID"),
-        (r"^PUS8", "LED", "MID"),
-        (r"^PUS", "LED", "ENTRY"),
-        (r"^P[FH]S", "LED", "BASE"),
-    ],
-    "SONY": [
-        (r"^XR9", "MINILED", "TOP"),           # Bravia 9
-        (r"^XR8", "OLED", "PREMIUM"),          # Bravia 8
-        (r"^XR7", "MINILED", "MID"),           # Bravia 7
-        (r"^A9", "OLED", "TOP"),
-        (r"^A[78]", "OLED", "PREMIUM"),
-        (r"^X9", "LED", "PREMIUM"),
-        (r"^X8", "LED", "MID"),
-        (r"^X7", "LED", "ENTRY"),
-        (r"^S\d", "LED", "ENTRY"),             # Bravia 3
-        (r"^W\d", "LED", "BASE"),
-    ],
-    "PANASONIC": [
-        (r"^Z9|^MZ", "OLED", "PREMIUM"),
-        (r"^Z", "OLED", "MID"),
-        (r"^W9[5-9]", "MINILED", "PREMIUM"),
-        (r"^W9|^MX9", "LED", "MID"),
-        (r"^W8|^MX8", "LED", "MID"),
-        (r"^W|^MX", "LED", "ENTRY"),
-        (r"^[ML]S", "LED", "BASE"),
-    ],
-}
-
-
-# Sony senza codice nel titolo: "BRAVIA 8 65"
-_SONY_BRAVIA = {"9": ("MINILED", "TOP"), "8": ("OLED", "PREMIUM"), "7": ("MINILED", "MID"),
-                "5": ("MINILED", "ENTRY"), "3": ("LED", "ENTRY"), "2": ("LED", "BASE")}
-# marche economiche senza tabella: fascia predefinita (BASE se HD/Full HD)
-_MARCHE_ECONOMICHE = {"TOSHIBA", "METZ", "TELEFUNKEN", "THOMSON", "SHARP", "GRUNDIG", "VIDAA"}
-
-
+# ----------------------------------------------------------------- altre marche
 def _generica(T: str, info: InfoTV):
     """Altre marche (TCL, Philips, Sony...): codice = primo token con pollici+lettere.
-    Se la serie è nella tabella SERIE: famiglia = marca + tecnologia + fascia della tabella;
+    Tecnologia, fascia e famiglia arrivano poi dal catalogo (applica_catalogo);
     altrimenti famiglia = marca + serie letterale (es. SHARP-GR8), senza la tecnologia del titolo."""
     m = re.search(r"\b(?:[A-Z]{1,4})?(\d{2,3})([A-Z]{1,4})(\d{1,4})([A-Z0-9]*)\b", T)
     tec_titolo = tecnologia_testo(T)
@@ -372,10 +369,11 @@ def _generica(T: str, info: InfoTV):
             n = re.search(r"\b(3[2-9]|[4-9]\d|1[01]\d)\b", T)
             info.pollici = int(n.group(1)) if n else None
         if b and info.pollici:
-            info.tecnologia, info.fascia = _SONY_BRAVIA[b.group(1)]
             info.codice = f"BRAVIA {b.group(1)} {info.pollici}"
             info.core = f"{info.pollici}BRAVIA{b.group(1)}"
-            info.famiglia = f"SONY-{info.tecnologia}-{info.fascia}"
+            info.chiave = f"BRAVIA {b.group(1)}"
+            info.tecnologia = tec_titolo
+            info.famiglia = f"SONY-BRAVIA{b.group(1)}"
             info.regola = "SONY-bravia"
             return True
     if not m:  # codici tipo TE43759S48U4P (Telefunken): lettere + pollici + cifre
@@ -387,29 +385,91 @@ def _generica(T: str, info: InfoTV):
     if not m:
         info.tecnologia = tec_titolo
         info.famiglia = f"{info.marca}-"
-        _fascia_economica(T, info)
         return bool(info.codice)
     info.codice = m.group(0)
     info.pollici = info.pollici or int(m.group(1))
     info.core = m.group(1) + m.group(2) + m.group(3)
-    chiave = m.group(2) + m.group(3)
-    for rx, tec, fascia in SERIE.get(info.marca, []):
-        if re.search(rx, chiave):
-            info.tecnologia = tec
-            info.fascia = fascia
-            info.famiglia = f"{info.marca}-{tec}-{fascia}"
-            info.regola = f"{info.marca}-tabella"
-            return True
+    info.chiave = m.group(2) + m.group(3)
     info.tecnologia = tec_titolo
     info.famiglia = f"{info.marca}-{m.group(2)}{m.group(3)[0]}"
-    _fascia_economica(T, info)
     return True
 
 
-def _fascia_economica(T: str, info: InfoTV):
-    if info.marca in _MARCHE_ECONOMICHE and not info.fascia:
-        info.fascia = "BASE" if trova_risoluzione(T) in ("HD", "FHD") else "ENTRY"
-        info.tecnologia = info.tecnologia or "LED"
+def _voce_catalogo(info: InfoTV, T: str):
+    """Serie del catalogo che corrisponde al modello: prefisso più lungo della chiave
+    (es. chiave QN95 -> voce QN95 batte QN9), rispettando il flag PRO se la voce lo indica.
+    Per le voci lunghe (BEOVISION, BRAVIA 8) basta che compaiano nel testo."""
+    m = _CAT["marche"].get(info.marca)
+    if not m:
+        return None, None
+    chiave = (info.chiave or "").replace(" ", "")
+    migliore, punti = None, -1
+    for v in m.get("serie", []):
+        serie = _norm(v.get("serie", ""))
+        if not serie:
+            continue
+        compatta = serie.replace(" ", "")
+        if v.get("pro") is not None and bool(v["pro"]) != info.pro:
+            continue
+        p = -1
+        if chiave and chiave.startswith(compatta):
+            p = 100 + len(compatta) * 2 + (1 if v.get("pro") is not None else 0)
+        elif (len(compatta) >= 4 or " " in serie) and re.search(rf"(?<![A-Z0-9]){re.escape(serie)}(?![A-Z0-9])", T):
+            p = len(compatta)
+        if p > punti:
+            migliore, punti = v, p
+    return m, migliore
+
+
+def applica_catalogo(info: InfoTV, T: str):
+    m, v = _voce_catalogo(info, T)
+    if v:
+        info.tecnologia = v.get("tecnologia") or info.tecnologia
+        info.fascia = v.get("fascia") or info.fascia
+        info.famiglia = f"{info.marca}-{v.get('famiglia') or (info.tecnologia + '-' + info.fascia)}"
+        info.fascia_fonte = "catalogo"
+        info.regola = f"catalogo: {m['marca']} {v['serie']}"
+        if not info.codice and info.pollici:  # nessun codice (es. Beovision): serie + pollici
+            info.codice = f"{v['serie']} {info.pollici}"
+            info.core = f"{info.pollici}{v['serie'].replace(' ', '')}"
+        return True
+    if m and not info.fascia and m.get("fascia_predefinita"):
+        f = m["fascia_predefinita"]
+        info.fascia = "BASE" if f == "ENTRY" and trova_risoluzione(T) in ("HD", "FHD") else f
+        info.tecnologia = info.tecnologia or m.get("tecnologia_predefinita") or ""
+        info.fascia_fonte = "marca"
+    return False
+
+
+# Fascia stimata dal prezzo (marche e serie sconosciute): soglie in €/pollice per un 55",
+# scalate con la diagonale perché i TV grandi costano di più al pollice.
+_SOGLIE_PREZZO = [("BASE", 7), ("ENTRY", 12), ("MID", 20), ("PREMIUM", 32)]
+
+
+def stima_fascia(prezzo: float | None, pollici: int | None, tecnologia: str = "") -> str:
+    if not prezzo or not pollici:
+        return ""
+    k = (pollici / 55) ** 0.6 * (1.4 if tecnologia == "OLED" else 1.0)
+    al_pollice = prezzo / pollici
+    for f, soglia in _SOGLIE_PREZZO:
+        if al_pollice < soglia * k:
+            return f
+    return "TOP"
+
+
+def leggi_prezzo(t: str) -> float | None:
+    m = re.search(r"(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})?|\d+(?:\.\d{2})?)\s?€|€\s?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)", t or "")
+    if not m:
+        return None
+    x = (m.group(1) or m.group(2)).replace(" ", "")
+    if re.search(r",\d{2}$", x):
+        x = x.replace(".", "").replace(",", ".")
+    else:
+        x = x.replace(",", "").replace(".", "") if re.search(r"[.,]\d{3}$", x) else x
+    try:
+        return float(x)
+    except ValueError:
+        return None
 
 
 # fascia comune per le marche con regole proprie (LG, Hisense, Samsung): ricavata dalla famiglia
@@ -432,11 +492,16 @@ def fascia_da_famiglia(fam: str) -> str:
     return ""
 
 
-def analizza(testo: str, codice_noto: str = "") -> InfoTV:
-    """Analizza titolo prodotto (+ eventuale codice modello già noto)."""
+def analizza(testo: str, codice_noto: str = "", marca_nota: str = "", prezzo: float | None = None) -> InfoTV:
+    """Analizza titolo prodotto (+ eventuale codice modello già noto, marca e prezzo letti da Amazon)."""
+    if not _CAT["marche"]:
+        imposta_catalogo(catalogo_predefinito())
     T = _norm(f"{codice_noto} {testo}")
     info = InfoTV(testo=testo or "")
     info.marca = trova_marca(T) or marca_da_codice(codice_noto or T)
+    if not info.marca and marca_nota:
+        info.marca = trova_marca(marca_nota) or _norm(marca_nota)
+        info.marca_nuova = info.marca not in _CAT["marche"]
     info.risoluzione = trova_risoluzione(T)
     info.hz = trova_hz(T)
     info.pollici = trova_pollici_testo(T)
@@ -453,6 +518,7 @@ def analizza(testo: str, codice_noto: str = "") -> InfoTV:
         ok = _xiaomi(T, info)
     if not ok:
         _generica(T, info)
+    applica_catalogo(info, T)
     if pollici_testo and info.pollici != pollici_testo:
         info.note.append(f"pollici codice {info.pollici} ≠ titolo {pollici_testo}")
         info.pollici = pollici_testo
@@ -460,8 +526,12 @@ def analizza(testo: str, codice_noto: str = "") -> InfoTV:
         info.anno = anno_t
     if not info.tecnologia:
         info.tecnologia = tecnologia_testo(T)
-    if not info.fascia:
+    if not info.fascia and info.famiglia:
         info.fascia = fascia_da_famiglia(info.famiglia)
+        info.fascia_fonte = "regole" if info.fascia else ""
+    if not info.fascia and prezzo:
+        info.fascia = stima_fascia(prezzo, info.pollici, info.tecnologia)
+        info.fascia_fonte = "stimata"
     if info.tecnologia == "OLED" and not info.risoluzione:
         info.risoluzione = "4K"
     info.dolby_vision = "DOLBY VISION" in T

@@ -2,7 +2,7 @@
 Usato sia dall'exe/CLI (motore.py) sia dal runner del sito (web_runner.py)."""
 import re
 
-from regole import analizza, confronta_param, stesso_modello, unisci_parametri
+from regole import analizza, confronta_param, leggi_prezzo, stesso_modello, unisci_parametri
 
 ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
          "nessun_simile": "Nessun modello simile", "errore": "Ricerca non riuscita",
@@ -120,19 +120,29 @@ def info_dict(i):
 
 
 def riconosci_amazon(br, riga, anagrafica=None, log=print):
-    """Ricava titolo/modello dell'ASIN. Ordine: modello scritto a mano -> anagrafica -> Amazon -> ricerca web.
-    Ritorna (nome, modello, img, fonte, nota)."""
+    """Ricava i dati dell'ASIN. Ordine: modello scritto a mano -> anagrafica -> Amazon -> ricerca web.
+    Ritorna dict: titolo, modello, img, fonte, nota, marca, prezzo."""
     paese = (riga.get("paese") or "IT").upper()
     nome, modello = riga.get("nome", ""), (riga.get("modello") or "").strip()
+    vuoto = {"titolo": nome, "modello": "", "img": "", "fonte": "", "nota": "", "marca": riga.get("marca", ""), "prezzo": ""}
     if modello:
-        return nome, modello, "", "inserito a mano", ""
+        return {**vuoto, "modello": modello, "fonte": "inserito a mano"}
     noto = (anagrafica or {}).get(f"{riga['asin']}|{paese}") or (anagrafica or {}).get(riga["asin"])
     if noto and noto.get("modello"):
-        return noto.get("titolo", ""), noto["modello"], noto.get("img", ""), "anagrafica", ""
+        return {**vuoto, "titolo": noto.get("titolo", ""), "modello": noto["modello"], "img": noto.get("img", ""),
+                "fonte": "anagrafica", "marca": noto.get("marca", "")}
     a = br.amazon(riga["asin"], AMAZON_DOMINIO.get(paese, "amazon.it"))
-    info = analizza(a["titolo"], a["modello"])
+    dati = {**vuoto, "titolo": a["titolo"], "modello": a["modello"], "img": a.get("img", ""),
+            "marca": a.get("marca", ""), "prezzo": a.get("prezzo", "")}
+    info = analizza(a["titolo"], a["modello"], dati["marca"], leggi_prezzo(dati["prezzo"]))
     if info.marca and info.pollici and info.codice:
-        return a["titolo"], a["modello"] or info.codice, a.get("img", ""), "Amazon", ""
+        return {**dati, "modello": a["modello"] or info.codice, "fonte": "Amazon"}
+    if info.marca and info.pollici and info.tecnologia and info.fascia:
+        # modello non in archivio (marca o serie nuova): si procede con i dati letti da Amazon
+        nota = "modello non in archivio: dati ricavati dalla pagina Amazon"
+        if info.fascia_fonte == "stimata":
+            nota += f", fascia stimata dal prezzo ({dati['prezzo']})"
+        return {**dati, "fonte": "Amazon", "nota": nota}
     # piano B: Amazon bloccato o pagina illeggibile -> motore di ricerca
     log(f"   Amazon non leggibile ({a['errore'] or 'modello non trovato'}): provo la ricerca web")
     try:
@@ -147,8 +157,8 @@ def riconosci_amazon(br, riga, anagrafica=None, log=print):
             voti.setdefault(k, [0, t, i.codice])[0] += 1
     if voti:
         _, t, cod = max(voti.values(), key=lambda v: v[0])
-        return t, cod, a.get("img", ""), "ricerca web", "modello ricavato da ricerca web: verificare"
-    return a["titolo"], a["modello"], a.get("img", ""), "", a["errore"] or "modello Amazon non riconosciuto"
+        return {**dati, "titolo": t, "modello": cod, "fonte": "ricerca web", "nota": "modello ricavato da ricerca web: verificare"}
+    return {**dati, "nota": a["errore"] or "modello Amazon non riconosciuto"}
 
 
 def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, anagrafica=None):
@@ -159,10 +169,13 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
     paese = (riga.get("paese") or "IT").upper()
     out = {"asin": riga["asin"], "paese": paese, "amazon": {}, "match": {}, "esito": {}, "dettaglio": [], "errore": ""}
     url_amz = f"https://www.{AMAZON_DOMINIO.get(paese, 'amazon.it')}/dp/{riga['asin']}"
-    nome, modello, img, fonte, nota = riconosci_amazon(br, riga, anagrafica, log)
-    info = analizza(nome, modello)
-    out["amazon"] = {"titolo": nome, "modello": info.codice or modello, "img": img, "url": url_amz,
-                     "fonte": fonte, "nota": nota, **info_dict(info)}
+    am = riconosci_amazon(br, riga, anagrafica, log)
+    nome, modello, fonte, nota = am["titolo"], am["modello"], am["fonte"], am["nota"]
+    info = analizza(nome, modello, am.get("marca", ""), leggi_prezzo(am.get("prezzo", "")))
+    out["amazon"] = {"titolo": nome, "modello": info.codice or modello, "img": am["img"], "url": url_amz,
+                     "fonte": fonte, "nota": nota, "marca_amazon": am.get("marca", ""), "prezzo": am.get("prezzo", ""),
+                     "fascia_fonte": info.fascia_fonte, "marca_nuova": info.marca_nuova, "regola": info.regola,
+                     **info_dict(info)}
     log(f"   Amazon ({fonte or 'non riconosciuto'}): {info.marca} {info.codice} {info.pollici}\" {info.famiglia}")
     # per cercare un concorrente servono tecnologia e fascia dell'ASIN, altrimenti il confronto è casuale
     non_classificato = P["modalita"] == "concorrente" and not (info.tecnologia and info.fascia)

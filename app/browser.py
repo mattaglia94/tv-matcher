@@ -182,7 +182,7 @@ class Browser:
             self.log(f"   Amazon: captcha al tentativo {i + 1}/{len(tentativi)}")
             time.sleep(random.uniform(6, 12))
         else:
-            return {"url": url, "titolo": "", "modello": "", "img": "", "errore": "captcha Amazon"}
+            return {"url": url, "titolo": "", "modello": "", "img": "", "marca": "", "prezzo": "", "errore": "captcha Amazon"}
         titolo = ""
         try:
             titolo = self.page.locator("#productTitle, #title").first.inner_text(timeout=5000).strip()
@@ -201,13 +201,34 @@ class Browser:
                     break
         except Exception:
             pass
+        marca = ""
+        try:  # riga "Marca" della scheda tecnica, altrimenti il link "Visita lo Store di ..."
+            for r in self.page.locator("tr, #detailBullets_feature_div li, #productOverview_feature_div tr").all_inner_texts():
+                r1 = re.sub(r"[\u200e\u200f]", "", r).strip()
+                mm = re.match(r"(?:Marca|Marke|Marque|Brand)\s*[:\t\n]+\s*(.+)", r1, re.I)
+                if mm:
+                    marca = mm.group(1).split("\n")[0].strip()
+                    break
+            if not marca:
+                by = self.page.locator("#bylineInfo").first.inner_text(timeout=2000)
+                mm = re.search(r"(?:Store di|Store von|boutique|Store de|Visit the)\s+(.+?)(?:\s+Store)?$", by.strip(), re.I) or \
+                    re.search(r"(?:Marca|Marke|Marque|Brand)\s*:\s*(.+)", by, re.I)
+                marca = mm.group(1).strip() if mm else ""
+        except Exception:
+            pass
+        prezzo = ""
+        try:
+            prezzo = self.page.locator("#corePrice_feature_div .a-offscreen, #corePriceDisplay_desktop_feature_div .a-offscreen, "
+                                       "#apex_desktop .a-offscreen, .a-price .a-offscreen").first.inner_text(timeout=3000).strip()
+        except Exception:
+            pass
         img = ""
         try:
             el = self.page.locator("#landingImage, #imgTagWrapperId img, #main-image").first
             img = el.get_attribute("data-old-hires", timeout=2000) or el.get_attribute("src", timeout=2000) or ""
         except Exception:
             pass
-        return {"url": url, "titolo": titolo, "modello": modello, "img": img,
+        return {"url": url, "titolo": titolo, "modello": modello, "img": img, "marca": marca, "prezzo": prezzo,
                 "errore": "" if titolo else "titolo non trovato"}
 
     def cerca_web(self, asin):

@@ -1,0 +1,1315 @@
+{
+ "versione": 1,
+ "aggiornato": "2026-10-09",
+ "fasce": {
+  "BASE": "Base",
+  "ENTRY": "Entry",
+  "MID": "Media",
+  "PREMIUM": "Premium",
+  "TOP": "Top"
+ },
+ "tecnologie": {
+  "LED": "LED",
+  "QLED": "QLED",
+  "MINILED": "Mini-LED",
+  "NEOQLED": "Neo QLED",
+  "OLED": "OLED"
+ },
+ "marche": [
+  {
+   "marca": "Samsung",
+   "alias": [
+    "SAMSUNG"
+   ],
+   "note": "Anno dall'ultima lettera del codice: H = 2026, F = 2025, D = 2024.",
+   "fascia_predefinita": "",
+   "tecnologia_predefinita": "",
+   "serie": [
+    {
+     "serie": "U6",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "Crystal UHD U6",
+     "famiglia": "UHD-SUPERENTRY"
+    },
+    {
+     "serie": "U7",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "Crystal UHD U7",
+     "famiglia": "UHD-SUPERENTRY"
+    },
+    {
+     "serie": "U8",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "Crystal UHD U8",
+     "famiglia": "UHD-ENTRY"
+    },
+    {
+     "serie": "Q6",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "QLED Q6",
+     "famiglia": "QLED-ENTRY"
+    },
+    {
+     "serie": "Q7",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "QLED Q7",
+     "famiglia": "QLED-ENTRY"
+    },
+    {
+     "serie": "Q8",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "QLED Q8",
+     "famiglia": "QLED-PREMIUM"
+    },
+    {
+     "serie": "Q9",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "QLED Q9",
+     "famiglia": "QLED-PREMIUM"
+    },
+    {
+     "serie": "LS03",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "The Frame",
+     "famiglia": "THE-FRAME"
+    },
+    {
+     "serie": "LS01",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "The Serif",
+     "famiglia": "LIFESTYLE"
+    },
+    {
+     "serie": "M7",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "Mini LED M70",
+     "famiglia": "MINILED-ENTRY"
+    },
+    {
+     "serie": "M8",
+     "tecnologia": "MINILED",
+     "fascia": "MID",
+     "descrizione": "Mini LED M80",
+     "famiglia": "MINILED-MID"
+    },
+    {
+     "serie": "QN7",
+     "tecnologia": "NEOQLED",
+     "fascia": "ENTRY",
+     "descrizione": "Neo QLED QN70",
+     "famiglia": "NEOQLED-4K-SUPERENTRY"
+    },
+    {
+     "serie": "QN8",
+     "tecnologia": "NEOQLED",
+     "fascia": "MID",
+     "descrizione": "Neo QLED QN80/QN85",
+     "famiglia": "NEOQLED-4K-ENTRY"
+    },
+    {
+     "serie": "QN9",
+     "tecnologia": "NEOQLED",
+     "fascia": "PREMIUM",
+     "descrizione": "Neo QLED QN90-QN94",
+     "famiglia": "NEOQLED-4K-MID"
+    },
+    {
+     "serie": "QN95",
+     "tecnologia": "NEOQLED",
+     "fascia": "TOP",
+     "descrizione": "Neo QLED QN95+",
+     "famiglia": "NEOQLED-4K-PREMIUM"
+    },
+    {
+     "serie": "QN96",
+     "tecnologia": "NEOQLED",
+     "fascia": "TOP",
+     "descrizione": "Neo QLED QN95+",
+     "famiglia": "NEOQLED-4K-PREMIUM"
+    },
+    {
+     "serie": "QN97",
+     "tecnologia": "NEOQLED",
+     "fascia": "TOP",
+     "descrizione": "Neo QLED QN95+",
+     "famiglia": "NEOQLED-4K-PREMIUM"
+    },
+    {
+     "serie": "QN98",
+     "tecnologia": "NEOQLED",
+     "fascia": "TOP",
+     "descrizione": "Neo QLED QN95+",
+     "famiglia": "NEOQLED-4K-PREMIUM"
+    },
+    {
+     "serie": "QN99",
+     "tecnologia": "NEOQLED",
+     "fascia": "TOP",
+     "descrizione": "Neo QLED QN95+",
+     "famiglia": "NEOQLED-4K-PREMIUM"
+    },
+    {
+     "serie": "8K-QN7",
+     "tecnologia": "NEOQLED",
+     "fascia": "PREMIUM",
+     "descrizione": "Neo QLED 8K QN700",
+     "famiglia": "NEOQLED-8K-ENTRY"
+    },
+    {
+     "serie": "8K-QN8",
+     "tecnologia": "NEOQLED",
+     "fascia": "TOP",
+     "descrizione": "Neo QLED 8K QN800",
+     "famiglia": "NEOQLED-8K-MID"
+    },
+    {
+     "serie": "8K-QN9",
+     "tecnologia": "NEOQLED",
+     "fascia": "TOP",
+     "descrizione": "Neo QLED 8K QN900",
+     "famiglia": "NEOQLED-8K-MID"
+    },
+    {
+     "serie": "8K-QN99",
+     "tecnologia": "NEOQLED",
+     "fascia": "TOP",
+     "descrizione": "Neo QLED 8K QN990",
+     "famiglia": "NEOQLED-8K-PREMIUM"
+    },
+    {
+     "serie": "S8",
+     "tecnologia": "OLED",
+     "fascia": "MID",
+     "descrizione": "OLED S85",
+     "famiglia": "OLED-ENTRY"
+    },
+    {
+     "serie": "S9",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "OLED S90-S93",
+     "famiglia": "OLED-MID"
+    },
+    {
+     "serie": "S94",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "OLED S94-S98",
+     "famiglia": "OLED-PREMIUM"
+    },
+    {
+     "serie": "S95",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "OLED S95",
+     "famiglia": "OLED-PREMIUM"
+    },
+    {
+     "serie": "S96",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "OLED S95+",
+     "famiglia": "OLED-PREMIUM"
+    },
+    {
+     "serie": "S97",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "OLED S95+",
+     "famiglia": "OLED-PREMIUM"
+    },
+    {
+     "serie": "S98",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "OLED S95+",
+     "famiglia": "OLED-PREMIUM"
+    },
+    {
+     "serie": "S99",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "OLED S99",
+     "famiglia": "OLED-SUPERPREMIUM"
+    },
+    {
+     "serie": "R8",
+     "tecnologia": "MINILED",
+     "fascia": "TOP",
+     "descrizione": "Micro RGB R85",
+     "famiglia": "MICRO-RGB"
+    },
+    {
+     "serie": "R9",
+     "tecnologia": "MINILED",
+     "fascia": "TOP",
+     "descrizione": "Micro RGB R95",
+     "famiglia": "MICRO-RGB"
+    }
+   ]
+  },
+  {
+   "marca": "LG",
+   "alias": [
+    "LG"
+   ],
+   "note": "OLED: cifra dopo la serie = anno (C6 = 2026, C5 = 2025).",
+   "fascia_predefinita": "",
+   "tecnologia_predefinita": "",
+   "serie": [
+    {
+     "serie": "UA7",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "UHD UA73/UA75",
+     "famiglia": "UHD-ENTRY"
+    },
+    {
+     "serie": "UT7",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "UHD UT7x",
+     "famiglia": "UHD-ENTRY"
+    },
+    {
+     "serie": "UR7",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "UHD UR7x",
+     "famiglia": "UHD-ENTRY"
+    },
+    {
+     "serie": "UQ7",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "UHD UQ7x",
+     "famiglia": "UHD-ENTRY"
+    },
+    {
+     "serie": "NANO",
+     "tecnologia": "LED",
+     "fascia": "MID",
+     "descrizione": "NanoCell",
+     "famiglia": "UHD-PREMIUM"
+    },
+    {
+     "serie": "NU",
+     "tecnologia": "LED",
+     "fascia": "MID",
+     "descrizione": "NanoCell NU8x",
+     "famiglia": "UHD-PREMIUM"
+    },
+    {
+     "serie": "QNED7",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "QNED evo Mini LED 70",
+     "famiglia": "MINILED-ENTRY"
+    },
+    {
+     "serie": "QNED8",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "QNED 80/81/82/84",
+     "famiglia": "QLED-ENTRY"
+    },
+    {
+     "serie": "QNED85",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "QNED 85/86 Mini LED",
+     "famiglia": "MINILED-ENTRY"
+    },
+    {
+     "serie": "QNED86",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "QNED 85/86 Mini LED",
+     "famiglia": "MINILED-ENTRY"
+    },
+    {
+     "serie": "QNED87",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "QNED 87 Mini LED",
+     "famiglia": "MINILED-ENTRY"
+    },
+    {
+     "serie": "QNED9",
+     "tecnologia": "MINILED",
+     "fascia": "MID",
+     "descrizione": "QNED 92/93 Mini LED",
+     "famiglia": "MINILED-PREMIUM"
+    },
+    {
+     "serie": "MRGB",
+     "tecnologia": "MINILED",
+     "fascia": "TOP",
+     "descrizione": "Micro RGB evo",
+     "famiglia": "MICRO-RGB"
+    },
+    {
+     "serie": "OLEDB",
+     "tecnologia": "OLED",
+     "fascia": "MID",
+     "descrizione": "OLED B",
+     "famiglia": "OLED-ENTRY"
+    },
+    {
+     "serie": "OLEDC",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "OLED evo C",
+     "famiglia": "OLED-MID"
+    },
+    {
+     "serie": "OLEDG",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "OLED evo G",
+     "famiglia": "OLED-PREMIUM"
+    },
+    {
+     "serie": "OLEDM",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "OLED evo M (wireless)",
+     "famiglia": "OLED-PREMIUM"
+    },
+    {
+     "serie": "OLEDW",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "OLED evo W (Wallpaper)",
+     "famiglia": "OLED-PREMIUM"
+    }
+   ]
+  },
+  {
+   "marca": "Hisense",
+   "alias": [
+    "HISENSE"
+   ],
+   "note": "Famiglie del documento di matching (E7 = QLED Entry 1, A7 = QLED Entry 2, PRO separati).",
+   "fascia_predefinita": "",
+   "tecnologia_predefinita": "",
+   "serie": [
+    {
+     "serie": "A4",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "A4 HD/Full HD",
+     "famiglia": "LED-HD"
+    },
+    {
+     "serie": "A5",
+     "tecnologia": "QLED",
+     "fascia": "BASE",
+     "descrizione": "A5 QLED HD/Full HD",
+     "famiglia": "QLED-HD"
+    },
+    {
+     "serie": "A6",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "A6 4K",
+     "famiglia": "LED-4K-ENTRY"
+    },
+    {
+     "serie": "E6",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "E6 4K",
+     "famiglia": "LED-4K-ENTRY"
+    },
+    {
+     "serie": "A7",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "A7 QLED",
+     "famiglia": "QLED-ENTRY-2"
+    },
+    {
+     "serie": "E7",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "E7 QLED",
+     "famiglia": "QLED-ENTRY-1",
+     "pro": false
+    },
+    {
+     "serie": "E7",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "E7 PRO QLED",
+     "famiglia": "QLED-PREMIUM",
+     "pro": true
+    },
+    {
+     "serie": "Q6",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "Q6 QLED",
+     "famiglia": "QLED-ENTRY-1"
+    },
+    {
+     "serie": "Q7",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "Q7 QLED",
+     "famiglia": "QLED-ENTRY-1"
+    },
+    {
+     "serie": "S5",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "S5 Deco (design)",
+     "famiglia": "QLED-DESIGN"
+    },
+    {
+     "serie": "S7",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "S7 Canvas (design)",
+     "famiglia": "QLED-DESIGN"
+    },
+    {
+     "serie": "E8",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "E8 Mini LED",
+     "famiglia": "MINILED-SUPERENTRY"
+    },
+    {
+     "serie": "U6",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "U6 Mini LED",
+     "famiglia": "MINILED-SUPERENTRY"
+    },
+    {
+     "serie": "Q8",
+     "tecnologia": "MINILED",
+     "fascia": "MID",
+     "descrizione": "Q8 Mini LED",
+     "famiglia": "MINILED-ENTRY"
+    },
+    {
+     "serie": "U7",
+     "tecnologia": "MINILED",
+     "fascia": "MID",
+     "descrizione": "U7 Mini LED",
+     "famiglia": "MINILED-ENTRY",
+     "pro": false
+    },
+    {
+     "serie": "U7",
+     "tecnologia": "MINILED",
+     "fascia": "PREMIUM",
+     "descrizione": "U7 PRO Mini LED",
+     "famiglia": "MINILED-MID",
+     "pro": true
+    },
+    {
+     "serie": "U8",
+     "tecnologia": "MINILED",
+     "fascia": "PREMIUM",
+     "descrizione": "U8 Mini LED",
+     "famiglia": "MINILED-PREMIUM"
+    },
+    {
+     "serie": "UR8",
+     "tecnologia": "MINILED",
+     "fascia": "PREMIUM",
+     "descrizione": "UR8 RGB Mini LED",
+     "famiglia": "RGB-MINILED"
+    },
+    {
+     "serie": "UR9",
+     "tecnologia": "MINILED",
+     "fascia": "TOP",
+     "descrizione": "UR9 RGB Mini LED",
+     "famiglia": "RGB-MINILED-TOP"
+    },
+    {
+     "serie": "UX",
+     "tecnologia": "MINILED",
+     "fascia": "TOP",
+     "descrizione": "UX / UXQ ammiraglia",
+     "famiglia": "MINILED-TOP"
+    }
+   ]
+  },
+  {
+   "marca": "TCL",
+   "alias": [
+    "TCL"
+   ],
+   "note": "",
+   "fascia_predefinita": "",
+   "tecnologia_predefinita": "",
+   "serie": [
+    {
+     "serie": "S4",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "S4 HD/Full HD"
+    },
+    {
+     "serie": "S5",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "S5 HD/Full HD"
+    },
+    {
+     "serie": "V6",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "V6 4K"
+    },
+    {
+     "serie": "P6",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "P6 4K"
+    },
+    {
+     "serie": "P7",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "P7 QLED"
+    },
+    {
+     "serie": "P8",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "P8 QLED 120/144 Hz"
+    },
+    {
+     "serie": "T6",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "T6 QLED"
+    },
+    {
+     "serie": "T7",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "T7 QLED"
+    },
+    {
+     "serie": "T8",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "T8 QLED"
+    },
+    {
+     "serie": "Q6",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "Q6 QLED"
+    },
+    {
+     "serie": "Q7",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "Q7 QLED"
+    },
+    {
+     "serie": "C64",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "C645 QLED"
+    },
+    {
+     "serie": "C65",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "C655 QLED"
+    },
+    {
+     "serie": "C6",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "C6K / C6K Pro QD-Mini LED"
+    },
+    {
+     "serie": "C74",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "C745 QLED"
+    },
+    {
+     "serie": "C7",
+     "tecnologia": "MINILED",
+     "fascia": "MID",
+     "descrizione": "C7K / C7L SQD-Mini LED"
+    },
+    {
+     "serie": "C8",
+     "tecnologia": "MINILED",
+     "fascia": "PREMIUM",
+     "descrizione": "C8K / C8L SQD-Mini LED"
+    },
+    {
+     "serie": "C9",
+     "tecnologia": "MINILED",
+     "fascia": "TOP",
+     "descrizione": "C9K Mini LED"
+    },
+    {
+     "serie": "RM7",
+     "tecnologia": "MINILED",
+     "fascia": "MID",
+     "descrizione": "RM7L RGB Mini LED"
+    },
+    {
+     "serie": "RM8",
+     "tecnologia": "MINILED",
+     "fascia": "PREMIUM",
+     "descrizione": "RM8L RGB Mini LED"
+    },
+    {
+     "serie": "RM9",
+     "tecnologia": "MINILED",
+     "fascia": "TOP",
+     "descrizione": "RM9L RGB Mini LED"
+    },
+    {
+     "serie": "X",
+     "tecnologia": "MINILED",
+     "fascia": "TOP",
+     "descrizione": "X11 ammiraglia"
+    },
+    {
+     "serie": "QM",
+     "tecnologia": "MINILED",
+     "fascia": "MID",
+     "descrizione": "QM (mercato USA)"
+    },
+    {
+     "serie": "A4",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "A400 / NXTVISION (design)"
+    }
+   ]
+  },
+  {
+   "marca": "Xiaomi",
+   "alias": [
+    "XIAOMI",
+    "REDMI"
+   ],
+   "note": "Xiaomi non usa codici nei titoli: serie + pollici (TV F Pro 75) o codice L43MB-FAVEU.",
+   "fascia_predefinita": "",
+   "tecnologia_predefinita": "",
+   "serie": [
+    {
+     "serie": "F-HD",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "TV F HD/Full HD (Fire TV)",
+     "famiglia": "AF-HD"
+    },
+    {
+     "serie": "A-HD",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "TV A HD/Full HD (Google TV)",
+     "famiglia": "AF-HD"
+    },
+    {
+     "serie": "F",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "TV F (Fire TV)",
+     "famiglia": "AF",
+     "pro": false
+    },
+    {
+     "serie": "A",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "TV A (Google TV)",
+     "famiglia": "AF",
+     "pro": false
+    },
+    {
+     "serie": "F",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "TV F Pro QLED",
+     "famiglia": "AF",
+     "pro": true
+    },
+    {
+     "serie": "A",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "TV A Pro QLED",
+     "famiglia": "AF",
+     "pro": true
+    },
+    {
+     "serie": "Q",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "TV Q QLED",
+     "famiglia": "AF"
+    },
+    {
+     "serie": "MAX",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "TV Max (grandi formati)",
+     "famiglia": "MAX"
+    },
+    {
+     "serie": "S",
+     "tecnologia": "MINILED",
+     "fascia": "PREMIUM",
+     "descrizione": "TV S Mini LED",
+     "famiglia": "S"
+    }
+   ]
+  },
+  {
+   "marca": "Philips",
+   "alias": [
+    "PHILIPS"
+   ],
+   "note": "",
+   "fascia_predefinita": "",
+   "tecnologia_predefinita": "",
+   "serie": [
+    {
+     "serie": "PHS",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "HD"
+    },
+    {
+     "serie": "PFS",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "Full HD"
+    },
+    {
+     "serie": "PUS6",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "PUS6 4K"
+    },
+    {
+     "serie": "PUS7",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "PUS7 4K Ambilight"
+    },
+    {
+     "serie": "PUS8",
+     "tecnologia": "LED",
+     "fascia": "MID",
+     "descrizione": "PUS8 4K Ambilight"
+    },
+    {
+     "serie": "PUS9",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "PUS9 Ambilight"
+    },
+    {
+     "serie": "PQS8",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "PQS8 QLED"
+    },
+    {
+     "serie": "PQS9",
+     "tecnologia": "QLED",
+     "fascia": "MID",
+     "descrizione": "PQS9 The One"
+    },
+    {
+     "serie": "PML8",
+     "tecnologia": "MINILED",
+     "fascia": "MID",
+     "descrizione": "PML8 Mini LED"
+    },
+    {
+     "serie": "PML9",
+     "tecnologia": "MINILED",
+     "fascia": "PREMIUM",
+     "descrizione": "PML9 Mini LED"
+    },
+    {
+     "serie": "MLED9",
+     "tecnologia": "MINILED",
+     "fascia": "PREMIUM",
+     "descrizione": "MLED981 RGB Mini LED"
+    },
+    {
+     "serie": "OLED7",
+     "tecnologia": "OLED",
+     "fascia": "MID",
+     "descrizione": "OLED 7xx"
+    },
+    {
+     "serie": "OLED8",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "OLED 8xx"
+    },
+    {
+     "serie": "OLED9",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "OLED+ 9xx"
+    }
+   ]
+  },
+  {
+   "marca": "Sony",
+   "alias": [
+    "SONY"
+   ],
+   "note": "",
+   "fascia_predefinita": "",
+   "tecnologia_predefinita": "",
+   "serie": [
+    {
+     "serie": "BRAVIA 2",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "BRAVIA 2"
+    },
+    {
+     "serie": "BRAVIA 3",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "BRAVIA 3"
+    },
+    {
+     "serie": "BRAVIA 5",
+     "tecnologia": "MINILED",
+     "fascia": "MID",
+     "descrizione": "BRAVIA 5 Mini LED"
+    },
+    {
+     "serie": "BRAVIA 7",
+     "tecnologia": "MINILED",
+     "fascia": "PREMIUM",
+     "descrizione": "BRAVIA 7 Mini LED"
+    },
+    {
+     "serie": "BRAVIA 8",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "BRAVIA 8 OLED"
+    },
+    {
+     "serie": "BRAVIA 9",
+     "tecnologia": "MINILED",
+     "fascia": "TOP",
+     "descrizione": "BRAVIA 9 Mini LED"
+    },
+    {
+     "serie": "S2",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "K-xxS20 (BRAVIA 2)"
+    },
+    {
+     "serie": "S3",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "K-xxS30 (BRAVIA 3)"
+    },
+    {
+     "serie": "XR50",
+     "tecnologia": "MINILED",
+     "fascia": "MID",
+     "descrizione": "BRAVIA 5"
+    },
+    {
+     "serie": "XR70",
+     "tecnologia": "MINILED",
+     "fascia": "PREMIUM",
+     "descrizione": "BRAVIA 7"
+    },
+    {
+     "serie": "XR80",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "BRAVIA 8"
+    },
+    {
+     "serie": "XR90",
+     "tecnologia": "MINILED",
+     "fascia": "TOP",
+     "descrizione": "BRAVIA 9"
+    },
+    {
+     "serie": "A7",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "OLED A7x"
+    },
+    {
+     "serie": "A8",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "OLED A8x"
+    },
+    {
+     "serie": "A9",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "OLED A9x"
+    },
+    {
+     "serie": "X7",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "X7x"
+    },
+    {
+     "serie": "X8",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "X80/X85"
+    },
+    {
+     "serie": "X9",
+     "tecnologia": "LED",
+     "fascia": "MID",
+     "descrizione": "X90"
+    },
+    {
+     "serie": "W8",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "W8x HD"
+    }
+   ]
+  },
+  {
+   "marca": "Panasonic",
+   "alias": [
+    "PANASONIC"
+   ],
+   "note": "",
+   "fascia_predefinita": "",
+   "tecnologia_predefinita": "",
+   "serie": [
+    {
+     "serie": "LS",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "HD/Full HD"
+    },
+    {
+     "serie": "MS",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "HD/Full HD"
+    },
+    {
+     "serie": "W5",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "W50"
+    },
+    {
+     "serie": "W6",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "W60"
+    },
+    {
+     "serie": "W7",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "W70"
+    },
+    {
+     "serie": "MX",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "MX"
+    },
+    {
+     "serie": "W8",
+     "tecnologia": "LED",
+     "fascia": "MID",
+     "descrizione": "W80"
+    },
+    {
+     "serie": "W9",
+     "tecnologia": "LED",
+     "fascia": "MID",
+     "descrizione": "W90"
+    },
+    {
+     "serie": "W95",
+     "tecnologia": "MINILED",
+     "fascia": "PREMIUM",
+     "descrizione": "W95 Mini LED"
+    },
+    {
+     "serie": "Z8",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "Z80/Z85 OLED"
+    },
+    {
+     "serie": "Z9",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "Z90/Z95 OLED"
+    },
+    {
+     "serie": "MZ",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "MZ OLED"
+    }
+   ]
+  },
+  {
+   "marca": "Sharp",
+   "alias": [
+    "SHARP"
+   ],
+   "note": "",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": []
+  },
+  {
+   "marca": "Toshiba",
+   "alias": [
+    "TOSHIBA"
+   ],
+   "note": "",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": [
+    {
+     "serie": "QV",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "QV QLED"
+    },
+    {
+     "serie": "QA",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "QA QLED"
+    },
+    {
+     "serie": "UV",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "UV 4K"
+    },
+    {
+     "serie": "UA",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "UA 4K"
+    },
+    {
+     "serie": "LV",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "LV Full HD"
+    },
+    {
+     "serie": "WV",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "WV HD"
+    }
+   ]
+  },
+  {
+   "marca": "Grundig",
+   "alias": [
+    "GRUNDIG"
+   ],
+   "note": "",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": []
+  },
+  {
+   "marca": "Telefunken",
+   "alias": [
+    "TELEFUNKEN"
+   ],
+   "note": "",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": []
+  },
+  {
+   "marca": "Thomson",
+   "alias": [
+    "THOMSON"
+   ],
+   "note": "",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": []
+  },
+  {
+   "marca": "Metz",
+   "alias": [
+    "METZ"
+   ],
+   "note": "",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": [
+    {
+     "serie": "MQF",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "QLED"
+    },
+    {
+     "serie": "MOC",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "OLED"
+    }
+   ]
+  },
+  {
+   "marca": "Haier",
+   "alias": [
+    "HAIER"
+   ],
+   "note": "",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": []
+  },
+  {
+   "marca": "Vidaa",
+   "alias": [
+    "VIDAA"
+   ],
+   "note": "Marchio economico di Hisense",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": []
+  },
+  {
+   "marca": "JVC",
+   "alias": [
+    "JVC"
+   ],
+   "note": "",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": []
+  },
+  {
+   "marca": "Blaupunkt",
+   "alias": [
+    "BLAUPUNKT"
+   ],
+   "note": "",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": []
+  },
+  {
+   "marca": "Strong",
+   "alias": [
+    "STRONG"
+   ],
+   "note": "",
+   "fascia_predefinita": "BASE",
+   "tecnologia_predefinita": "LED",
+   "serie": []
+  },
+  {
+   "marca": "Nokia",
+   "alias": [
+    "NOKIA"
+   ],
+   "note": "",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": []
+  },
+  {
+   "marca": "CHiQ",
+   "alias": [
+    "CHIQ"
+   ],
+   "note": "",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": []
+  },
+  {
+   "marca": "Loewe",
+   "alias": [
+    "LOEWE"
+   ],
+   "note": "Marca premium tedesca",
+   "fascia_predefinita": "PREMIUM",
+   "tecnologia_predefinita": "OLED",
+   "serie": [
+    {
+     "serie": "BILD",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "bild (OLED)"
+    },
+    {
+     "serie": "STELLAR",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "stellar"
+    }
+   ]
+  },
+  {
+   "marca": "Bang & Olufsen",
+   "alias": [
+    "BANG & OLUFSEN",
+    "BANG&OLUFSEN",
+    "BANG OLUFSEN",
+    "B&O",
+    "BEOVISION"
+   ],
+   "note": "Marca di lusso",
+   "fascia_predefinita": "TOP",
+   "tecnologia_predefinita": "OLED",
+   "serie": [
+    {
+     "serie": "BEOVISION",
+     "tecnologia": "OLED",
+     "fascia": "TOP",
+     "descrizione": "Beovision (Contour, Theatre, Harmony)"
+    }
+   ]
+  }
+ ]
+}
