@@ -123,7 +123,8 @@ _LG_FAM = [  # (regex sul codice, tecnologia, famiglia)
     (r"QNED9[23]", "MINILED", "LG-MINILED-PREMIUM"),
     (r"QNED8[56]", "MINILED", "LG-MINILED-ENTRY"),
     (r"QNED8[0124]", "QLED", "LG-QLED-ENTRY"),
-    (r"NANO", "LED", "LG-UHD-PREMIUM"),
+    (r"QNED7", "MINILED", "LG-MINILED-ENTRY"),
+    (r"NANO|NU\d", "LED", "LG-UHD-PREMIUM"),
     (r"UA7", "LED", "LG-UHD-ENTRY"),
 ]
 
@@ -139,7 +140,7 @@ def _lg(T: str, info: InfoTV):
         anno_cifra = int(m.group(3))
         info.anno = 2020 + anno_cifra if anno_cifra <= 9 else None
     else:
-        m = re.search(r"\b(\d{2,3})((?:QNED|NANO|UA|UT|UR|UQ)\d{1,2})([A-Z0-9]*)", T)
+        m = re.search(r"\b(\d{2,3})((?:QNED|NANO|NU|UA|UT|UR|UQ)\d{1,2})([A-Z0-9]*)", T)
         if not m:
             return False
         info.codice = m.group(0)
@@ -250,7 +251,7 @@ def _xiaomi(T: str, info: InfoTV):
     m = (re.search(r"\bXIA(\d{2,3})(A|F|S|MAX|Q)(PRO)?\d?\b", T)
          or re.search(r"\b(?:TV\s+)?(A|F|S|MAX|Q\d?)(\s+PRO)?\s*(MINI\s?LED)?\b[^0-9]{0,20}?(\d{2,3})\b", T))
     if not m:
-        return False
+        return _xiaomi_codice(T, info)
     if m.re.pattern.startswith("\\bXIA"):
         poll, serie, pro = int(m.group(1)), m.group(2), bool(m.group(3))
     else:
@@ -266,6 +267,25 @@ def _xiaomi(T: str, info: InfoTV):
     info.famiglia = f"XIAOMI-{info.tecnologia}-{fam}"
     info.fascia = "PREMIUM" if serie == "S" else "MID" if (info.pro or serie == "MAX") else "ENTRY"
     info.regola = "XIAOMI"
+    return True
+
+
+def _xiaomi_codice(T: str, info: InfoTV):
+    """Titoli Xiaomi senza nome di serie ma con codice tipo L43MB-FAVEU (F = Fire TV, A = Google TV)."""
+    m = re.search(r"\bL(\d{2,3})M[A-Z0-9]{1,3}(?:-([A-Z]{2,6}))?", T)
+    if not m:
+        return False
+    info.pollici = info.pollici or int(m.group(1))
+    suff = m.group(2) or ""
+    serie = "F" if suff.startswith("F") or "FIRE TV" in T else "A"
+    info.pro = "PRO" in suff or " PRO" in T
+    info.codice = m.group(0)
+    info.core = f"{info.pollici}{serie}{'PRO' if info.pro else ''}"
+    info.tecnologia = tecnologia_testo(T) or ("QLED" if info.pro else "LED")
+    ris = trova_risoluzione(T)
+    info.fascia = "MID" if info.pro else "BASE" if ris in ("HD", "FHD") else "ENTRY"
+    info.famiglia = f"XIAOMI-{info.tecnologia}-AF{'-' + ris if ris in ('HD', 'FHD') else ''}"
+    info.regola = "XIAOMI-codice"
     return True
 
 
@@ -480,8 +500,7 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
                 return False, f"famiglia {cand.famiglia or '?'}", 0
         elif amz.fascia:
             if not cand.fascia:
-                note.append("fascia da verificare")
-                score += 40
+                return False, "fascia non determinabile", 0
             else:
                 d = abs(LIVELLI[cand.fascia] - LIVELLI[amz.fascia])
                 if d > 1:
@@ -491,6 +510,8 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
                     note.append(f"fascia {cand.fascia.lower()} (ASIN {amz.fascia.lower()})")
     if P["tecnologia"]["attivo"] and amz.tecnologia:
         if not cand.tecnologia:
+            if concorrente:
+                return False, "tecnologia non determinabile", 0
             note.append("tecnologia da verificare")
             score += 30
         elif not _tec_equivalenti(amz.tecnologia, cand.tecnologia, P["tecnologia"].get("equivalenze")):

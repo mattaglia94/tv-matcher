@@ -102,8 +102,10 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
     out["amazon"] = {"titolo": nome, "modello": info.codice or modello, "img": img, "url": url_amz,
                      "fonte": fonte, "nota": nota, **info_dict(info)}
     log(f"   Amazon ({fonte or 'non riconosciuto'}): {info.marca} {info.codice} {info.pollici}\" {info.famiglia}")
-    if not info.marca or not info.pollici:
-        out["errore"] = nota or "modello Amazon non riconosciuto"
+    # per cercare un concorrente servono tecnologia e fascia dell'ASIN, altrimenti il confronto è casuale
+    non_classificato = P["modalita"] == "concorrente" and not (info.tecnologia and info.fascia)
+    if not info.marca or not info.pollici or non_classificato:
+        out["errore"] = nota or ("fascia del modello Amazon non riconosciuta" if non_classificato else "modello Amazon non riconosciuto")
         out["esito"] = {r["nome"]: "saltato" for r in retailer}
         log("   ⚠ modello Amazon non riconosciuto: scrivere il modello a mano")
         return out
@@ -161,6 +163,9 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
                 mancanti = [n for k, n in (("dolby_vision", "Dolby Vision"), ("hdr10plus", "HDR10+"),
                                            ("hdmi21", "HDMI 2.1"))
                             if P[k]["attivo"] and getattr(info, k) and not getattr(full, k)]
+                if P["risoluzione"]["attivo"] and info.risoluzione and full.risoluzione and \
+                        full.risoluzione != info.risoluzione and not cp.risoluzione == info.risoluzione:
+                    mancanti.append(f"risoluzione {info.risoluzione} (pagina: {full.risoluzione})")
                 if mancanti:
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
                                              "esito": "scartato: manca " + ", ".join(mancanti)})
