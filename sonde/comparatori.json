@@ -1,33 +1,598 @@
 {
- "expert": {
-  "home": "https://www.expert.it/",
-  "http_home": 200,
-  "titolo_home": "Acquista TV, Smartphone, Elettrodomestici nello shop online di Expert | Expert Italia",
-  "errore": "Locator.click: Timeout 8000ms exceeded.\nCall log:\n  - waiting for locator(\"input[type=search], input[name=q], input[name*=query i], input[name*=search i], input[placeholder*=cerc i], input[placeholder*=search i]\").first\n    - locator resolved to <input value=\"\" readonly type=\"text\" name=\"terms\" plac",
-  "titolo": "Acquista TV, Smartphone, Elettrodomestici nello shop online di Expert | Expert Italia",
-  "url_ricerca": "https://www.expert.it/it/it/exp/?r=1"
- },
- "kelkoo": {
-  "home": "https://www.kelkoo.it/",
-  "http_home": 200,
-  "titolo_home": "Kelkoo Italia - Acquisti Online & Confronto Prezzi",
-  "errore": "Locator.click: Timeout 8000ms exceeded.\nCall log:\n  - waiting for locator(\"input[type=search], input[name=q], input[name*=query i], input[name*=search i], input[placeholder*=cerc i], input[placeholder*=search i]\").first\n",
-  "titolo": "Kelkoo Italia - Acquisti Online & Confronto Prezzi",
-  "url_ricerca": "https://www.kelkoo.it/"
- },
- "idealo": {
-  "home": "https://www.idealo.it/",
-  "http_home": 200,
-  "titolo_home": "idealo – il tuo comparatore prezzi",
-  "url_ricerca": "https://www.idealo.it/risultati.html?q=TCL+65C7K",
-  "titolo": "TCL 65C7K su idealo.it",
-  "caratteri": 5482,
-  "testo": "Preferiti\nPrezzo Ideale\nAccedi\nCerca\nRisultati(10)*\nPopolarità\nPrezzo crescente\nPrezzo: dal più alto\nPrezzo base: dal più economico\nNovità\nTelecomandi\n(9)\nTelevisori\n(1)\nTipo di prodotto\nTelecomando originale\n 7\nTelecomando di ricambio\n 5\nTV 4K\n 1\nPrezzo\n€\n-\n€\nmeno di € 18\n 3\n€ 21 - € 23\n 3\n€ 25 - € 29\n 2\nda € 85\n 2\nDisponibilità\nSpedizione veloce (1-7 giorni feriali)\n2\nProduttori\nVINABTY\n 4\nTCL\n 2\nTelecomando di ricambio per TCL 65C7K\nVenduto da: amazon-marketplace.it\nDisponibilità immediata\nspedizione gratuita\n€ 22,99 IVA compresa\nDettagli dell’offerta\nGOUYESHO RC833A FMB1 Telecomando vocale adatto per TCL 55Q6C 55Q7C 50C7K 55C7K 65C7K 75C7K 85C7K 98C7K QLED Mini TV compatibile con 55T8C 65T8C 75T8C 85T8C 98T8C QLED 4K TV\nVenduto da: amazon-marketplace.it\nDisponibilità immediata\nspedizione gratuita\n€ 22,99 IVA compresa\nDettagli dell’offerta\nTelecomando TCL G0401-000263 RC833A FMB1 per televisori QLED 65Q8C\nVenduto da: kaufland.it\n5-6 giorni lavorativi\nSpedizione a partire da € 11,99\n€ 85,99 IVA compresa\nDettagli dell’offerta\nVINABTY Telecomando vocale sostitutivo Adatto per TCL Full HD Smart QLED Direct TV 55Q6C 55Q7C 50C7K 55C7K 65C7K 75C7K 85C7K 98C7K 65C9K 55T8C 65T8C 75T8C 85T8C 98T8C 5Q6C 32V5C 40V5C\nVenduto da: amazon-marketplace.it\nDisponibilità: solo 5 -- ordina subito (ulteriori in arrivo).\nspedizione gratuita\n€ 17,88 IVA compresa\nDettagli dell’offerta\nTCL 65C7L\n\nTV 4K, 2026, HDR, 3.840 x 2.160 Pixel, 65 pollici, Frequenza di aggiornamento effettiva 144 Hz, Dolby Vision IQ, Tuner digitale DVB-S2 HD / DVB-C HD / DVB-T2 HEVC, Google TV, HDMI 2.1, Ingresso HDMI 4, Smart TV\n\nVoto medio 10/10\n13 offerte\na partire da€ 857,49\nDettagli del prodotto\nRC833A Telecomando vocale Adatto per TCL TV 55A400 55Q7D-Pro 65Q7D-Pro | 75Q7D-Pro 85Q7D-Pro 98Q7D-Pro 55P7K-UK 75P6K-UK",
+ "euronics_home": {
+  "url": "https://www.euronics.it/",
+  "http": 200,
+  "finale": "https://www.euronics.it/",
+  "titolo": "Elettronica, Informatica, Elettrodomestici e Telefonia Online | Euronics",
+  "caratteri": 7289,
+  "testo": "Skip to main content\nSkip to footer content\nNegozi Volantini Servizi Star Club Magazine\nProdotti \nCiao\n0\nslide 3 of 26\nLe nostre proposte\nslide 1 to 5 of 7\nConsegna Gratuita\nScheda informativa\nIPHONE\nAPPLE - iPhone 18 Pro 512GB-Nero\n€ 1.739,00\n\n€ 1.739,00 consigliato\n\n AGGIUNGI\nGift Card 300€\nLAVASCIUGA\nHAIER - Lavasciuga CLC108-GNU1-S 10/8Kg Classe A/B-Antracite\n€ 1.999,99\n\n€ 2.999,99 consigliato\n\n AGGIUNGI\nNOTEBOOK\nHP - Notebook OMNIBOOK 3 NG AI 16-BS0001NLX-Glacier Silver\n€ 699,99\n\n€ 1.079,99 consigliato\n\n AGGIUNGI\nTV 4K\nLG - Smart TV QNED EVO AI MINILED 4K 65\" 65QNED86B6B-Charcoal Black\n€ 849,00\n\n€ 1.299,00 consigliato\n\n AGGIUNGI\nGift Card 200€\nASCIUGATRICI\nAEG - Asciugatrice TR8H310BY 10Kg Classe B-Bianco\n€ 989,99\n\n€ 1.249,99 consigliato\n\n AGGIUNGI\nConsegna Gratuita\nPIASTRE\nDYSON - Styler asciugacapelli Airwrap i.d. Lisci/Mossi-Amber Silk\n€ 449,00\n\n€ 549,00 consigliato\n\n AGGIUNGI\nFRIGGITRICI\nHIGO - Friggitrice elettrica ad aria digitale 8L FA-80\n€ 69,99\n\n€ 69,99 consigliato\n\n AGGIUNGI\nslide 2 to 4 of 3\nFINO AL 28 OTTOBRE\nScopri i prodotti\nSCOPRI DI PIÙ\nSPECIALI DI CATEGORIA\nScopri i prodotti\nSCOPRI DI PIÙ\nFINO AL 31 DICEMBRE\nTest@casa\nSCOPRI DI PIÙ\n\n\n\nslide 3 of 10\n\n\n\nPensati per te\nslide 1 to 5 of 10\nConsegna Gratuita\nSCOPE ELETTRICHE\nDYSON - Scopa elettrica V8 Cyclone-Grigio/ Verde\n€ 299,00\n\n€ 399,00 consigliato\n\n AGGIUNGI\nPermuta e Risparmia\nScheda informativa\nIPHONE\nAPPLE - iPhone 17 Pro 256GB-Blu Profondo\n€ 1.259,00\n\n€ 1.339,00 consigliato\n\n AGGIUNGI\nASPIRAPOLVERE ROBOT\nDREAME - Aspirapolvere robot X60VIM PRO ULTRA COMPLETE-Bianco\n€ 1.099,00\n\n€ 1.499,00 consigliato\n\n AGGIUNGI\nNOTEBOOK\nASUS - Notebook Vivobook S14 OLED S5406SAL-SF329W-Silver\n€ 799,00\n\n€ 1.199,00 consigliato\n\n AGGIUNGI\nLAVATRICI STANDARD\nHISENSE - Lavatrice WF3S1243BW3 12 Kg Classe A-Bianco\n€ 549,00\n\n€ 599,00 consigliato\n\n AGGIUNGI\nPermuta e Risparmia\nScheda informativa\nIPHONE\nAPPLE - iPhone 17 Pro 256GB-Arancione Cosmico\n€ 1.205,00\n\n€ 1.339,00 consigliato\n\n AGGIUNGI\nNOTEBOOK\nACER - Notebook ASPIRE LITE AL15-54P-56N1 15.6\"-Silver\n€ 649,00\n\n€ 729,99 consigliato\n\n AGGIUNGI\nConsegna Gratuita\nSCOPE ELETTRICHE\nDYSON - Scopa elettrica V16 PISTON SUBMARINE-Black\n€ 999,00\n\n€ 999,00 consigliato\n\n AGGIUNGI\nASPIRAPOLVERE ROBOT\nDREAME - Robot aspirapolvere lavapavimenti L40 VIM ULTRA AE-Nero\n€ 359,00\n\n€ 549,00 consigliato\n\n AGGIUNGI\nNOTEBOOK\nLENOVO - Notebook IdeaPad Slim 3 IPS3 15IPH11 16GB 512GB-luna grey\n€ 869,00\n\n€ 999,99 consigliato\n\n AGGIUNGI\nDal nostro Magazine\nFesteggia con Euronics e partecipa a \"Il futuro è di casa\". Fino al 30 novembre, fai acquisti online o in negozio, accumula gettoni e scopri subito se hai vinto uno dei premi.\n\nScopri di più\nScopri Ronics, il nostro agente Al. Grazie alla potenza dell'intelligenza artificiale, Ronics è sempre pronto a guidarti nella scelta dei tuoi nuovi elettrodomestici.\n\nScopri di più\nEsclusiva Euronics! La filosofia Higo si basa su innovazione e qualità. Per questo i nostri prodotti sono progettati per durare nel tempo e accompagnart",
+  "form": [
+   [
+    "https://www.euronics.it/search",
+    "get",
+    "q:text,lang:hidden"
+   ],
+   [
+    "https://www.euronics.it/on/demandware.store/Sites-euronics-Site/it_IT/Starclub-RequestCard",
+    "post",
+    ":checkbox,:hidden"
+   ]
+  ],
   "link": [
    [
-    "https://www.idealo.it/risultati.html?q=TCL%2065C7K",
-    "TCL 65C7K"
+    "https://www.euronics.it/outlet/offerte/",
+    "Offerte Outlet"
    ],
+   [
+    "https://www.euronics.it/tv-e-audio/tv/tv-4k/lg---smart-tv-qned-evo-ai-miniled-4k-65-65qned86b6b-charcoal-black/262004850.html",
+    "LG - Smart TV QNED EVO AI MINILED 4K 65\" 65QNED86B6B-Charcoal Black"
+   ],
+   [
+    "https://www.euronics.it/concorso-anniversario.html",
+    "Festeggia con Euronics e partecipa a \"Il futuro è di casa\". Fino al 30 novembre, fai acquisti online o in negozio, accumula gettoni e scopri subito se hai vinto"
+   ],
+   [
+    "https://www.euronics.it/vetrina-apple/",
+    "VISITA IL NEGOZIO"
+   ],
+   [
+    "https://www.euronics.it/sis-dyson.html",
+    "VISITA IL NEGOZIO"
+   ],
+   [
+    "https://www.euronics.it/vetrina-hisense/vetrina-hisense.html",
+    "VISITA IL NEGOZIO"
+   ],
+   [
+    "https://www.euronics.it/shop-in-shop-intel/vetrina-intel.html",
+    "VISITA IL NEGOZIO"
+   ],
+   [
+    "https://www.euronics.it/vetrina-lenovo/",
+    "VISITA IL NEGOZIO"
+   ],
+   [
+    "https://www.euronics.it/vetrina-lg/vetrina-lg.html",
+    "VISITA IL NEGOZIO"
+   ],
+   [
+    "https://www.euronics.it/vetrina-miele/",
+    "VISITA IL NEGOZIO"
+   ],
+   [
+    "https://www.euronics.it/vetrina-samsung/",
+    "VISITA IL NEGOZIO"
+   ],
+   [
+    "https://www.euronics.it/servizi/prenota-e-ritira/",
+    "Prenota e Ritira in Negozio"
+   ]
+  ]
+ },
+ "euronics_q": {
+  "url": "https://www.euronics.it/search?q=TCL+65C7K",
+  "http": 200,
+  "finale": "https://www.euronics.it/search?q=TCL+65C7K",
+  "titolo": "TCL 65C7K - offerte e prezzi su Euronics",
+  "caratteri": 1622,
+  "testo": "Skip to main content\nSkip to footer content\nNegozi Volantini Servizi Star Club Magazine\nProdotti \nCiao\n0\nRisultati per TCL 65C7K\nInformazioni sui prezzi e prodotti visualizzati\nOrdina per:\nRilevanza\nPrezzo Crescente\nPrezzo Decrescente\n\n1 prodotti\n\nFiltri Attivi (0)\nPrezzo\nMarca\nTV 4K\nTCL - Smart TV QD-Mini LED 4K 65\" 65C7L-Nero\n€ 949,00\n\n€ 1.299,99 consigliato\n\nAcquisto online: disponibile\nRitiro in negozio in 30' gratuito: verifica\n AGGIUNGI\n\nL'AZIENDA\n\nChi siamo\nEuronics International\nProgramma Franchising\nLo Facciamo per te, i nostri impegni\nLo facciamo per il tuo mondo\nLavora con noi\nArea Riservata Soci\nArea Riservata Affiliati\nRetail Media\nRonics: agente AI\n\nPER I TUOI ACQUISTI\n\nCondizioni di vendita (Consegna a domicilio)\nCondizioni di vendita (Prenota e Ritira)\nPrenota e Ritira in Negozio\nGaranzia Legale\nDiritto di Recesso e Difetti di Conformità\nPrezzi e Sconti (Omnibus)\nMetodi di pagamento\nFinanziamenti\nCompra ora e paga dopo\nConsegna e Installazione\n\nAREA CLIENTI\n\nContattaci\nRichiesta diritto recesso\nDomande frequenti\nCarta Star Club\nVerifica stato della riparazione\nCredito Gift Card\nServizi Serena\nServizi Altri\nPRIVACY\nGestisci cookie\nPrivacy Policy\nInformativa Cookies\n\n\nWhistleblowing\n   \nTech news\nMappa sito\nMappa marche\nElenco negozi\n\nTrova negozio\n\nINVIA\n\nSeguici sui social\n\nScarica la nostra app\n\n \n\nEuronics Italia SpA. Sede legale Via Montefeltro, 6/a 20156 Milano Partita Iva, Codice Fiscale e iscrizione CCIAA Milano Monza Brianza Lodi n. 13337170156. Codice intermediario SDI: HHBD9AK. Vendite soggette agli Artt. 45 e ss del Codice del Consumo in tema di Diritti dei Consumatori.",
+  "form": [
+   [
+    "https://www.euronics.it/search",
+    "get",
+    "q:text,lang:hidden"
+   ],
+   [
+    "https://www.euronics.it/on/demandware.store/Sites-euronics-Site/it_IT/Compare-Show",
+    "get",
+    "cgid:hidden,backUrl:hidden"
+   ],
+   [
+    "https://www.euronics.it/on/demandware.store/Sites-euronics-Site/it_IT/Starclub-RequestCard",
+    "post",
+    ":checkbox,:hidden"
+   ]
+  ],
+  "link": [
+   [
+    "https://www.euronics.it/outlet/offerte/",
+    "Offerte Outlet"
+   ],
+   [
+    "https://www.euronics.it/tv-e-audio/tv/tv-4k/tcl---smart-tv-qd-mini-led-4k-65-65c7l-nero/262004145.html",
+    "TCL - Smart TV QD-Mini LED 4K 65\" 65C7L-Nero"
+   ],
+   [
+    "https://www.euronics.it/tv-e-audio/tv/tv-4k/tcl---smart-tv-qd-mini-led-4k-65-65c7l-nero/262004145.html",
+    "TCL - Smart TV QD-Mini LED 4K 65\" 65C7L-Nero"
+   ],
+   [
+    "https://www.euronics.it/servizi/prenota-e-ritira/",
+    "Prenota e Ritira in Negozio"
+   ]
+  ]
+ },
+ "euronics_q2": {
+  "url": "https://www.euronics.it/ricerca?q=TCL+65C7K",
+  "http": 404,
+  "finale": "https://www.euronics.it/ricerca?q=TCL+65C7K",
+  "titolo": "Sites-euronics-Site",
+  "caratteri": 3257,
+  "testo": "Skip to main content\nSkip to footer content\nNegozi Volantini Servizi Star Club Magazine\nProdotti \nCiao\n0\nOoops!\n\nAbbiamo perso momentaneamente la pagina.\n\nVAI SU EURONICS.IT\nI più venduti\nslide 1 to 5 of 16\nPermuta e Risparmia\nScheda informativa\nIPHONE\nAPPLE - iPhone 17 Pro 256GB-Blu Profondo\n€ 1.259,00\n\n€ 1.339,00 consigliato\n\n AGGIUNGI\nConsegna Gratuita\nSCOPE ELETTRICHE\nDYSON - Scopa elettrica V8 Cyclone-Grigio/ Verde\n€ 299,00\n\n€ 399,00 consigliato\n\n AGGIUNGI\nBackToNew\nPermuta e Risparmia\nScheda informativa\nIPHONE\nAPPLE - iPhone 17 256GB-Nero\n€ 1.072,00\n AGGIUNGI\nNOTEBOOK\nLENOVO - Notebook IdeaPad Slim 3 IPS3 15IPH11 16GB 512GB-luna grey\n€ 869,00\n\n€ 999,99 consigliato\n\n AGGIUNGI\nPermuta e Risparmia\nScheda informativa\nIPHONE\nAPPLE - iPhone 17 Pro 256GB-Arancione Cosmico\n€ 1.205,00\n\n€ 1.339,00 consigliato\n\n AGGIUNGI\nPermuta e Risparmia\nScheda informativa\nIPHONE\nAPPLE - iPhone 17 Pro Max 256GB-Arancione Cosmico\n€ 1.348,00\n\n€ 1.489,00 consigliato\n\n AGGIUNGI\nPermuta e Risparmia\nScheda informativa\nIPHONE\nAPPLE - iPhone 17 Pro Max 256GB-Blu Profondo\n€ 1.346,00\n\n€ 1.489,00 consigliato\n\n AGGIUNGI\nASPIRAPOLVERE ROBOT\nDREAME - Aspirapolvere robot X60VIM PRO ULTRA COMPLETE-Bianco\n€ 1.099,00\n\n€ 1.499,00 consigliato\n\n AGGIUNGI\nNOTEBOOK\nASUS - Notebook Vivobook S14 OLED S5406SAL-SF329W-Silver\n€ 799,00\n\n€ 1.199,00 consigliato\n\n AGGIUNGI\nBackToNew\nPermuta e Risparmia\nScheda informativa\nIPHONE\nAPPLE - iPhone 17 256GB-Salvia\n€ 1.075,00\n AGGIUNGI\nCONTENUTI DIGITALI SONY PLAYSTATION\nSONY COMPUTER - PlayStation Gift Card 100€\n€ 100,00\n AGGIUNGI\nBackToNew\nPermuta e Risparmia\nScheda informativa\nIPHONE\nAPPLE - iPhone 16 128GB-Nero\n€ 899,00\n AGGIUNGI\nSMART TV\nHISENSE - Smart TV QLED FHD 32\" 32A59S-NERO\n€ 219,00\n\n€ 399,00 consigliato\n\n AGGIUNGI\nBackToNew\nPermuta e Risparmia\nScheda informativa\nIPHONE\nAPPLE - iPhone 17 256GB-Lavanda\n€ 1.077,00\n AGGIUNGI\nLAVATRICI STANDARD\nHISENSE - Lavatrice WF3S1243BW3 12 Kg Classe A-Bianco\n€ 549,00\n\n€ 599,00 consigliato\n\n AGGIUNGI\nBackToNew\nPermuta e Risparmia\nScheda informativa\nIPHONE\nAPPLE - iPhone 17 256GB-Bianco\n€ 1.074,00\n AGGIUNGI\n\nL'AZIENDA\n\nChi siamo\nEuronics International\nProgramma Franchising\nLo Facciamo per te, i nostri impegni\nLo facciamo per il tuo mondo\nLavora con noi\nArea Riservata Soci\nArea Riservata Affiliati\nRetail Media\nRonics: agente AI\n\nPER I TUOI ACQUISTI\n\nCondizioni di vendita (Consegna a domicilio)\nCondizioni di vendita (Prenota e Ritira)\nPrenota e Ritira in Negozio\nGaranzia Legale\nDiritto di Recesso e Difetti di Conformità\nPrezzi e Sconti (Omnibus)\nMetodi di pagamento\nFinanziamenti\nCompra ora e paga dopo\nConsegna e Installazione\n\nAREA CLIENTI\n\nContattaci\nRichiesta diritto recesso\nDomande frequenti\nCarta Star Club\nVerifica stato della riparazione\nCredito Gift Card\nServizi Serena\nServizi Altri\nPRIVACY\nGestisci cookie\nPrivacy Policy\nInformativa Cookies\n\n\nWhistleblowing\n   \nTech news\nMappa sito\nMappa marche\nElenco negozi\n\nTrova negozio\n\nINVIA\n\nSeguici sui social\n\nScarica la nostra app\n\n \n\nEuronics Italia SpA. Sede le",
+  "form": [
+   [
+    "https://www.euronics.it/search",
+    "get",
+    "q:text,lang:hidden"
+   ],
+   [
+    "https://www.euronics.it/on/demandware.store/Sites-euronics-Site/it_IT/Starclub-RequestCard",
+    "post",
+    ":checkbox,:hidden"
+   ]
+  ],
+  "link": [
+   [
+    "https://www.euronics.it/outlet/offerte/",
+    "Offerte Outlet"
+   ],
+   [
+    "https://www.euronics.it/",
+    "VAI SU EURONICS.IT"
+   ],
+   [
+    "https://www.euronics.it/servizi/prenota-e-ritira/",
+    "Prenota e Ritira in Negozio"
+   ]
+  ]
+ },
+ "expert_home": {
+  "url": "https://www.expert.it/",
+  "http": 200,
+  "finale": "https://www.expert.it/it/it/exp/?r=1",
+  "titolo": "Acquista TV, Smartphone, Elettrodomestici nello shop online di Expert | Expert Italia",
+  "caratteri": 20629,
+  "testo": "Nota: questo sito Web include un sistema di accessibilità. Premi Control-F11 per adattare il sito web ai non vedenti che utilizzano uno screen reader; Premi Control-F10 per aprire un menu di accessibilità.\nAccessibilità\nPremi invio per Accessibilità per non vedenti\nche usano lettori di schermo\nPremi invio per la navigazione da tastiera\nPremi invio per il menu Accessibilità\nScegli la modalità\ndel tuo ordine\nRICEZIONE A CASA\nAccedi\n Categorie\nVolantino\nCarta del docente\nBonus Clima\nCerca negozio\nMy Expert\nSOTTOCOSTO E SOTTOPREZZI\nIL MEGLIO PER LA TUA IGIENE ORALE\nSPECIALE APPLE SOTTOCOSTO & SOTTOPREZZI\nFC27 E' ARRIVATO!\nIN ARRIVO IPHONE DUO\nGli esperti vi consigliano le migliori promozioni\nPrevious\nLENOVO IDEA TAB 8GB 128GB WIFI\n\nTablet schermo 11'\nram 8 GB\ncapacità 128 GB\nmodulo G non presente Bluetooth 5.2\nproc. dimensity 6300\npeso netto 0.48 Kg\nlan wi-fi 5 (802.11ac)\n\nRicevilo a casa\n233\n,90€\n-15%\npari a 34,90€\n199 ,00€\nTROVA LA PROMO NEL TUO NEGOZIO!\nROWENTA X-CLEAN 7, LAVAPAVIMENTI SENZA FILI, AUTONOMIA 50', TECNOLOGIA SMART, ASSISTENTE VOCALE, AUTOPULIZIA E ASCIUGATURA, LUCI LED, PULIZIA BORDI, GZ5736\n\nLavapavimenti senza sacco 250 W\nalimentazione a batteria\nfiltro a cicloni\ncontenitore polvere 0.5 l\nspazzola motorizzata\nRumorosità 76 dBA\n\n\nRicevilo a casa\n319\n,90€\n-13%\npari a 40,90€\n279 ,00€\nTROVA LA PROMO NEL TUO NEGOZIO!\nTRUST GAMING GXT 703 RIYE SEDIA GAMING - NERO\n\nSedia gaming con braccioli\naltezza regolabile\nportata massima 140 Kg\nschienale reclinabile\n5 ruote\nmateriale misto traspirante\n\n\nRicevilo a casa\n149\n,00€\n-20%\npari a 29,10€\n119 ,90€\nTROVA LA PROMO NEL TUO NEGOZIO!\nBOSCH SMS4EMI06E SERIE 4 LAVASTOVIGLIE DA LIBERA INSTALLAZIONE 14 COPERTI ACCIAIO SPAZZOLATO ANTI-IMPRONTA CLASSE B\n\nLavastoviglie libera installazione 14 coperti\nnuova classe efficienza energetica B\nclasse emissione rumore B\n6 programmi\n3 cestelli\nlarg. 60 alt. 85 prof. 60 cm\n\nRicevilo a casa\n690\n,90€\n-21%\npari a 141,90€\n549 ,00€\nTROVA LA PROMO NEL TUO NEGOZIO!\nNINTENDO SWITCH 2\n\nConsole portatile\nhard disk 256 GB\ncontroller wireless\nWiFi\nuscita HDMI\n2 porte USB\npiattaforma SWITCH 2\n\n\nRicevilo a casa\n482\n,90€\n-5%\npari a 23,00€\n459 ,90€\nTROVA LA PROMO NEL TUO NEGOZIO!\nSAMSUNG FAR09MLH\n\nKit condizionatore mono split\nraffredda a 2.5 kW\nriscalda a 2.93 kW\nunità esterna 9000 btu\nclasse energetica freddo A++ caldo A+\ncoefficiente seer 6.3 scop 4\ngas R32\n\n\nRicevilo a casa\n418\n,90€\n-24%\npari a 99,90€\n319 ,00€\nTROVA LA PROMO NEL TUO NEGOZIO!\nSAMSUNG GALAXY A37 5G 8+256GB AWESOME CHARCOAL\n\nDisplay super amoled 6.7''\n256 GBram\nBluetooth 5.3 4G-LTE 5G-LTE\ndualsim\ns.o. Android android 16\nfotoc. posteriore 50 Mpx\nfotoc. frontale 12 Mpx\nproc. octacore 2.75 GHz\nbatteria lithium-ion 5000 mah\ncolore awesome charcoal\n\nRicevilo a casa\n440\n,90€\n-25%\npari a 111,00€\n329 ,90€\nTROVA LA PROMO NEL TUO NEGOZIO!\nHAIER HW90-BP14357GUIT LAVATRICE CARICAMENTO FRONTALE 9 KG 1400 GIRI/MIN ANTRACITE\n\nLavatrice libera installazione 9 Kg\nnuova classe efficienza energetica A\ncentrifuga max 1400 giri/min",
+  "form": [
+   [
+    "https://www.expert.it/it/it/exp/account/signinwithemailheader",
+    "post",
+    "ReturnUrl:hidden,Username:text,Password:password,RememberMe:checkbox,__RequestVerificationToken:hidden,RememberMe:hidden"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/shop/search",
+    "get",
+    "terms:search"
+   ],
+   [
+    "javascript:void(0);",
+    "post",
+    "__RequestVerificationToken:hidden,ContactType:hidden,ContactSource:hidden,IdSourceBu:hidden,IdPreferredBu:hidden,AffiliationCode:hidden,g-recaptcha-response:hidden,FirstName:text,LastName:text,Email:text,Accepted:checkbox"
+   ]
+  ],
+  "link": [
+   [
+    "javascript:void(0);",
+    "Ritiro in negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Ritiro in negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Cerca negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Cerca negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/shop/product/aqua10vim-ultra-roller-complete-white-versione-mercato-italiano/exp898264",
+    "Robot aspirapolvere 650 W autonomia 175 min. capacità raccoglitore polvere 3.2 lt filtro HEPA sistema antiurto sensori ostacoli diametro 35 cm"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/shop/product/aqua10vim-ultra-roller-complete-white-versione-mercato-italiano/exp898264",
+    "Robot aspirapolvere 650 W autonomia 175 min. capacità raccoglitore polvere 3.2 lt filtro HEPA sistema antiurto sensori ostacoli diametro 35 cm"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ],
+   [
+    "javascript:void(0);",
+    "TROVA LA PROMO NEL TUO NEGOZIO!"
+   ]
+  ]
+ },
+ "expert_1": {
+  "url": "https://www.expert.it/it/it/exp/search/?text=TCL+65C7K",
+  "http": 404,
+  "finale": "https://www.expert.it/it/it/exp/error?code=404&path=%2Fit%2Fit%2Fexp%2Fsearch%2F",
+  "titolo": "Error page | Expert Italia",
+  "caratteri": 2285,
+  "testo": "Nota: questo sito Web include un sistema di accessibilità. Premi Control-F11 per adattare il sito web ai non vedenti che utilizzano uno screen reader; Premi Control-F10 per aprire un menu di accessibilità.\nAccessibilità\nPremi invio per Accessibilità per non vedenti\nche usano lettori di schermo\nPremi invio per la navigazione da tastiera\nPremi invio per il menu Accessibilità\nScegli la modalità\ndel tuo ordine\nRICEZIONE A CASA\nAccedi\n Categorie\nVolantino\nCarta del docente\nBonus Clima\nCerca negozio\nMy Expert\nPagina non trovata\n\nLa pagina che stavi cercando non è stata trovata; se stavi cercando un prodotto può essere che non esista più o sia temporaneamente non disponibile. Per riprendere la navigazione clicca qui\n\nRequest ID: 00-7486495862a4dfaa44dad6eed7b23b53-9c8c7184e2016b9b-00\n\nISCRIVITI ALLA NEWSLETTER PER ESSERE SEMPRE AGGIORNATO SULLE NOSTRE OFFERTE\nREGISTRATI ALLA NEWSLETTER\nServizio clienti\nTraccia il tuo ordine\nSpedizioni\nPagamenti\nResi e recessi\nFaq\nContattaci\nNegozi\nContatta negozio\nStore locator\nAcquisti in negozio\nGiftcard\nMy account\nGestione profilo\nStorico ordini\nWishlist\nMy expert\nGestione privacy\nArea legale\nCondizioni generali di vendita - acquisti online\nCondizioni generali di vendita - prenota e ritira\nAvviso armonizzato sulla garanzia legale\nDiritto di recesso\nInformativa raee\nInformativa privacy\nCookie policy\n\nExpert Italy S.p.A., sede legale via G. Fara 35 Milano (MI), P.I. e C.F. 01460390154 iscritta al Registro Imprese di Milano al n. 01460390154;\n\nE-commerce partner Daito Solutions s.r.l., con sede legale in Italia, Viale Papiniano 8 , 20123 Milano, P.I. e C.F. 16189751007, REA MI-2726347, Cap.Soc. € 10.000,00\n\nPer offrire una migliore esperienza di navigazione questo sito utilizza cookie tecnici, analitici e, previo tuo consenso, cookie di marketing e profilazione anche di terze parti, utilizzati per consentirti di navigare in modo sicuro ed efficiente, per raccogliere informazioni statistiche sull'utilizzo del sito e per mostrarti annunci personalizzati e non personalizzati. Selezionando \"Accetta\" acconsenti all'utilizzo di tutti i cookie.\n\nSe vuoi saperne di più o dare il consenso solo ad alcuni cookie seleziona \"Preferenze\". \n\nMaggiori informazioni nella nostra Cookie Policy.\n\nPREFERENZE COOKIE\nRIFIUTA E CHIUDI\nACCETTA",
+  "form": [
+   [
+    "https://www.expert.it/it/it/exp/account/signinwithemailheader",
+    "post",
+    "ReturnUrl:hidden,Username:text,Password:password,RememberMe:checkbox,__RequestVerificationToken:hidden,RememberMe:hidden"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/shop/search",
+    "get",
+    "terms:search"
+   ],
+   [
+    "javascript:void(0);",
+    "post",
+    "__RequestVerificationToken:hidden,ContactType:hidden,ContactSource:hidden,IdSourceBu:hidden,IdPreferredBu:hidden,AffiliationCode:hidden,g-recaptcha-response:hidden,FirstName:text,LastName:text,Email:text,Accepted:checkbox"
+   ]
+  ],
+  "link": [
+   [
+    "javascript:void(0);",
+    "Ritiro in negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Ritiro in negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Cerca negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Cerca negozio"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/lg/acquisti-in-negozio",
+    "Contatta negozio"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/lg/acquisti-in-negozio",
+    "Acquisti in negozio"
+   ],
+   [
+    "javascript: changePreferentialStore();",
+    "SCEGLI NEGOZIO"
+   ]
+  ]
+ },
+ "expert_2": {
+  "url": "https://www.expert.it/it/it/exp/search?text=TCL%2065C7K",
+  "http": 404,
+  "finale": "https://www.expert.it/it/it/exp/error?code=404&path=%2Fit%2Fit%2Fexp%2Fsearch",
+  "titolo": "Error page | Expert Italia",
+  "caratteri": 2285,
+  "testo": "Nota: questo sito Web include un sistema di accessibilità. Premi Control-F11 per adattare il sito web ai non vedenti che utilizzano uno screen reader; Premi Control-F10 per aprire un menu di accessibilità.\nAccessibilità\nPremi invio per Accessibilità per non vedenti\nche usano lettori di schermo\nPremi invio per la navigazione da tastiera\nPremi invio per il menu Accessibilità\nScegli la modalità\ndel tuo ordine\nRICEZIONE A CASA\nAccedi\n Categorie\nVolantino\nCarta del docente\nBonus Clima\nCerca negozio\nMy Expert\nPagina non trovata\n\nLa pagina che stavi cercando non è stata trovata; se stavi cercando un prodotto può essere che non esista più o sia temporaneamente non disponibile. Per riprendere la navigazione clicca qui\n\nRequest ID: 00-8b69916ff68960f3197acd7159c9772f-181602100d9954ac-00\n\nISCRIVITI ALLA NEWSLETTER PER ESSERE SEMPRE AGGIORNATO SULLE NOSTRE OFFERTE\nREGISTRATI ALLA NEWSLETTER\nServizio clienti\nTraccia il tuo ordine\nSpedizioni\nPagamenti\nResi e recessi\nFaq\nContattaci\nNegozi\nContatta negozio\nStore locator\nAcquisti in negozio\nGiftcard\nMy account\nGestione profilo\nStorico ordini\nWishlist\nMy expert\nGestione privacy\nArea legale\nCondizioni generali di vendita - acquisti online\nCondizioni generali di vendita - prenota e ritira\nAvviso armonizzato sulla garanzia legale\nDiritto di recesso\nInformativa raee\nInformativa privacy\nCookie policy\n\nExpert Italy S.p.A., sede legale via G. Fara 35 Milano (MI), P.I. e C.F. 01460390154 iscritta al Registro Imprese di Milano al n. 01460390154;\n\nE-commerce partner Daito Solutions s.r.l., con sede legale in Italia, Viale Papiniano 8 , 20123 Milano, P.I. e C.F. 16189751007, REA MI-2726347, Cap.Soc. € 10.000,00\n\nPer offrire una migliore esperienza di navigazione questo sito utilizza cookie tecnici, analitici e, previo tuo consenso, cookie di marketing e profilazione anche di terze parti, utilizzati per consentirti di navigare in modo sicuro ed efficiente, per raccogliere informazioni statistiche sull'utilizzo del sito e per mostrarti annunci personalizzati e non personalizzati. Selezionando \"Accetta\" acconsenti all'utilizzo di tutti i cookie.\n\nSe vuoi saperne di più o dare il consenso solo ad alcuni cookie seleziona \"Preferenze\". \n\nMaggiori informazioni nella nostra Cookie Policy.\n\nPREFERENZE COOKIE\nRIFIUTA E CHIUDI\nACCETTA",
+  "form": [
+   [
+    "https://www.expert.it/it/it/exp/account/signinwithemailheader",
+    "post",
+    "ReturnUrl:hidden,Username:text,Password:password,RememberMe:checkbox,__RequestVerificationToken:hidden,RememberMe:hidden"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/shop/search",
+    "get",
+    "terms:search"
+   ],
+   [
+    "javascript:void(0);",
+    "post",
+    "__RequestVerificationToken:hidden,ContactType:hidden,ContactSource:hidden,IdSourceBu:hidden,IdPreferredBu:hidden,AffiliationCode:hidden,g-recaptcha-response:hidden,FirstName:text,LastName:text,Email:text,Accepted:checkbox"
+   ]
+  ],
+  "link": [
+   [
+    "javascript:void(0);",
+    "Ritiro in negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Ritiro in negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Cerca negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Cerca negozio"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/lg/acquisti-in-negozio",
+    "Contatta negozio"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/lg/acquisti-in-negozio",
+    "Acquisti in negozio"
+   ],
+   [
+    "javascript: changePreferentialStore();",
+    "SCEGLI NEGOZIO"
+   ]
+  ]
+ },
+ "expert_3": {
+  "url": "https://www.expert.it/it/it/exp/search/?q=TCL+65C7K",
+  "http": 404,
+  "finale": "https://www.expert.it/it/it/exp/error?code=404&path=%2Fit%2Fit%2Fexp%2Fsearch%2F",
+  "titolo": "Error page | Expert Italia",
+  "caratteri": 2285,
+  "testo": "Nota: questo sito Web include un sistema di accessibilità. Premi Control-F11 per adattare il sito web ai non vedenti che utilizzano uno screen reader; Premi Control-F10 per aprire un menu di accessibilità.\nAccessibilità\nPremi invio per Accessibilità per non vedenti\nche usano lettori di schermo\nPremi invio per la navigazione da tastiera\nPremi invio per il menu Accessibilità\nScegli la modalità\ndel tuo ordine\nRICEZIONE A CASA\nAccedi\n Categorie\nVolantino\nCarta del docente\nBonus Clima\nCerca negozio\nMy Expert\nPagina non trovata\n\nLa pagina che stavi cercando non è stata trovata; se stavi cercando un prodotto può essere che non esista più o sia temporaneamente non disponibile. Per riprendere la navigazione clicca qui\n\nRequest ID: 00-f898a557e21f21638885ff4e215e3359-eec08bc22ca080d2-00\n\nISCRIVITI ALLA NEWSLETTER PER ESSERE SEMPRE AGGIORNATO SULLE NOSTRE OFFERTE\nREGISTRATI ALLA NEWSLETTER\nServizio clienti\nTraccia il tuo ordine\nSpedizioni\nPagamenti\nResi e recessi\nFaq\nContattaci\nNegozi\nContatta negozio\nStore locator\nAcquisti in negozio\nGiftcard\nMy account\nGestione profilo\nStorico ordini\nWishlist\nMy expert\nGestione privacy\nArea legale\nCondizioni generali di vendita - acquisti online\nCondizioni generali di vendita - prenota e ritira\nAvviso armonizzato sulla garanzia legale\nDiritto di recesso\nInformativa raee\nInformativa privacy\nCookie policy\n\nExpert Italy S.p.A., sede legale via G. Fara 35 Milano (MI), P.I. e C.F. 01460390154 iscritta al Registro Imprese di Milano al n. 01460390154;\n\nE-commerce partner Daito Solutions s.r.l., con sede legale in Italia, Viale Papiniano 8 , 20123 Milano, P.I. e C.F. 16189751007, REA MI-2726347, Cap.Soc. € 10.000,00\n\nPer offrire una migliore esperienza di navigazione questo sito utilizza cookie tecnici, analitici e, previo tuo consenso, cookie di marketing e profilazione anche di terze parti, utilizzati per consentirti di navigare in modo sicuro ed efficiente, per raccogliere informazioni statistiche sull'utilizzo del sito e per mostrarti annunci personalizzati e non personalizzati. Selezionando \"Accetta\" acconsenti all'utilizzo di tutti i cookie.\n\nSe vuoi saperne di più o dare il consenso solo ad alcuni cookie seleziona \"Preferenze\". \n\nMaggiori informazioni nella nostra Cookie Policy.\n\nPREFERENZE COOKIE\nRIFIUTA E CHIUDI\nACCETTA",
+  "form": [
+   [
+    "https://www.expert.it/it/it/exp/account/signinwithemailheader",
+    "post",
+    "ReturnUrl:hidden,Username:text,Password:password,RememberMe:checkbox,__RequestVerificationToken:hidden,RememberMe:hidden"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/shop/search",
+    "get",
+    "terms:search"
+   ],
+   [
+    "javascript:void(0);",
+    "post",
+    "__RequestVerificationToken:hidden,ContactType:hidden,ContactSource:hidden,IdSourceBu:hidden,IdPreferredBu:hidden,AffiliationCode:hidden,g-recaptcha-response:hidden,FirstName:text,LastName:text,Email:text,Accepted:checkbox"
+   ]
+  ],
+  "link": [
+   [
+    "javascript:void(0);",
+    "Ritiro in negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Ritiro in negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Cerca negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Cerca negozio"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/lg/acquisti-in-negozio",
+    "Contatta negozio"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/lg/acquisti-in-negozio",
+    "Acquisti in negozio"
+   ],
+   [
+    "javascript: changePreferentialStore();",
+    "SCEGLI NEGOZIO"
+   ]
+  ]
+ },
+ "expert_4": {
+  "url": "https://www.expert.it/it/it/exp/ricerca?q=TCL+65C7K",
+  "http": 404,
+  "finale": "https://www.expert.it/it/it/exp/error?code=404&path=%2Fit%2Fit%2Fexp%2Fricerca",
+  "titolo": "Error page | Expert Italia",
+  "caratteri": 2285,
+  "testo": "Nota: questo sito Web include un sistema di accessibilità. Premi Control-F11 per adattare il sito web ai non vedenti che utilizzano uno screen reader; Premi Control-F10 per aprire un menu di accessibilità.\nAccessibilità\nPremi invio per Accessibilità per non vedenti\nche usano lettori di schermo\nPremi invio per la navigazione da tastiera\nPremi invio per il menu Accessibilità\nScegli la modalità\ndel tuo ordine\nRICEZIONE A CASA\nAccedi\n Categorie\nVolantino\nCarta del docente\nBonus Clima\nCerca negozio\nMy Expert\nPagina non trovata\n\nLa pagina che stavi cercando non è stata trovata; se stavi cercando un prodotto può essere che non esista più o sia temporaneamente non disponibile. Per riprendere la navigazione clicca qui\n\nRequest ID: 00-09ce9dce8ec1a10778da04f25d1a1e33-950a9c068cb96e0c-00\n\nISCRIVITI ALLA NEWSLETTER PER ESSERE SEMPRE AGGIORNATO SULLE NOSTRE OFFERTE\nREGISTRATI ALLA NEWSLETTER\nServizio clienti\nTraccia il tuo ordine\nSpedizioni\nPagamenti\nResi e recessi\nFaq\nContattaci\nNegozi\nContatta negozio\nStore locator\nAcquisti in negozio\nGiftcard\nMy account\nGestione profilo\nStorico ordini\nWishlist\nMy expert\nGestione privacy\nArea legale\nCondizioni generali di vendita - acquisti online\nCondizioni generali di vendita - prenota e ritira\nAvviso armonizzato sulla garanzia legale\nDiritto di recesso\nInformativa raee\nInformativa privacy\nCookie policy\n\nExpert Italy S.p.A., sede legale via G. Fara 35 Milano (MI), P.I. e C.F. 01460390154 iscritta al Registro Imprese di Milano al n. 01460390154;\n\nE-commerce partner Daito Solutions s.r.l., con sede legale in Italia, Viale Papiniano 8 , 20123 Milano, P.I. e C.F. 16189751007, REA MI-2726347, Cap.Soc. € 10.000,00\n\nPer offrire una migliore esperienza di navigazione questo sito utilizza cookie tecnici, analitici e, previo tuo consenso, cookie di marketing e profilazione anche di terze parti, utilizzati per consentirti di navigare in modo sicuro ed efficiente, per raccogliere informazioni statistiche sull'utilizzo del sito e per mostrarti annunci personalizzati e non personalizzati. Selezionando \"Accetta\" acconsenti all'utilizzo di tutti i cookie.\n\nSe vuoi saperne di più o dare il consenso solo ad alcuni cookie seleziona \"Preferenze\". \n\nMaggiori informazioni nella nostra Cookie Policy.\n\nPREFERENZE COOKIE\nRIFIUTA E CHIUDI\nACCETTA",
+  "form": [
+   [
+    "https://www.expert.it/it/it/exp/account/signinwithemailheader",
+    "post",
+    "ReturnUrl:hidden,Username:text,Password:password,RememberMe:checkbox,__RequestVerificationToken:hidden,RememberMe:hidden"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/shop/search",
+    "get",
+    "terms:search"
+   ],
+   [
+    "javascript:void(0);",
+    "post",
+    "__RequestVerificationToken:hidden,ContactType:hidden,ContactSource:hidden,IdSourceBu:hidden,IdPreferredBu:hidden,AffiliationCode:hidden,g-recaptcha-response:hidden,FirstName:text,LastName:text,Email:text,Accepted:checkbox"
+   ]
+  ],
+  "link": [
+   [
+    "javascript:void(0);",
+    "Ritiro in negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Ritiro in negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Cerca negozio"
+   ],
+   [
+    "javascript:void(0);",
+    "Cerca negozio"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/lg/acquisti-in-negozio",
+    "Contatta negozio"
+   ],
+   [
+    "https://www.expert.it/it/it/exp/lg/acquisti-in-negozio",
+    "Acquisti in negozio"
+   ],
+   [
+    "javascript: changePreferentialStore();",
+    "SCEGLI NEGOZIO"
+   ]
+  ]
+ },
+ "idealo_ris": {
+  "url": "https://www.idealo.it/risultati.html?q=TCL+65C7K",
+  "http": 200,
+  "finale": "https://www.idealo.it/risultati.html?q=TCL+65C7K",
+  "titolo": "TCL 65C7K su idealo.it",
+  "caratteri": 6606,
+  "testo": "Preferiti\nPrezzo Ideale\nAccedi\nCerca\nRisultati(10)*\nPopolarità\nPrezzo crescente\nPrezzo: dal più alto\nPrezzo base: dal più economico\nNovità\nTelecomandi\n(9)\nTelevisori\n(1)\nTipo di prodotto\nTelecomando originale\n 7\nTelecomando di ricambio\n 5\nTV 4K\n 1\nPrezzo\n€\n-\n€\nmeno di € 18\n 3\n€ 21 - € 23\n 3\n€ 25 - € 29\n 2\nda € 85\n 2\nDisponibilità\nSpedizione veloce (1-7 giorni feriali)\n2\nProduttori\nVINABTY\n 4\nTCL\n 2\nTelecomando di ricambio per TCL 65C7K\nVenduto da: amazon-marketplace.it\nDisponibilità immediata\nspedizione gratuita\n€ 22,99 IVA compresa\nDettagli dell’offerta\nGOUYESHO RC833A FMB1 Telecomando vocale adatto per TCL 55Q6C 55Q7C 50C7K 55C7K 65C7K 75C7K 85C7K 98C7K QLED Mini TV compatibile con 55T8C 65T8C 75T8C 85T8C 98T8C QLED 4K TV\nVenduto da: amazon-marketplace.it\nDisponibilità immediata\nspedizione gratuita\n€ 22,99 IVA compresa\nDettagli dell’offerta\nTelecomando TCL G0401-000263 RC833A FMB1 per televisori QLED 65Q8C\nVenduto da: kaufland.it\n5-6 giorni lavorativi\nSpedizione a partire da € 11,99\n€ 85,99 IVA compresa\nDettagli dell’offerta\nVINABTY Telecomando vocale sostitutivo Adatto per TCL Full HD Smart QLED Direct TV 55Q6C 55Q7C 50C7K 55C7K 65C7K 75C7K 85C7K 98C7K 65C9K 55T8C 65T8C 75T8C 85T8C 98T8C 5Q6C 32V5C 40V5C\nVenduto da: amazon-marketplace.it\nDisponibilità: solo 5 -- ordina subito (ulteriori in arrivo).\nspedizione gratuita\n€ 17,88 IVA compresa\nDettagli dell’offerta\nTCL 65C7L\n\nTV 4K, 2026, HDR, 3.840 x 2.160 Pixel, 65 pollici, Frequenza di aggiornamento effettiva 144 Hz, Dolby Vision IQ, Tuner digitale DVB-S2 HD / DVB-C HD / DVB-T2 HEVC, Google TV, HDMI 2.1, Ingresso HDMI 4, Smart TV\n\nVoto medio 10/10\n13 offerte\na partire da€ 857,49\nDettagli del prodotto\nRC833A Telecomando vocale Adatto per TCL TV 55A400 55Q7D-Pro 65Q7D-Pro | 75Q7D-Pro 85Q7D-Pro 98Q7D-Pro 55P7K-UK 75P6K-UK 32S4K-UK 50S5K-UK 50S5K 43S5K 40S5K 32S5K 55T8C 65T8C 75T8C 85T8C 50C7K\nVenduto da: amazon-marketplace.it\nUnknown\nspedizione gratuita\n€ 16,99 IVA compresa\nDettagli dell’offerta\nTelecomando sostitutivo RC802NU YUI1 compatibile con TV TCL 4K QLED 55C735K 65C7\nVenduto da: ebay.it\nSpedizione entro 4 - 10 giorni lavorativi dall'avvenuto pagamento.\nspedizione gratuita\n€ 21,89 IVA compresa\nDettagli dell’offerta\nVINABTY Telecomando di ricambio per TCL 2025 C6K C7K C71K C8K TV 32V5C 43V5C 40V5C 75V6C 65V6C 50V6C 43V6C 43V6C 65C9K 55T8C 65T8C 75T8C 85T8C 98T8C 5Q6C C 55 V 6 C QD-Mini TV LED\nVenduto da: amazon-marketplace.it\nDisponibilità: solo 8\nSpedizione a partire da € 3,99\n€ 28,02 IVA compresa\nDettagli dell’offerta\nAULCMEET Télécommande vocale de remplacement Convient pour TCL Q6C, Q7C, C6K, C6KS, C7K, C8K, C9K, C71K, 55T8C, 65T8C, 75T8C, 85T8C, 98T8CQLED Mini LED Fernseher\nVenduto da: amazon-marketplace.it\nUnknown\nspedizione gratuita\n€ 17,99 IVA compresa\nDettagli dell’offerta\nTelecomando vocale di ricambio adatto per TCL QD-Mini LED 4K HDR Ultra TV | 65P8L-UK 75P8L-UK 85P8L-UK 65C7L-UK 55C7L-UK 75C7L-UK 85C7L-UK 98C7L-UK 55T8C 65T8C 75T8C 85T8C\nVenduto da: amazon-marketplace.it\nDisponib",
+  "form": [
+   [
+    "https://www.idealo.it/risultati.html",
+    "get",
+    "q:search"
+   ],
+   [
+    "https://www.idealo.it/risultati.html?q=TCL+65C7K",
+    "get",
+    ""
+   ],
+   [
+    "https://www.idealo.it/risultati.html?q=TCL+65C7K",
+    "get",
+    ":radio,:radio,:radio,:radio,:radio"
+   ],
+   [
+    "https://www.idealo.it/risultati.html?q=TCL+65C7K",
+    "get",
+    ":number,:number"
+   ],
+   [
+    "https://www.idealo.it/ipc/prg",
+    "post",
+    "value:hidden"
+   ],
+   [
+    "https://www.idealo.it/ipc/prg",
+    "post",
+    "value:hidden"
+   ]
+  ],
+  "link": [
    [
     "https://www.idealo.it/risultati.html?q=tcl%2065c7k",
     "tcl 65c7k - in Altri risultati"
@@ -39,23 +604,197 @@
    [
     "https://www.idealo.it/confronta-prezzi/209962597/tcl-65c7l.html",
     "TCL 65C7L"
+   ],
+   [
+    "https://voli.idealo.it/deals/viaggi-Last-minute/",
+    "Offerte di voli last minute"
+   ],
+   [
+    "https://www.idealo.it/legal/nota-legale",
+    "* Tutti i prezzi in Euro sono IVA inclusa (escluse eventuali spese di spedizione). Prezzi, classificazioni delle offerte, tempi e costi di consegna sono suscett"
    ]
   ]
  },
- "euronics": {
-  "home": "https://www.euronics.it/",
-  "http_home": 200,
-  "titolo_home": "Elettronica, Informatica, Elettrodomestici e Telefonia Online | Euronics",
-  "errore": "Locator.click: Timeout 8000ms exceeded.\nCall log:\n  - waiting for locator(\"input[type=search], input[name=q], input[name*=query i], input[name*=search i], input[placeholder*=cerc i], input[placeholder*=search i]\").first\n    - locator resolved to <input tabindex=\"0\" role=\"combobox\" autocomplete=\"off\"",
-  "titolo": "Elettronica, Informatica, Elettrodomestici e Telefonia Online | Euronics",
-  "url_ricerca": "https://www.euronics.it/"
- },
- "trovaprezzi": {
-  "home": "https://www.trovaprezzi.it/",
-  "http_home": 403,
-  "titolo_home": "trovaprezzi.it",
-  "errore": "Locator.click: Timeout 8000ms exceeded.\nCall log:\n  - waiting for locator(\"input[type=search], input[name=q], input[name*=query i], input[name*=search i], input[placeholder*=cerc i], input[placeholder*=search i]\").first\n",
-  "titolo": "trovaprezzi.it",
-  "url_ricerca": "https://www.trovaprezzi.it/"
+ "idealo_prod": {
+  "url": "https://www.idealo.it/confronta-prezzi/209962597/tcl-65c7l.html",
+  "http": 200,
+  "finale": "https://www.idealo.it/confronta-prezzi/209962597/tcl-65c7l.html",
+  "titolo": "TCL 65C7L a € 857,49 | Ottobre 2026 | Migliori prezzi e offerte su idealo",
+  "caratteri": 9135,
+  "testo": "Vai alla navigazione\nVai alla ricerca\nVai al contenuto principale\nVai alla lista delle offerte\nPreferiti\nPrezzo Ideale\nAccedi\n \n Elettronica \n TV, Video & DVD \n Televisori \n TCL C7L \n 65C7L\nTCL C7L 65C7L\nOpinione degli esperti:\nTest: Voto 10/10 \nScheda informativa del prodotto  Panoramica del prodotto: 2026  HDR  3.840 x 2.160 Pixel  65 pollici  Frequenza di aggiornamento effettiva 144 Hz  Dolby Vision IQ  Tuner digitale DVB-S2 HD / DVB-C HD / DVB-T2 HEVC  Google TV  HDMI 2.1  Ingresso HDMI 4  Smart TV Dettagli prodotto\nProdotti simili: TV 4K  TV 4K TCL  Televisori TCL\nVariante:\nFiltra\nTutte le varianti\na partire da\n€ 694,09\n65C7L\n65C7L\na partire da\n€ 857,49\n55C7L\n55C7L\na partire da\n€ 694,09\nMiglior prezzo\n75C7L\n75C7L\na partire da\n€ 1.171,49\n85C7L\n85C7L\na partire da\n€ 1.799,00\n98C7L\n98C7L\na partire da\n€ 3.211,44\nTop 10\nTV 4K\n1\nSamsung UE-U7000FU\nda € 269,00\n2\nSamsung TQ-LS03FWU\nda € 1.033,11\n3\nTCL C8L\nda € 760,90\n4\nTCL P89K 2025\nda € 357,26\n5\nLG OLED AI 4K B5 2025\nda € 649,00\n6\nLG OLED G5 2025\nda € 915,90\n7\nXiaomi TV F\nda € 299,00\n8\nSamsung QE-Q7F\nda € 291,43\n9\nTCL C6K Pro\nda € 499,00\n10\nSamsung QE-S90F\nda € 879,90\nI prodotti più popolari su idealo\nTCL 65C8K\na partire da € 1.259,07\nTCL 65C6K\na partire da € 878,48\nTCL 65C9K\na partire da € 2.022,68\nTCL 65Q6C\na partire da € 1.151,13\nTCL 65RM7L\na partire da € 999,90\nPrezzi internazionali\nTCL 65C7L\nidealo.it\nda € 857,49\nidealo.es\nda € 949,00\nidealo.fr\nda € 961,23\nidealo.at\nda € 999,00\nidealo.de\nda € 999,00\nDettagli prodotto\nTipo di prodotto\tTV 4K\nIntroduzione sul mercato\t2026\nImmagini\nTecnologia display\tHDR, QLED, Mini-LED\nRisoluzione\t3.840 x 2.160 Pixel\nDimensioni dello schermo\t65 pollici\nDiagonale dello schermo\t165 cm\nFrequenza di aggiornamento\t120 Hz\nFrequenza di aggiornamento effettiva\t144 Hz\nFormato di visualizzazione\t16:9\nTecnologia LED\tLocal-Dimming LED\nCaratteristiche speciali dell'immagine\t4K Ultra HD, Wide Color Gamut, Local Dimming, Brilliant Contrast, Ultimate Contrast, Colorful Quantum Crystal, High Contrast, Ultra Viewing Angle, Ai Clarity, Ai Contrast, IMAX Enhanced\nStandard HDR\tDolby Vision IQ, Dolby Vision, HDR10+, HDR10, HDR HLG\nEquipaggiamento\nTuner digitale\tdigitale terrestre (DVB-T2), digitale terrestre (DVB-T), digitale terrestre (DVB-T2) HEVC, via cavo HD (DVB-C HD), via cavo (DVB-C), satellite (DVB-S), satellite (DVB-S2), tuner singolo\n\n\n\n\n\nMostra tutti i dettagli\nComparazione prezzi\nSpedizione rapida\nReso gratuito\nOrdina per:\nPrezzo\nPrezzo totale\nNome dell'offerta\nPrezzo e spedizione\nMetodi di pagamento*\nConsegna\nNegozio e valutazione\nTCL Smart TV 65 Pollici 4K Ultra HD Display SQD-Mini LED Sistema Google TV Dolby Vision - Atmos Classe E colore Nero - 65C7L\n€ 857,49\nPrezzo più vantaggioso\n\n€ 885,48 incl. spedizione\n \n \n \n \nBonifico anticipato\n \n\nConsegna:\nfino a lun 12.10.\n\nBartolini\n1,4\n203\nDettagli del negozio\nVai allo shop\nTCL C7L TV 65C7L SQD-Mini LED da 65\", 4K HDR, 3000 nit, 1.152 zone di dimming, Google TV, 144Hz, Dolby Vision & Atmos, Audio Bang & Olufsen\n€ 877,75\n€ 91",
+  "form": [
+   [
+    "https://www.idealo.it/risultati.html",
+    "get",
+    "q:search"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/209962597/tcl-65c7l.html",
+    "get",
+    ":checkbox,:checkbox,price-sort:radio,price-sort:radio"
+   ]
+  ],
+  "link": [
+   [
+    "https://www.idealo.it/confronta-prezzi/209962597/tcl-65c7l.html#i-header-navigation",
+    "Vai alla navigazione"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/209962597/tcl-65c7l.html#i-header-search",
+    "Vai alla ricerca"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/209962597/tcl-65c7l.html#oopStage-title",
+    "Vai al contenuto principale"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/209962597/tcl-65c7l.html#offerlist-head",
+    "Vai alla lista delle offerte"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=9eb1274a1df1e9605a4e303c5aa12042&price=857.49&productid=209962597&sid=280639&type=offer&pos=-2",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/209962597/tcl-65c7l.html#offerList",
+    "Confronta 13 offerte"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/209962597/tcl-65c7l.html#offerList",
+    "13 offerte: € 857,49 – € 1.491,80"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/209962597/tcl-65c7l.html",
+    "65C7L"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/206575693/tcl-65c8k.html",
+    "TCL 65C8K"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/206294024/tcl-65c6k.html",
+    "TCL 65C6K"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/206579289/tcl-65c9k.html",
+    "TCL 65C9K"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/206167635/tcl-65q6c.html",
+    "TCL 65Q6C"
+   ],
+   [
+    "https://www.idealo.it/confronta-prezzi/211912530/tcl-65rm7l.html",
+    "TCL 65RM7L"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=9eb1274a1df1e9605a4e303c5aa12042&pos=1&price=857.49&productid=209962597&sid=280639&type=offer",
+    "TCL Smart TV 65 Pollici 4K Ultra HD Display SQD-Mini LED Sistema Google TV Dolby Vision - Atmos Classe E colore Nero - 65C7L"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=9eb1274a1df1e9605a4e303c5aa12042&pos=1&price=857.49&productid=209962597&sid=280639&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=48ef58b734bd42146add66a6ac0e6e06&pos=2&price=877.75&productid=209962597&sid=323664&type=offer",
+    "TCL C7L TV 65C7L SQD-Mini LED da 65\", 4K HDR, 3000 nit, 1.152 zone di dimming, Google TV, 144Hz, Dolby Vision & Atmos, Audio Bang & Olufsen"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=48ef58b734bd42146add66a6ac0e6e06&pos=2&price=877.75&productid=209962597&sid=323664&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=663a5227f88c67bd30b74d7320444575&pos=3&price=905.90&productid=209962597&sid=280103&type=offer",
+    "TCL C7L TV 65C7L SQD-Mini LED da 65\", 4K HDR, 3000 nit, 1.152 zone di dimming, Google TV, 144Hz, Dolby Vision & Atmos, Audio Bang & Olufsen"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=663a5227f88c67bd30b74d7320444575&pos=3&price=905.90&productid=209962597&sid=280103&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=c10c4a215ca82819c5c84b06ee8deda8&pos=4&price=907.99&productid=209962597&sid=275419&type=offer",
+    "TCL C7L TV 65C7L SQD-Mini LED da 65\", 4K HDR, 3000 nit, 1.152 zone di dimming, G"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=c10c4a215ca82819c5c84b06ee8deda8&pos=4&price=907.99&productid=209962597&sid=275419&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=8cabc085781e8d180f32b72766573a7f&pos=5&price=916.70&productid=209962597&sid=299422&type=offer",
+    "TCL C7L TV 65C7L SQD-Mini LED da 65\", 4K HDR, 3000 nit, 1.152 zone di dimming, Google TV, 144Hz, Dolby Vision & Atmos, Audio"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=8cabc085781e8d180f32b72766573a7f&pos=5&price=916.70&productid=209962597&sid=299422&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=177221bd76a0a74aec45e1b07d7782e3&pos=6&price=921.06&productid=209962597&sid=335195&type=offer",
+    "TCL C7L TV 65C7L SQD Mini LED da 65\", 4K HDR, 3000 nit, 1.152 zone di dimming, Google TV, 144Hz, Dolby Vision Atmos, Audio Bang Olufsen"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=177221bd76a0a74aec45e1b07d7782e3&pos=6&price=921.06&productid=209962597&sid=335195&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=614d7e73c40071caf8cd9b9997358ca0&pos=7&price=921.06&productid=209962597&sid=275418&type=offer",
+    "TCL 65C7L - Tv 65 Smart Tv 4k Led 3840 x 2160 Pixel DVB-T2 H.264, H.265 Nero Classe Energetica E"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=614d7e73c40071caf8cd9b9997358ca0&pos=7&price=921.06&productid=209962597&sid=275418&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=271b28d01e1c6a7cadb1fd46b80102a0&pos=8&price=948.99&productid=209962597&sid=315066&type=offer",
+    "TV TCL 65C7L, Smart 65'', SQD-Mini LED, 4K HDR, 3000 nit, 1.152 zone di dimming, Google TV, 144Hz, Dolby Vision & Atmos, Audio Bang Olufsen"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=271b28d01e1c6a7cadb1fd46b80102a0&pos=8&price=948.99&productid=209962597&sid=315066&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=cc28e4169c9f469afc4745b96649367e&pos=9&price=949.00&productid=209962597&sid=279179&type=offer",
+    "Tcl - Smart Tv Qd-mini Led 4k 65\" 65c7l-nero TCL"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=cc28e4169c9f469afc4745b96649367e&pos=9&price=949.00&productid=209962597&sid=279179&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=4687901103daac7a9dfa97e870c1607d&pos=10&price=968.99&productid=209962597&sid=302701&type=offer",
+    "Tcl C7l Tv 65c7l Sqd-mini Led Da 65\", 4k Hdr, 3000 Nit, 1.152 Zone Di Dimming, Google Tv, 144hz, Dolby Vision & Atmos, Audio Bang & Olufsen"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=4687901103daac7a9dfa97e870c1607d&pos=10&price=968.99&productid=209962597&sid=302701&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=e92480580f7e35d042bffce3ee323aea&pos=11&price=988.90&productid=209962597&sid=314442&type=offer",
+    "TCL C7L TV 65C7L SQD-Mini LED da 65\", 4K HDR, 3000 nit, 1.152 zone di dimming, Google TV, 144Hz, Dolby Vision & Atmos, Audio Bang & Olufsen"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=e92480580f7e35d042bffce3ee323aea&pos=11&price=988.90&productid=209962597&sid=314442&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=a3e3a9678e49343dc0aaa85afc9a4e4d&pos=12&price=1347.00&productid=209962597&sid=331517&type=offer",
+    "TV TCL QLED C7L 65C7L 65\" 4K UltraHD 144Hz Smart TV Google TV HDR10+ Dolby Vision IQ Mini LED"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=a3e3a9678e49343dc0aaa85afc9a4e4d&pos=12&price=1347.00&productid=209962597&sid=331517&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=754fd6d9f47ad2af4017cf782e276f88&pos=13&price=1491.80&productid=209962597&sid=333717&type=offer",
+    "TCL C7L 65C7L TV 165,1 cm (65 ) 4K Ultra HD Smart TV Wifi Nero 3000 cd/m² - Nouvo"
+   ],
+   [
+    "https://www.idealo.it/relocator/relocate?categoryId=4012&offerKey=754fd6d9f47ad2af4017cf782e276f88&pos=13&price=1491.80&productid=209962597&sid=333717&type=offer",
+    "Vai allo shop"
+   ],
+   [
+    "https://www.idealo.it/lista/121533237/tv-tcl-65-pollici-4k-qled-mini-led.html",
+    "TV TCL 65 Pollici 4K QLED Mini LED"
+   ]
+  ]
  }
 }
