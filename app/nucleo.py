@@ -9,6 +9,11 @@ ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
          "illeggibile": "Risultati non leggibili",
          "saltato": "Saltato: modello Amazon mancante"}
 
+# indirizzi di ricerca vecchi o sbagliati salvati nelle impostazioni -> indirizzo corretto
+URL_CORRETTI = {"https://www.expert.it/search?q={q}": "https://www.expert.it/it/it/exp/shop/search?terms={q}"}
+
+IDEALO = {"IT": "idealo.it", "DE": "idealo.de", "FR": "idealo.fr", "ES": "idealo.es", "UK": "idealo.co.uk"}
+
 AMAZON_DOMINIO = {"IT": "amazon.it", "DE": "amazon.de", "FR": "amazon.fr",
                   "ES": "amazon.es", "UK": "amazon.co.uk"}
 
@@ -49,6 +54,63 @@ def query_ricerca(info, P):
     if m:
         q.append(f"TV {m} {p}")
     return q
+
+
+def chiave_negozio(nome):
+    """'Euronics-DE' -> 'euronics', 'El Corte Inglés' -> 'elcorteingles', 'AO.com' -> 'ao'."""
+    n = re.sub(r"-(IT|DE|FR|ES|UK)$", "", nome.strip(), flags=re.I).lower()
+    n = n.replace("é", "e").replace("è", "e").replace(".com", "").replace(".fr", "")
+    return re.sub(r"[^a-z0-9]", "", n)
+
+
+def ponte_idealo(br, info, r, P, paese, out, max_m, log=print):
+    """Il sito del retailer non è leggibile: cerca su idealo i modelli simili e tiene solo
+    le offerte di quel retailer. Ogni match riporta 'via' = dominio idealo usato."""
+    dom = IDEALO.get(paese)
+    chiave = chiave_negozio(r["nome"])
+    if not dom or len(chiave) < 3:
+        return []
+    concorrente = P["modalita"] == "concorrente"
+    candidati = {}
+    for q in query_ricerca(info, P):
+        try:
+            prodotti = br.idealo_cerca(dom, q)
+        except Exception:
+            prodotti = []
+        for l in prodotti:
+            c = analizza(l["testo"])
+            if not c.marca or not c.pollici or (c.marca != info.marca) != concorrente:
+                continue
+            ok, motivo, score = confronta_param(info, c, P)
+            if ok and l["url"] not in candidati:
+                candidati[l["url"]] = (score, c, motivo)
+        if len(candidati) >= 3:
+            break
+    scelti, codici = [], set()
+    for url, (score, c, motivo) in sorted(candidati.items(), key=lambda x: x[1][0])[:5]:
+        if len(scelti) >= max_m:
+            break
+        if c.codice in codici:
+            continue
+        try:
+            offerte = br.idealo_offerte(url)
+        except Exception:
+            offerte = []
+        off = next((o for o in offerte if chiave in re.sub(r"[^a-z0-9]", "", o["negozio"].lower())), None)
+        out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "famiglia": c.famiglia, "pollici": c.pollici,
+                                 "anno": c.anno, "url": url, "ricerca": f"{dom}",
+                                 "esito": (f"VALIDO via {dom}: offerta {r['nome']} {off.get('prezzo', '')}".strip() if off
+                                           else f"via {dom}: nessuna offerta {r['nome']} ({len(offerte)} offerte)")})
+        if not off:
+            continue
+        codici.add(c.codice)
+        nota = f"trovato tramite {dom}: il sito di {r['nome']} non era leggibile"
+        if motivo != "ok":
+            nota += f"; {motivo}"
+        scelti.append({"modello": c.codice, "url": off["url"], "img": off.get("img", ""), "nota": nota,
+                       "titolo": (off.get("testo") or c.testo)[:160], "via": dom, "prezzo": off.get("prezzo", ""),
+                       "pagina_comparatore": url, **info_dict(c)})
+    return scelti
 
 
 def info_dict(i):
@@ -110,7 +172,9 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
         log("   ⚠ modello Amazon non riconosciuto: scrivere il modello a mano")
         return out
     max_m = max(1, int(P.get("max_match") or 1))
+    out["ponte"] = {}
     for r in retailer:
+        r = {**r, "url": URL_CORRETTI.get(r["url"], r["url"])}
         if stop():
             break
         validi = {}
@@ -196,8 +260,16 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
             esito = "illeggibile"
         else:
             esito = "errore"
+        if esito in ("errore", "illeggibile") and P.get("ponte_idealo", True) and not stop():
+            log(f"   {r['nome']}: sito non leggibile, provo tramite {IDEALO.get(paese, 'comparatore')}")
+            via = ponte_idealo(br, info, r, P, paese, out, max_m, log)
+            out["ponte"][r["nome"]] = IDEALO.get(paese, "")
+            if via:
+                scelti = via
+                out["match"][r["nome"]] = scelti
+                esito = "trovato"
         out["esito"][r["nome"]] = esito
-        testo = ", ".join(s["modello"] for s in scelti) or ESITI[esito]
+        testo = ", ".join(s["modello"] + (f" (via {s['via']})" if s.get("via") else "") for s in scelti) or ESITI[esito]
         if esito == "errore" and errori:
             testo += f" ({errori[-1]})"
         log(f"   {r['nome']}: {testo}")

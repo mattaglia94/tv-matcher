@@ -12,7 +12,7 @@ window.TVM = {
     ["IT", "MediaWorld", "https://www.mediaworld.it/it/search.html?query={q}"],
     ["IT", "Euronics", "https://www.euronics.it/search?q={q}"],
     ["IT", "Unieuro", "https://www.unieuro.it/online/?q={q}"],
-    ["IT", "Expert", "https://www.expert.it/search?q={q}"],
+    ["IT", "Expert", "https://www.expert.it/it/it/exp/shop/search?terms={q}"],
     ["ES", "MediaMarkt-ES", "https://www.mediamarkt.es/es/search.html?query={q}"],
     ["ES", "El Corte Inglés", "https://www.elcorteingles.es/search-nwx/1/?s={q}"],
     ["ES", "Carrefour", "https://www.carrefour.es/?q={q}"],
@@ -55,6 +55,7 @@ window.TVM = {
     hdmi21: { attivo: false },
     max_match: 1,
     verifica_url: true,
+    ponte_idealo: true,
   },
 
   // Descrizione dei parametri per la schermata "Somiglianza"

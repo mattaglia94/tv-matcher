@@ -10,7 +10,7 @@ RETAILER = [
     ("IT", "MediaWorld", "https://www.mediaworld.it/it/search.html?query={q}", "SI"),
     ("IT", "Euronics", "https://www.euronics.it/search?q={q}", "SI"),
     ("IT", "Unieuro", "https://www.unieuro.it/online/?q={q}", "SI"),
-    ("IT", "Expert", "https://www.expert.it/search?q={q}", "SI"),
+    ("IT", "Expert", "https://www.expert.it/it/it/exp/shop/search?terms={q}", "SI"),
 
     ("ES", "MediaMarkt-ES", "https://www.mediamarkt.es/es/search.html?query={q}", "SI"),
     ("ES", "ElCorteIngles", "https://www.elcorteingles.es/search-nwx/1/?s={q}", "SI"),

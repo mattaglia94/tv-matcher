@@ -445,6 +445,7 @@ PARAMETRI_DEFAULT = {
     "hdmi21": {"attivo": False},
     "max_match": 1,
     "verifica_url": True,
+    "ponte_idealo": True,   # se il sito del retailer non è leggibile, cerca le sue offerte su idealo
 }
 
 

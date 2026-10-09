@@ -89,6 +89,8 @@
       const { impostazioni, anagrafica } = await api("impostazioni");
       S.anagrafica = anagrafica || {};
       if (impostazioni && Array.isArray(impostazioni.retailer) && impostazioni.retailer.length) {
+        const corretti = { "https://www.expert.it/search?q={q}": "https://www.expert.it/it/it/exp/shop/search?terms={q}" };
+        impostazioni.retailer.forEach((r) => { if (corretti[r.url]) r.url = corretti[r.url]; });
         S.impostazioni = { retailer: impostazioni.retailer, preset: impostazioni.preset || [] };
       }
     } catch { /* restano i predefiniti */ }
@@ -481,6 +483,10 @@
             <label class="switch"><input type="checkbox" data-bool="verifica_url" ${P.verifica_url ? "checked" : ""} aria-label="Verifica pagina prodotto"><span></span></label>
             <div><h4>Verifica la pagina prodotto</h4><p>Apre ogni link scelto: controlla che sia attivo e legge anno e caratteristiche. Più lento ma più affidabile.</p></div>
           </div>
+          <div class="param" style="grid-template-columns:auto 1fr;padding:12px">
+            <label class="switch"><input type="checkbox" data-bool="ponte_idealo" ${P.ponte_idealo ? "checked" : ""} aria-label="Usa idealo come ponte"><span></span></label>
+            <div><h4>Se un sito blocca la ricerca, usa idealo</h4><p>Cerca il modello simile sul comparatore idealo e tiene solo le offerte di quel retailer. Il risultato è segnalato come trovato tramite servizio terzo.</p></div>
+          </div>
         </div>
       </section>`;
     const cambia = () => { S.bozza.preset = ""; salvaBozza(); passoParametri(box); };
@@ -809,12 +815,13 @@
               if (m === undefined) return `<div class="match-tile nessuno"><div class="retailer">${esc(ret.nome)}</div><span>In attesa</span></div>`;
               if (!m.length) {
                 const e = (r.esito || {})[ret.nome] || "nessun_simile";
-                return `<div class="match-tile nessuno ${e}"><div class="retailer">${esc(ret.nome)}<span class="chip ${e === "errore" || e === "illeggibile" ? "errore" : ""}">${ESITI[e]}</span></div><span class="piccolo">${ESITI_NOTA[e] || ""}</span></div>`;
+                return `<div class="match-tile nessuno ${e}"><div class="retailer">${esc(ret.nome)}<span class="chip ${e === "errore" || e === "illeggibile" ? "errore" : ""}">${ESITI[e]}</span></div><span class="piccolo">${ESITI_NOTA[e] || ""}${(r.ponte || {})[ret.nome] ? ` Cercato anche su ${esc(r.ponte[ret.nome])}: nessuna offerta di ${esc(ret.nome)} per un modello simile.` : ""}</span></div>`;
               }
               const [x, ...altri] = m;
               return `
                 <div class="match-tile">
-                  <div class="retailer"><span>${esc(ret.nome)}</span>${x.nota ? `<span class="chip attenzione">${esc(x.nota)}</span>` : '<span class="chip ok">simile</span>'}</div>
+                  <div class="retailer"><span>${esc(ret.nome)}</span>${x.via ? `<span class="chip attenzione">via ${esc(x.via)}</span>` : x.nota ? `<span class="chip attenzione">${esc(x.nota)}</span>` : '<span class="chip ok">simile</span>'}</div>
+                  ${x.via ? `<p class="piccolo tenue">Il sito di ${esc(ret.nome)} non era leggibile: offerta trovata sul comparatore ${esc(x.via)}${x.prezzo ? ` (${esc(x.prezzo)})` : ""}. Il link passa da ${esc(x.via)}.${x.pagina_comparatore ? ` <a href="${esc(x.pagina_comparatore)}" target="_blank" rel="noopener">Scheda sul comparatore</a>` : ""}</p>` : ""}
                   ${foto(x.img, x.modello)}
                   <div class="modello">${esc(x.modello)}</div>
                   ${x.titolo ? `<p class="titolo-ret" title="${esc(x.titolo)}">${esc(x.titolo)}</p>` : ""}

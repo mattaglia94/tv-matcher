@@ -116,7 +116,8 @@ def scrivi_output(risultati, nomi_ret, paese, cartella_out):
             m = (r.get("match") or {}).get(n) or []
             esito = (r.get("esito") or {}).get(n)
             if m:
-                riga += [" / ".join(x["modello"] for x in m), " ".join(x["url"] for x in m)]
+                riga += [" / ".join(x["modello"] + (f" (via {x['via']})" if x.get("via") else "") for x in m),
+                         " ".join(x["url"] for x in m)]
             elif esito and esito != "trovato":
                 riga += [ESITI[esito], ""]
             else:

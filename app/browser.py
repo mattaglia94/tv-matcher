@@ -39,6 +39,23 @@ JS_LINKS = """
 """
 
 
+class _RispostaFinta:
+    def __init__(self, status):
+        self.status = status
+
+
+JS_OFFERTE = """
+() => [...document.querySelectorAll('#offerList li, li[class*=productOffers-listItem]')].map(li => {
+  const a = li.querySelector('a[href*="relocator"], a[href*="/go/"], a[href*="redirect"]') || li.querySelector('a[href]');
+  const alts = [...li.querySelectorAll('img')].map(i => i.alt || '').join(' / ');
+  const prezzo = (li.innerText.match(/(?:€|£)\\s?[\\d.,]+|[\\d.,]+\\s?(?:€|£)/) || [''])[0];
+  const img = [...li.querySelectorAll('img')].map(i => i.currentSrc || i.src || '').find(s => s && !s.startsWith('data:')) || '';
+  return {url: a ? a.href : '', negozio: alts + ' ' + (li.getAttribute('data-shop-name') || ''),
+          testo: (li.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 400), prezzo, img};
+}).filter(o => o.url && o.testo.length > 20)
+"""
+
+
 class Browser:
     def __init__(self, visibile=False, log=print):
         self.log = log
@@ -60,6 +77,8 @@ class Browser:
                         "(KHTML, like Gecko) Chrome/130.0 Safari/537.36 Edg/130.0"))
         self.page = self.ctx.new_page()
         self._cookie_ok = set()
+        self._riscaldati = set()   # domini già visitati dalla home (cookie anti-bot ottenuti)
+        self._idealo_azione = {}   # dominio idealo -> URL del modulo di ricerca
 
     def chiudi(self):
         try:
@@ -99,12 +118,44 @@ class Browser:
             self.page.wait_for_load_state("networkidle", timeout=12000)
         except PWTimeout:
             pass
+        r = self._attendi_verifica(r)
         dominio = re.sub(r"^https?://(www\.)?", "", url).split("/")[0]
         self._cookie(dominio)
         for _ in range(4):  # scroll per caricare i prodotti "lazy"
             self.page.mouse.wheel(0, 2500)
             time.sleep(0.6)
         return r
+
+    def _in_verifica(self):
+        try:
+            t = self.page.title().lower()
+        except Exception:
+            return False
+        return any(x in t for x in ("ci siamo quasi", "just a moment", "un momento", "attention required",
+                                    "verifica di sicurezza", "einen moment", "un instant"))
+
+    def _attendi_verifica(self, r):
+        """Pagine di verifica anti-bot non interattive (es. Cloudflare): spesso si superano da sole in pochi secondi."""
+        if not self._in_verifica():
+            return r
+        for _ in range(10):
+            time.sleep(3)
+            if not self._in_verifica():
+                try:
+                    self.page.wait_for_load_state("domcontentloaded", timeout=10000)
+                except PWTimeout:
+                    pass
+                return _RispostaFinta(200)
+        return r
+
+    def riscalda(self, url):
+        """Prima ricerca su un dominio: passa dalla home, così il sito rilascia i cookie di sessione/anti-bot."""
+        m = re.match(r"(https?://[^/]+)", url)
+        if not m or m.group(1) in self._riscaldati:
+            return
+        self._riscaldati.add(m.group(1))
+        self._vai(m.group(1) + "/")
+        self._pausa(1.5, 3)
 
     # ------------------------------------------------------------ Amazon
     def _amazon_bloccato(self):
@@ -178,7 +229,13 @@ class Browser:
     # ------------------------------------------------------------ Retailer
     def cerca(self, url_template, query):
         url = url_template.replace("{q}", quote_plus(query))
+        self.riscalda(url)
         r = self._vai(url)
+        if r is not None and r.status in (403, 429) or self._in_verifica():
+            # bloccato: ripasso dalla home e riprovo una volta
+            self._riscaldati.discard(re.match(r"(https?://[^/]+)", url).group(1))
+            self.riscalda(url)
+            r = self._vai(url)
         if r is None:
             return url, [], "timeout"
         self._pausa(1, 2.5)
@@ -196,6 +253,43 @@ class Browser:
                         "img": urljoin(url, l.get("img") or "") if l.get("img") else ""})
         stato = f"HTTP {r.status}" if r.status >= 400 else "ok"
         return url, out, stato
+
+    # ------------------------------------------------------------ idealo (ponte quando il retailer non è leggibile)
+    def idealo_cerca(self, dominio, query):
+        """Cerca su idealo e ritorna i link prodotto [{url, testo}]."""
+        base = f"https://www.{dominio}"
+        if dominio not in self._idealo_azione:
+            self._vai(base + "/")
+            try:
+                azione = self.page.evaluate("""() => { const i = document.querySelector('form input[name=q]');
+                                               return i && i.form ? i.form.action : ''; }""")
+            except Exception:
+                azione = ""
+            self._idealo_azione[dominio] = azione or base + "/MainSearchProductCategory.html"
+        url = f"{self._idealo_azione[dominio]}?q={quote_plus(query)}"
+        r = self._vai(url)
+        if r is None or r.status >= 400:
+            return []
+        links = self.page.evaluate(JS_LINKS)
+        visti, out = set(), []
+        for l in links:
+            h = l["href"].split("#")[0]
+            # pagina prodotto idealo: contiene un id numerico lungo (es. /confronta-prezzi/209962597/...)
+            if h in visti or dominio not in h or not re.search(r"/\d{6,}[/_]", h) or "relocator" in h:
+                continue
+            visti.add(h)
+            out.append({"url": h, "testo": l["testo"]})
+        return out
+
+    def idealo_offerte(self, url):
+        """Offerte di una pagina prodotto idealo: [{url, negozio, testo, prezzo, img}]."""
+        r = self._vai(url)
+        if r is None or r.status >= 400:
+            return []
+        try:
+            return self.page.evaluate(JS_OFFERTE)
+        except Exception:
+            return []
 
     def verifica(self, url):
         """Apre la pagina prodotto: ritorna (vivo, titolo+h1, testo pagina, immagine)."""
