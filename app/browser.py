@@ -39,6 +39,45 @@ JS_LINKS = """
 """
 
 
+JS_SCHEDA = r"""
+() => {
+  // scheda tecnica dell'inserzione: coppie voce -> valore (tabelle, elenchi, dati strutturati per Google)
+  const out = {};
+  const pulisci = (t) => (t || '').replace(/[\u200e\u200f]/g, '').replace(/\s+/g, ' ').trim();
+  const add = (k, v) => {
+    k = pulisci(k).replace(/[\s:]+$/, ''); v = pulisci(v);
+    if (!k || !v || k.length > 70 || v.length > 200 || k === v) return;
+    const kl = k.toLowerCase();
+    if (!(kl in out) && Object.keys(out).length < 400) out[kl] = v;
+  };
+  document.querySelectorAll('tr').forEach((tr) => { const c = tr.querySelectorAll('th, td'); if (c.length === 2) add(c[0].innerText, c[1].innerText); });
+  document.querySelectorAll('dl').forEach((dl) => { const dt = dl.querySelectorAll('dt'), dd = dl.querySelectorAll('dd'); dt.forEach((d, i) => dd[i] && add(d.innerText, dd[i].innerText)); });
+  document.querySelectorAll('li, [class*="spec" i] > div, [class*="feature" i] > div, [class*="attribute" i] > div').forEach((el) => {
+    const t = pulisci(el.innerText);
+    const m = t.match(/^([^:]{2,60}?)\s*:\s*(.{1,150})$/);
+    if (m && el.children.length < 6) add(m[1], m[2]);
+  });
+  document.querySelectorAll('script[type="application/ld+json"]').forEach((sc) => {
+    try {
+      const j = JSON.parse(sc.textContent);
+      (Array.isArray(j) ? j : (j['@graph'] || [j])).forEach((q) => {
+        if (!q || !/Product/i.test(String(q['@type']))) return;
+        if (q.name) add('ld:nome', q.name);
+        if (q.model) add('ld:modello', typeof q.model === 'string' ? q.model : q.model.name);
+        if (q.mpn) add('ld:mpn', q.mpn);
+        if (q.brand) add('ld:marca', q.brand.name || q.brand);
+        if (q.releaseDate) add('ld:data', q.releaseDate);
+        (q.additionalProperty || []).forEach((a) => add(a.name, String(a.value)));
+        const o = Array.isArray(q.offers) ? q.offers[0] : q.offers;
+        if (o && o.price) add('ld:prezzo', o.price + ' ' + (o.priceCurrency || ''));
+      });
+    } catch (e) { /* JSON non valido */ }
+  });
+  return out;
+}
+"""
+
+
 class _RispostaFinta:
     def __init__(self, status):
         self.status = status
@@ -229,7 +268,7 @@ class Browser:
         except Exception:
             pass
         return {"url": url, "titolo": titolo, "modello": modello, "img": img, "marca": marca, "prezzo": prezzo,
-                "errore": "" if titolo else "titolo non trovato"}
+                "scheda": self.scheda(), "errore": "" if titolo else "titolo non trovato"}
 
     def cerca_web(self, asin):
         """Piano B quando Amazon blocca: cerca l'ASIN su un motore di ricerca e ritorna i titoli trovati."""
@@ -313,10 +352,10 @@ class Browser:
             return []
 
     def verifica(self, url):
-        """Apre la pagina prodotto: ritorna (vivo, titolo+h1, testo pagina, immagine)."""
+        """Apre la pagina prodotto: ritorna (vivo, titolo+h1, testo pagina, immagine, scheda tecnica)."""
         r = self._vai(url)
         if r is None or r.status >= 400:
-            return False, "", "", ""
+            return False, "", "", "", {}
         try:
             h1 = " ".join(self.page.locator("h1").all_inner_texts()[:2])
         except Exception:
@@ -330,4 +369,10 @@ class Browser:
                                        return m ? m.content : ''; }""")
         except Exception:
             img = ""
-        return True, f"{self.page.title()} {h1}", corpo, img
+        return True, f"{self.page.title()} {h1}", corpo, img, self.scheda()
+
+    def scheda(self):
+        try:
+            return self.page.evaluate(JS_SCHEDA) or {}
+        except Exception:
+            return {}

@@ -558,6 +558,106 @@ def analizza(testo: str, codice_noto: str = "", marca_nota: str = "", prezzo: fl
     return info
 
 
+# ----------------------------------------------------------------- scheda tecnica dell'inserzione
+# Voci (in IT/DE/FR/ES/EN) delle schede tecniche di Amazon e dei negozi.
+_VOCI = {
+    "anno": ["anno del modello", "anno modello", "anno di uscita", "anno di lancio", "anno di produzione", "modelljahr",
+             "erscheinungsjahr", "jahr", "année du modèle", "année de sortie", "model year", "release year",
+             "año del modelo", "año de lanzamiento", "ld:data"],
+    "pollici": ["diagonale schermo", "diagonale dello schermo", "diagonale", "dimensione schermo", "dimensioni schermo",
+                "bildschirmdiagonale", "bildschirmgröße", "bilddiagonale", "screen size", "display size",
+                "taille de l'écran", "taille d'écran", "diagonale de l'écran", "tamaño de pantalla", "tamaño de la pantalla"],
+    "risoluzione": ["risoluzione", "risoluzione schermo", "risoluzione dello schermo", "auflösung", "bildschirmauflösung",
+                    "resolution", "display resolution", "résolution", "resolución", "resolución de pantalla"],
+    "tecnologia": ["tecnologia display", "tecnologia dello schermo", "tecnologia schermo", "tipo di display", "tipo display",
+                   "tipo di schermo", "display-technologie", "displaytechnologie", "bildschirmtechnologie", "displaytyp",
+                   "display type", "display technology", "panel type", "technologie d'affichage", "type d'écran",
+                   "tecnología de pantalla", "tipo de pantalla"],
+    "hz": ["frequenza di aggiornamento", "frequenza di aggiornamento dello schermo", "bildwiederholrate",
+           "bildwiederholfrequenz", "refresh rate", "taux de rafraîchissement", "fréquence de rafraîchissement",
+           "frecuencia de actualización", "tasa de refresco"],
+    "marca": ["marca", "marchio", "marke", "hersteller", "brand", "marque", "ld:marca"],
+    "modello": ["numero modello articolo", "numero modello", "modellnummer", "herstellernummer", "model number",
+                "item model number", "référence du modèle", "numéro du modèle", "número de modelo", "ld:modello", "ld:mpn"],
+}
+_TAGLIE = [24, 32, 40, 42, 43, 48, 50, 55, 58, 65, 70, 75, 77, 83, 85, 98, 100, 115]
+
+
+def _voce(scheda: dict, tipo: str):
+    for nome in _VOCI[tipo]:
+        if nome in scheda:
+            return scheda[nome]
+    for k, v in scheda.items():  # voce che inizia con il nome cercato (es. "auflösung (pixel)")
+        if any(k.startswith(n) for n in _VOCI[tipo] if len(n) > 4):
+            return v
+    return None
+
+
+def leggi_scheda(scheda: dict | None) -> dict:
+    """Dalla scheda tecnica (voce -> valore) ricava anno, pollici, risoluzione, tecnologia, frequenza, marca, modello."""
+    out = {}
+    if not scheda:
+        return out
+    v = _voce(scheda, "anno")
+    if v:
+        m = re.search(r"\b(20[1-3]\d)\b", v)
+        if m:
+            out["anno"] = int(m.group(1))
+    v = _voce(scheda, "pollici")
+    if v:
+        V = _norm(v).replace(",", ".")
+        m = re.search(r"(\d{2,3}(?:\.\d)?)\s*(?:\"|''|ZOLL|POLLICI|INCH|POUCES|PULGADAS)", V)
+        if m:
+            out["pollici"] = round(float(m.group(1)))
+        else:
+            m = re.search(r"(\d{2,3}(?:\.\d)?)\s*CM", V)
+            if m:  # cm -> pollici, arrotondato alla taglia commerciale più vicina
+                pol = float(m.group(1)) / 2.54
+                out["pollici"] = min(_TAGLIE, key=lambda t: abs(t - pol))
+    v = _voce(scheda, "risoluzione")
+    if v:
+        V = _norm(v)
+        r = ("8K" if re.search(r"7680|8K", V) else "4K" if re.search(r"3840|4K|UHD|2160", V)
+             else "FHD" if re.search(r"1920|FULL HD|FHD|1080", V) else "HD" if re.search(r"1366|1280|HD|720", V) else "")
+        if r:
+            out["risoluzione"] = r
+    v = _voce(scheda, "tecnologia")
+    if v and tecnologia_testo(v):
+        out["tecnologia"] = tecnologia_testo(v)
+    v = _voce(scheda, "hz")
+    if v:
+        nums = [int(x) for x in re.findall(r"\b(\d{2,3})\s*HZ", _norm(v)) if 50 <= int(x) <= 300]
+        if nums:
+            out["hz"] = max(nums)
+    for k in ("marca", "modello"):
+        v = _voce(scheda, k)
+        if v:
+            out[k] = v.strip()
+    tutto = _norm(" ".join(f"{k} {v}" for k, v in scheda.items()))
+    out["dolby_vision"] = "DOLBY VISION" in tutto
+    out["hdr10plus"] = bool(re.search(r"HDR\s?10\s?\+|HDR10 PLUS", tutto))
+    out["hdmi21"] = bool(re.search(r"HDMI\s?2\.1", tutto))
+    return out
+
+
+def arricchisci(info: InfoTV, dati: dict) -> InfoTV:
+    """I dati della scheda tecnica prevalgono su quelli dedotti dal titolo (anno, risoluzione, frequenza);
+    pollici e tecnologia la integrano solo se mancano (la tecnologia del Catalogo resta la più stabile)."""
+    if not dati:
+        return info
+    for k in ("anno", "risoluzione", "hz"):
+        if dati.get(k):
+            setattr(info, k, dati[k])
+    if dati.get("pollici") and not info.pollici:
+        info.pollici = dati["pollici"]
+    if dati.get("tecnologia") and not info.tecnologia:
+        info.tecnologia = dati["tecnologia"]
+    for k in ("dolby_vision", "hdr10plus", "hdmi21"):
+        if dati.get(k):
+            setattr(info, k, True)
+    return info
+
+
 # ----------------------------------------------------------------- parametri
 PARAMETRI_DEFAULT = {
     "modalita": "stessa_marca",   # "stessa_marca" = alternativa della stessa marca, "concorrente" = altra marca equivalente
@@ -669,7 +769,7 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
         if cand.anno is not None and cand.anno != target:
             return False, f"anno {cand.anno}", 0
         if cand.anno is None:
-            if not P["anno"].get("accetta_ignoto", True):
+            if not P["anno"].get("accetta_ignoto", True) and not P.get("verifica_url", True):
                 return False, "anno non determinabile", 0
             note.append("anno da verificare")
             score += 5

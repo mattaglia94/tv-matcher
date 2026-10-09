@@ -2,7 +2,7 @@
 Usato sia dall'exe/CLI (motore.py) sia dal runner del sito (web_runner.py)."""
 import re
 
-from regole import analizza, confronta_param, leggi_prezzo, stesso_modello, unisci_parametri
+from regole import _tec_equivalenti, analizza, arricchisci, classe_hz, confronta_param, leggi_prezzo, leggi_scheda, stesso_modello, unisci_parametri
 
 ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
          "nessun_simile": "Nessun modello simile", "errore": "Ricerca non riuscita",
@@ -146,9 +146,12 @@ def riconosci_amazon(br, riga, anagrafica=None, log=print):
     a = br.amazon(riga["asin"], AMAZON_DOMINIO.get(paese, "amazon.it"))
     if modello and not a["modello"]:
         a = {**a, "modello": modello}  # il modello scritto a mano resta, il titolo Amazon aggiunge marca e diagonale
-    dati = {**vuoto, "titolo": a["titolo"] or vuoto["titolo"], "modello": a["modello"], "img": a.get("img", "") or vuoto["img"],
-            "marca": a.get("marca", "") or vuoto["marca"], "prezzo": a.get("prezzo", "")}
-    info = analizza(dati["titolo"], a["modello"], dati["marca"], leggi_prezzo(dati["prezzo"]))
+    sch = leggi_scheda(a.get("scheda"))
+    dati = {**vuoto, "titolo": a["titolo"] or vuoto["titolo"], "modello": a["modello"] or sch.get("modello", ""),
+            "img": a.get("img", "") or vuoto["img"], "marca": a.get("marca", "") or sch.get("marca", "") or vuoto["marca"],
+            "prezzo": a.get("prezzo", ""), "scheda": sch}
+    a = {**a, "modello": dati["modello"]}
+    info = arricchisci(analizza(dati["titolo"], a["modello"], dati["marca"], leggi_prezzo(dati["prezzo"])), sch)
     if info.marca and info.pollici and info.codice:
         return {**dati, "modello": a["modello"] or info.codice, "fonte": "Amazon"}
     if info.marca and info.pollici and info.tecnologia and info.fascia:
@@ -185,10 +188,11 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
     url_amz = f"https://www.{AMAZON_DOMINIO.get(paese, 'amazon.it')}/dp/{riga['asin']}"
     am = riconosci_amazon(br, riga, anagrafica, log)
     nome, modello, fonte, nota = am["titolo"], am["modello"], am["fonte"], am["nota"]
-    info = analizza(nome, modello, am.get("marca", ""), leggi_prezzo(am.get("prezzo", "")))
+    info = arricchisci(analizza(nome, modello, am.get("marca", ""), leggi_prezzo(am.get("prezzo", ""))), am.get("scheda") or {})
     out["amazon"] = {"titolo": nome, "modello": info.codice or modello, "img": am["img"], "url": url_amz,
                      "fonte": fonte, "nota": nota, "marca_amazon": am.get("marca", ""), "prezzo": am.get("prezzo", ""),
                      "fascia_fonte": info.fascia_fonte, "marca_nuova": info.marca_nuova, "regola": info.regola,
+                     "scheda": {k: v for k, v in (am.get("scheda") or {}).items() if k in ("anno", "pollici", "risoluzione", "tecnologia", "hz", "modello")},
                      **info_dict(info)}
     log(f"   Amazon ({fonte or 'non riconosciuto'}): {info.marca} {info.codice} {info.pollici}\" {info.famiglia}")
     # per cercare un concorrente servono tecnologia e fascia dell'ASIN, altrimenti il confronto è casuale
@@ -240,7 +244,7 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
                                          "esito": ("VALIDO " if ok else "scartato: ") + motivo, "ricerca": q})
                 if ok and l["url"] not in validi:
                     validi[l["url"]] = (score, c, l.get("img", ""), motivo)
-            if len(validi) >= max_m:
+            if len(validi) >= max_m + 2:  # qualche riserva: la verifica della pagina può scartarne
                 break
         scelti, codici = [], set()
         for url, (score, c, im, motivo) in sorted(validi.items(), key=lambda x: x[1][0]):
@@ -250,36 +254,55 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
             if c.codice in codici:
                 continue
             if P.get("verifica_url", True):
-                vivo, titolo_pag, corpo, og = br.verifica(url)
+                res = br.verifica(url)
+                vivo, titolo_pag, corpo, og = res[:4]
+                sp = leggi_scheda(res[4] if len(res) > 4 else {})
                 if not vivo:
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url, "esito": "URL non attivo"})
                     continue
                 cp = analizza(titolo_pag)
-                if cp.codice and cp.pollici and P["pollici"]["attivo"] and \
-                        abs(cp.pollici - info.pollici) > int(P["pollici"].get("tolleranza") or 0):
+                n_voci = len(res[4]) if len(res) > 4 else 0
+                letti = ", ".join(f"{k} {v}" for k, v in sp.items() if k in ("anno", "pollici", "risoluzione", "tecnologia", "hz") and v)
+                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                         "esito": f"scheda tecnica: {letti or 'nessun dato utile'} ({n_voci} voci)"})
+                pol_pag = sp.get("pollici") or (cp.pollici if cp.codice else None)
+                if pol_pag and P["pollici"]["attivo"] and abs(pol_pag - info.pollici) > int(P["pollici"].get("tolleranza") or 0):
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                             "esito": "pagina prodotto non coerente"})
+                                             "esito": f"pagina prodotto non coerente ({pol_pag}\")"})
                     continue
-                full = analizza(f"{titolo_pag} {corpo[:20000]}", c.codice)
+                # caratteristiche: scheda tecnica, poi titolo; il testo libero della pagina solo per le funzioni HDR/HDMI
+                full = arricchisci(analizza(f"{titolo_pag} {corpo[:20000]}", c.codice), sp)
                 mancanti = [n for k, n in (("dolby_vision", "Dolby Vision"), ("hdr10plus", "HDR10+"),
                                            ("hdmi21", "HDMI 2.1"))
                             if P[k]["attivo"] and getattr(info, k) and not getattr(full, k)]
-                # anno e risoluzione SOLO da titolo/intestazione del prodotto: il resto della pagina
-                # contiene menu, banner, copyright ed etichette energetiche con altri anni e risoluzioni
-                ris_pag = cp.risoluzione
+                # anno e risoluzione: scheda tecnica, altrimenti SOLO il titolo del prodotto (il resto della pagina
+                # contiene menu, banner, copyright ed etichette energetiche con altri anni e risoluzioni)
+                ris_pag = sp.get("risoluzione") or cp.risoluzione
                 if P["risoluzione"]["attivo"] and info.risoluzione and ris_pag and ris_pag != info.risoluzione and \
                         not (P["modalita"] == "concorrente" and {ris_pag, info.risoluzione} <= {"HD", "FHD"}):
                     mancanti.append(f"risoluzione {info.risoluzione} (pagina: {ris_pag})")
+                hz_pag = sp.get("hz")
+                if P["refresh"]["attivo"] and info.hz and hz_pag and classe_hz(hz_pag) != classe_hz(info.hz):
+                    mancanti.append(f"frequenza {info.hz} Hz (pagina: {hz_pag} Hz)")
+                if P["tecnologia"]["attivo"] and sp.get("tecnologia") and c.fascia_fonte != "catalogo" and info.tecnologia and \
+                        sp["tecnologia"] != info.tecnologia and not _tec_equivalenti(info.tecnologia, sp["tecnologia"],
+                                                                                    P["tecnologia"].get("equivalenze")):
+                    mancanti.append(f"tecnologia {info.tecnologia} (pagina: {sp['tecnologia']})")
                 if mancanti:
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                             "esito": "scartato: manca " + ", ".join(mancanti)})
+                                             "esito": "scartato: " + ", ".join(mancanti)})
                     continue
-                anno_pag = cp.anno or c.anno
+                anno_pag = sp.get("anno") or cp.anno or c.anno
                 if anno_pag and P["anno"]["attivo"] and anno_pag != int(P["anno"]["valore"]):
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
                                              "esito": f"scartato: anno {anno_pag} (da pagina)"})
                     continue
-                if anno_pag:  # anno letto nel titolo della pagina: non è più "da verificare"
+                if not anno_pag and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True):
+                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                             "esito": "scartato: anno non indicato nemmeno nella scheda tecnica"})
+                    continue
+                if anno_pag:  # anno letto in scheda o nel titolo: non è più "da verificare"
+                    c.anno = anno_pag
                     motivo = ", ".join(x for x in motivo.split(", ") if x != "anno da verificare") or "ok"
                 im = og or im
                 nome_pag = titolo_pag.strip()

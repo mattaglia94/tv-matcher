@@ -89,11 +89,11 @@ SOMIGLIANZA = [
 
 class _BrowserFinto:
     """Simula Amazon, una pagina di ricerca e una pagina prodotto 'sporca' (menu con 8K, copyright 2025)."""
-    def __init__(self, titolo, risultati, titolo_pagina):
-        self.t, self.ris, self.tp = titolo, risultati, titolo_pagina
+    def __init__(self, titolo, risultati, titolo_pagina, scheda=None, scheda_amazon=None):
+        self.t, self.ris, self.tp, self.sch, self.sch_a = titolo, risultati, titolo_pagina, scheda or {}, scheda_amazon or {}
 
     def amazon(self, asin, dominio):
-        return {"titolo": self.t, "modello": "", "img": "", "marca": "", "prezzo": "", "errore": ""}
+        return {"titolo": self.t, "modello": "", "img": "", "marca": "", "prezzo": "", "errore": "", "scheda": self.sch_a}
 
     def cerca(self, url, q):
         return url, [{"url": t[1], "testo": t[0]} if isinstance(t, tuple) else {"url": f"https://negozio.it/p{i}", "testo": t}
@@ -101,7 +101,7 @@ class _BrowserFinto:
 
     def verifica(self, url):
         corpo = "Menu: TV 8K OLED, offerte 2025, Classe energetica 2025 © 2025 negozio"
-        return True, self.tp, corpo, ""
+        return True, self.tp, corpo, "", self.sch
 
 
 PAGINE = [  # (titolo ASIN, risultati di ricerca, titolo pagina prodotto, modalità, modello atteso)
@@ -126,9 +126,32 @@ CASI_ASIN = [  # (riga ASIN come la manda il sito, anagrafica, titolo Amazon) ->
 ]
 
 
+STRETTO = {"modalita": "stessa_marca", "verifica_url": True, "anno": {"attivo": True, "valore": 2026, "accetta_ignoto": False}}
+F75 = "Xiaomi TV F Pro 75 (190 cm), 4K UHD QLED, Smart TV, Fire OS8, HDR10+, MEMC"
+OTTO75 = "Xiaomi L75MB-APEU 189 cm (75 Zoll) 4K Ultra HD Smart TV Google TV"
+SCHEDE = [  # (titolo ASIN, scheda Amazon, titolo negozio, scheda negozio, parametri, simile?, campo Amazon atteso)
+    (F75, {}, OTTO75, {"modelljahr": "2026", "auflösung": "3840 x 2160 Pixel", "bildschirmdiagonale": "189 cm"}, STRETTO, True, None),
+    (F75, {}, OTTO75, {"modelljahr": "2025"}, STRETTO, False, None),
+    (F75, {}, OTTO75, {}, STRETTO, False, None),                                   # anno sconosciuto ovunque: Stretto scarta
+    (F75, {}, OTTO75, {}, {"modalita": "stessa_marca", "verifica_url": True}, True, None),  # Bilanciato: da verificare
+    (F75, {}, OTTO75, {"modelljahr": "2026", "auflösung": "1920 x 1080"}, STRETTO, False, None),  # risoluzione diversa
+    (F75, {}, OTTO75, {"modelljahr": "2026", "bildschirmdiagonale": "165 cm"}, STRETTO, False, None),  # in realtà un 65"
+    (F75, {"anno del modello": "2026"}, OTTO75, {"modelljahr": "2026"}, STRETTO, True, ("anno", 2026)),  # anno ASIN da scheda
+]
+
+
 def main():
     errori = 0
     from nucleo import elabora_asin
+    for amz, sch_a, neg, sch, par, atteso, campo in SCHEDE:
+        r = elabora_asin(_BrowserFinto(amz, [neg], neg, sch, sch_a), {"asin": "B0TEST0001", "paese": "DE"},
+                         [{"nome": "N", "url": "{q}"}], par, log=lambda m: None)
+        trovato = bool(r["match"].get("N"))
+        if trovato != atteso or (campo and r["amazon"].get(campo[0]) != campo[1]):
+            errori += 1
+            print(f"✗ scheda tecnica {sch} ({'stretto' if par is STRETTO else 'bilanciato'}): atteso "
+                  f"{'simile' if atteso else 'scartato'}, ottenuto {trovato}; {[d['esito'] for d in r['dettaglio']][-2:]}"
+                  + (f"; amazon {campo[0]}={r['amazon'].get(campo[0])}" if campo else ""))
     for riga, ana, titolo in CASI_ASIN:
         r = elabora_asin(_BrowserFinto(titolo, ["Xiaomi TV A Pro 32 2026 TV nero"], "Xiaomi - TV A PRO 32 2026 TV, Nero"),
                          dict(riga), [{"nome": "N", "url": "{q}"}], {"modalita": "stessa_marca", "verifica_url": True},
@@ -157,7 +180,7 @@ def main():
         if ok != atteso:
             errori += 1
             print(f"✗ somiglianza ({modo}): {amz_t[:45]} ↔ {cand_t[:45]}\n    atteso {'simile' if atteso else 'scartato'}, motivo: {motivo}")
-    tot = len(RICONOSCIMENTO) + len(SOMIGLIANZA) + len(PAGINE) + len(CASI_ASIN)
+    tot = len(RICONOSCIMENTO) + len(SOMIGLIANZA) + len(PAGINE) + len(CASI_ASIN) + len(SCHEDE)
     print(f"{tot - errori}/{tot} casi corretti")
     sys.exit(1 if errori else 0)
 
