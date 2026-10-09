@@ -170,6 +170,14 @@ class Browser:
             r = self.page.goto(url, wait_until="domcontentloaded", timeout=45000)
         except PWTimeout:
             return None
+        except Exception as e:  # navigazione interrotta (ERR_ABORTED, redirect via script...): riprovo una volta
+            if "ERR_ABORTED" not in str(e) and "interrupted" not in str(e):
+                return None
+            try:
+                time.sleep(1)
+                r = self.page.goto(url, wait_until="domcontentloaded", timeout=45000)
+            except Exception:
+                return None
         try:
             self.page.wait_for_load_state("networkidle", timeout=6000)
         except PWTimeout:
