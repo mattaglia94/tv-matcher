@@ -135,9 +135,22 @@ def trova_risoluzione(t: str) -> str:
     return ""
 
 
+_HZ_MARKETING = r"(?:GAME\s?BOOST|BOOST|MEMC|MOTION\s?RATE|MOTION|PMR|PQI|CMR|MCI|TRUMOTION|GAMING|DLG|VRR|FINO A|UP TO|BIS ZU|JUSQU)"
+
+
 def trova_hz(t: str) -> int | None:
-    vals = [int(x) for x in re.findall(r"\b(\d{2,3})\s?HZ\b", _norm(t))]
-    vals = [v for v in vals if 50 <= v <= 300]
+    """Frequenza NATIVA del pannello. Si ignorano i valori di marketing ("Game Boost 120Hz", "Motion Rate 240",
+    "MEMC 120 Hz"), che non indicano la frequenza reale."""
+    T = _norm(t)
+    vals = []
+    for m in re.finditer(r"\b(\d{2,3})\s?HZ\b", T):
+        prima = T[max(0, m.start() - 25):m.start()]
+        dopo = T[m.end():m.end() + 12]
+        if re.search(_HZ_MARKETING + r"[^,;|()]*$", prima) or re.match(r"\s*(?:MEMC|MOTION|GAME|BOOST)", dopo):
+            continue
+        v = int(m.group(1))
+        if 50 <= v <= 300:
+            vals.append(v)
     return max(vals) if vals else None
 
 

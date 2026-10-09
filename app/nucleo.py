@@ -171,7 +171,8 @@ def riconosci_amazon(br, riga, anagrafica=None, log=print):
     nome, modello = riga.get("nome", ""), (riga.get("modello") or "").strip()
     noto = (anagrafica or {}).get(f"{riga['asin']}|{paese}") or (anagrafica or {}).get(riga["asin"]) or {}
     vuoto = {"titolo": nome or noto.get("titolo", ""), "modello": "", "img": noto.get("img", ""), "fonte": "", "nota": "",
-             "marca": riga.get("marca", "") or noto.get("marca", ""), "prezzo": ""}
+             "marca": riga.get("marca", "") or noto.get("marca", ""), "prezzo": "",
+             "scheda": noto.get("scheda") or {}}  # scheda tecnica letta su Amazon in una ricerca precedente
 
     def basta(titolo, mod, marca):
         """Il TV è riconoscibile? Serve marca, diagonale e codice (o tecnologia + fascia).

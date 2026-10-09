@@ -152,6 +152,10 @@ F75 = "Xiaomi TV F Pro 75 (190 cm), 4K UHD QLED, Smart TV, Fire OS8, HDR10+, MEM
 OTTO75 = "Xiaomi L75MB-APEU 189 cm (75 Zoll) 4K Ultra HD Smart TV Google TV"
 SCHEDE = [  # (titolo ASIN, scheda Amazon, titolo negozio, scheda negozio, parametri, simile?, campo Amazon atteso)
     (F75, {}, OTTO75, {"modelljahr": "2026", "auflösung": "3840 x 2160 Pixel", "bildschirmdiagonale": "189 cm"}, STRETTO, True, None),
+    # MediaWorld reale: A Pro 75 a 60 Hz; l'F Pro 75 su Amazon dice "Game Boost 120Hz" (non è la frequenza del pannello)
+    ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED,Smart TV,Fire TV, HDR10+, Modalità Game Boost 120Hz, MEMC", {},
+     "Xiaomi A Pro 75 2026 ELA5840EU TV QLED piatto 75 UHD 4K",
+     {"frequenza di aggiornamento": "60 Hz", "risoluzione": "3840 x 2160 Pixel"}, {"modalita": "stessa_marca", "verifica_url": True}, True, None),
     (F75, {}, OTTO75, {"modelljahr": "2025"}, STRETTO, False, None),
     (F75, {}, OTTO75, {}, STRETTO, False, None),                                   # anno sconosciuto ovunque: Stretto scarta
     (F75, {}, OTTO75, {}, {"modalita": "stessa_marca", "verifica_url": True}, True, None),  # Bilanciato: da verificare

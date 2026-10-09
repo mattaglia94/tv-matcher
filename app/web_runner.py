@@ -225,8 +225,10 @@ def main():
             if am.get("fonte") in ("Amazon", "inserito a mano", "ricerca web") and am.get("modello") and am.get("pollici"):
                 anagrafica_nuova[f"{a['asin']}|{paese}"] = {
                     "modello": am["modello"], "titolo": am.get("titolo", ""), "img": am.get("img", ""),
-                    "marca": am.get("marca_amazon", ""),
+                    "marca": am.get("marca_amazon", ""), "scheda": am.get("scheda") or {},
                     "fonte": am["fonte"], "aggiornato": dt.datetime.utcnow().strftime("%Y-%m-%d")}
+                if not am.get("scheda") and (anagrafica.get(f"{a['asin']}|{paese}") or {}).get("scheda"):
+                    anagrafica_nuova[f"{a['asin']}|{paese}"]["scheda"] = anagrafica[f"{a['asin']}|{paese}"]["scheda"]
             if info is None:
                 stato["avanzamento"]["fatti"] += len(ret)
             else:
