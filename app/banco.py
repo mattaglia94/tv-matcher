@@ -42,7 +42,7 @@ JS_RISULTATI = r"""
 
 def raccogli(paese, per_marca=5):
     from browser import Browser
-    from regole import trova_marca, trova_pollici
+    from regole import trova_marca, trova_pollici_testo as trova_pollici
     from web_runner import Pubblicatore, assicura_branch, leggi_json, REPO, TOKEN
     dom = DOMINIO[paese]
     br = Browser(visibile=False)
