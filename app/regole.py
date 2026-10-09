@@ -325,7 +325,8 @@ def _xiaomi(T: str, info: InfoTV):
     info.pro = pro or " PRO" in T
     info.codice = f"{serie}{' PRO' if info.pro else ''} {info.pollici}"
     info.core = f"{info.pollici}{serie}{'PRO' if info.pro else ''}"
-    info.chiave = serie + ("-HD" if trova_risoluzione(T) in ("HD", "FHD") and serie in ("A", "F") else "")
+    # i 32"/40" HD della linea base formano una famiglia a sé; un PRO resta PRO anche se HD
+    info.chiave = serie + ("-HD" if trova_risoluzione(T) in ("HD", "FHD") and serie in ("A", "F") and not info.pro else "")
     info.tecnologia = tecnologia_testo(T) or ("MINILED" if serie == "S" else "QLED" if (info.pro or serie == "MAX") else "LED")
     fam = {"A": "AF", "F": "AF", "Q": "AF", "S": "S", "MAX": "MAX"}[serie]
     info.famiglia = f"XIAOMI-{info.tecnologia}-{fam}"
@@ -349,7 +350,7 @@ def _xiaomi_codice(T: str, info: InfoTV):
     ris = trova_risoluzione(T)
     info.fascia = "MID" if info.pro else "BASE" if ris in ("HD", "FHD") else "ENTRY"
     info.famiglia = f"XIAOMI-{info.tecnologia}-AF{'-' + ris if ris in ('HD', 'FHD') else ''}"
-    info.chiave = serie + ("-HD" if ris in ("HD", "FHD") else "")
+    info.chiave = serie + ("-HD" if ris in ("HD", "FHD") and not info.pro else "")
     info.regola = "XIAOMI-codice"
     return True
 
