@@ -1,15 +1,15 @@
-# TV Matcher
+# Radar TV
 
 Confronta i TV venduti su Amazon (per ASIN) con modelli **simili ma non identici** sui retailer del paese scelto. Il tool non usa AI: si basa solo su regole fisse.
 
 ## Requisiti sul PC
 - Windows con **Microsoft Edge** (già presente) oppure Google Chrome.
-- Nient'altro, se usi `TV_Matcher.exe`.
+- Nient'altro, se usi `Radar_TV.exe`.
 
 ## Uso mensile
 1. Apri `input_tv_matcher.xlsx` e compila il foglio **ASIN** (colonna ASIN e colonna Paese).
    - *Amazon product name* e *Amazon Model* sono facoltativi. Se li compili, il tool non apre Amazon (utile quando Amazon mostra un captcha).
-2. Fai doppio click su `TV_Matcher.exe`, scegli il file, il paese e premi **▶ Avvia**.
+2. Fai doppio click su `Radar_TV.exe`, scegli il file, il paese e premi **▶ Avvia**.
 3. L'output viene salvato nella cartella `Output` con il nome `Matching_TV_<PAESE>_<data>.xlsx`:
    - foglio **Matching**: ASIN, nome e modello Amazon, poi *Model Name* e *Product URL* per ogni retailer. Se non c'è un match valido, le celle restano vuote.
    - foglio **Dettaglio**: tutti i candidati trovati, con il motivo dello scarto oppure "VALIDO". Serve per i controlli di qualità.
@@ -23,6 +23,18 @@ Se compare un captcha, spunta "Mostra il browser", risolvilo a mano e il tool ri
   - anno target (2026);
   - se accettare modelli il cui anno non si ricava dal codice (vengono segnalati "anno da verificare");
   - se verificare che ogni URL scelto sia attivo.
+
+## Catalogo marche e serie (`web/catalogo.json`)
+Ogni marca ha nomi alternativi e un elenco di serie (es. TCL C7, Samsung QN9, LG OLEDC) con tecnologia, fascia
+(Base, Entry, Media, Premium, Top) ed eventuale famiglia. Il motore ricava la serie dal codice e la cerca nel catalogo
+(vince il prefisso più lungo: QN95 batte QN9).
+- Dal sito, scheda **Catalogo**: si aggiungono o modificano marche e serie; le modifiche sono salvate in `config/catalogo.json`
+  (branch `dati`) e hanno la precedenza sul catalogo predefinito.
+- Con l'exe: un file `catalogo_utente.json` nella cartella del file di input fa lo stesso.
+- Marca o serie sconosciute: la marca si prende da Amazon, la tecnologia dal titolo e la fascia si stima dal prezzo al
+  pollice (segnalato come "fascia stimata").
+
+Nessuna intelligenza artificiale: solo regole, tabelle e lettura delle pagine con un browser automatico.
 
 ## Regole di matching (`app/regole.py`)
 Due modalità, scelte per ogni ricerca.
@@ -51,7 +63,7 @@ Anno dal codice:
 
 ## Creare l'exe (una volta sola)
 - **Opzione A**: su un PC Windows con Python installato, doppio click su `build_exe.bat`.
-- **Opzione B**: carica la cartella su GitHub. Il workflow `.github/workflows/build.yml` crea l'exe in automatico (scheda Actions → artifact *TV_Matcher*).
+- **Opzione B**: carica la cartella su GitHub. Il workflow `.github/workflows/build.yml` crea l'exe in automatico (scheda Actions → artifact *Radar_TV*).
 
 ## Limiti noti
 - I siti cambiano layout e protezioni anti-bot. L'estrazione è generica (legge tutti i link della pagina di ricerca), quindi regge bene, ma se un retailer smette di restituire risultati va controllato il suo URL di ricerca nel foglio Retailer.

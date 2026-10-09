@@ -1208,16 +1208,6 @@
    "serie": []
   },
   {
-   "marca": "Vidaa",
-   "alias": [
-    "VIDAA"
-   ],
-   "note": "Marchio economico di Hisense",
-   "fascia_predefinita": "ENTRY",
-   "tecnologia_predefinita": "LED",
-   "serie": []
-  },
-  {
    "marca": "JVC",
    "alias": [
     "JVC"
@@ -1310,6 +1300,16 @@
      "descrizione": "Beovision (Contour, Theatre, Harmony)"
     }
    ]
+  },
+  {
+   "marca": "Saba",
+   "alias": [
+    "SABA"
+   ],
+   "note": "Marchio economico (spesso con sistema VIDAA)",
+   "fascia_predefinita": "ENTRY",
+   "tecnologia_predefinita": "LED",
+   "serie": []
   }
  ]
 }

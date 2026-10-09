@@ -1,7 +1,9 @@
-// GET: storico delle ricerche lanciate dal sito
-const { send, protezione, elencoRun } = require("./_lib");
+// GET: storico delle ricerche lanciate dal sito (escluse quelle eliminate)
+const { send, protezione, elencoRun, leggiJSON } = require("./_lib");
 
 module.exports = async (req, res) => {
   if (!protezione(req, res)) return;
-  return send(res, 200, { runs: await elencoRun(50) });
+  const [runs, nascoste] = await Promise.all([elencoRun(100), leggiJSON("config/nascoste.json")]);
+  const via = new Set((nascoste && nascoste.ids) || []);
+  return send(res, 200, { runs: runs.filter((r) => !via.has(r.id)).slice(0, 60) });
 };
