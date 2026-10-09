@@ -339,17 +339,16 @@ def _xiaomi(T: str, info: InfoTV):
     return True
 
 
-_XIAOMI_ANNO = {"A": 2024, "B": 2025, "C": 2026, "D": 2027}
-
-
 def _xiaomi_codice(T: str, info: InfoTV):
-    """Codici Xiaomi ufficiali: L<pollici>M<anno>[..]-<serie><P=Pro>..EU
-    es. L65MB-APEU = 65" 2025 A Pro, L65MC-SEU = 65" 2026 S Mini LED, L43MB-FAVEU = 43" 2025 F (Fire TV)."""
+    """Codici Xiaomi ufficiali: L<pollici>M<lettera>[..]-<serie><P=Pro>..EU
+    es. L75MB-APEU = 75" A Pro, L65MC-SEU = 65" S Mini LED, L43MB-FAVEU = 43" F (Fire TV)."""
     m = re.search(r"\bL(\d{2,3})M([A-Z])[A-Z0-9]{0,2}(?:-([A-Z]{2,6}))?", T)
     if not m:
         return False
     info.pollici = info.pollici or int(m.group(1))
-    info.anno = info.anno or trova_anno_testo(T) or _XIAOMI_ANNO.get(m.group(2))  # l'anno scritto nel titolo prevale
+    # NB: la lettera dopo "M" NON indica l'anno (L75MB-APEU è l'A Pro 75 2026, L65MB-FAEU l'F 65 2025):
+    # l'anno si prende solo dal titolo
+    info.anno = info.anno or trova_anno_testo(T)
     suff = m.group(3) or ""
     tec_t = tecnologia_testo(T)
     if suff[:1] in ("A", "F", "S", "Q"):
