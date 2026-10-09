@@ -12,6 +12,9 @@ ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
 # indirizzi di ricerca vecchi o sbagliati salvati nelle impostazioni -> indirizzo corretto
 URL_CORRETTI = {"https://www.expert.it/search?q={q}": "https://www.expert.it/it/it/exp/shop/search?terms={q}"}
 
+PID_MARCHE = {"SAM": "SAMSUNG", "XIA": "XIAOMI", "LGE": "LG", "HIS": "HISENSE", "TCL": "TCL", "PHI": "PHILIPS",
+              "SON": "SONY", "PAN": "PANASONIC", "SHA": "SHARP", "TOS": "TOSHIBA", "HAI": "HAIER", "SAB": "SABA"}
+
 IDEALO = {"IT": "idealo.it", "DE": "idealo.de", "FR": "idealo.fr", "ES": "idealo.es", "UK": "idealo.co.uk"}
 
 AMAZON_DOMINIO = {"IT": "amazon.it", "DE": "amazon.de", "FR": "amazon.fr",
@@ -206,9 +209,11 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
                 c = analizza(l["testo"])
                 if not c.codice:
                     # molti retailer mettono il codice modello solo nell'indirizzo (es. _tcl-75t69c-..., pidSAMQE75QN70H)
-                    slug = re.sub(r"pid[A-Z]{3}", " ", l["url"].split("?")[0].rsplit("/", 1)[-1])
+                    # Unieuro: pid + 3 lettere della marca (pidSAMQE75QN70H, pidXIA50APRO2)
+                    slug = l["url"].split("?")[0].rsplit("/", 1)[-1]
+                    slug = re.sub(r"pid([A-Z]{3})", lambda m: f" {PID_MARCHE.get(m.group(1), '')} " + ("XIA" if m.group(1) == "XIA" else ""), slug)
                     c2 = analizza(f"{l['testo']} {re.sub(r'[-_.]+', ' ', slug)}")
-                    if c2.codice and c2.marca == c.marca and (not c.pollici or c2.pollici == c.pollici):
+                    if c2.codice and (not c.marca or c2.marca == c.marca) and (not c.pollici or c2.pollici == c.pollici):
                         c = c2
                 if not c.marca or not c.pollici:
                     continue

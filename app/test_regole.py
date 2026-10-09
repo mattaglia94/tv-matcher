@@ -85,7 +85,8 @@ class _BrowserFinto:
         return {"titolo": self.t, "modello": "", "img": "", "marca": "", "prezzo": "", "errore": ""}
 
     def cerca(self, url, q):
-        return url, [{"url": f"https://negozio.it/p{i}", "testo": t} for i, t in enumerate(self.ris)], "ok"
+        return url, [{"url": t[1], "testo": t[0]} if isinstance(t, tuple) else {"url": f"https://negozio.it/p{i}", "testo": t}
+                     for i, t in enumerate(self.ris)], "ok"
 
     def verifica(self, url):
         corpo = "Menu: TV 8K OLED, offerte 2025, Classe energetica 2025 © 2025 negozio"
@@ -97,6 +98,11 @@ PAGINE = [  # (titolo ASIN, risultati di ricerca, titolo pagina prodotto, modali
      "Xiaomi A Pro 75 2026 ELA5840EU TV QLED piatto 75\" UHD 4K", "stessa_marca", "A PRO 75"),
     ("XIAOMI TV F Pro 32 2025, 32 pollici (81 cm), QLED, Smart TV, Fire TV, HD", ["Xiaomi TV A Pro 32 2026 TV nero"],
      "Xiaomi - TV A PRO 32 2026 TV, Nero", "stessa_marca", "A PRO 32"),
+    # codice solo nell'indirizzo (Unieuro): pidXIA50APRO2 = Xiaomi A Pro 50
+    ("Xiaomi TV F Pro 50 2025, 50 pollici, 4K UHD QLED", [("Smart TV 50 pollici 2026", "https://www.unieuro.it/online/TV-Led/ELA6088EU-pidXIA50APRO2")],
+     "Xiaomi TV A Pro 50 2026 QLED 4K", "stessa_marca", "A PRO 50"),
+    ("Samsung QE75QN80HATXZT Neo QLED 2026", [("Neo QLED 75 Vision AI 2026", "https://www.unieuro.it/online/TV-Neo-QLED/75-Neo-QLED-QN70H-pidSAMQE75QN70H")],
+     "Samsung 75\" Neo QLED QN70H 4K 2026", "concorrente", None),
 ]
 
 
@@ -107,7 +113,7 @@ def main():
         r = elabora_asin(_BrowserFinto(amz, ris, tp), {"asin": "B0TEST0000", "paese": "IT"}, [{"nome": "N", "url": "{q}"}],
                          {"modalita": modo, "verifica_url": True}, log=lambda m: None)
         trovati = [m["modello"] for m in r["match"].get("N", [])]
-        if atteso not in trovati:
+        if (atteso is None and trovati) or (atteso is not None and atteso not in trovati):
             errori += 1
             motivi = [d["esito"] for d in r["dettaglio"]]
             print(f"✗ pagina prodotto ({modo}): {amz[:40]} -> atteso {atteso}, trovati {trovati}; {motivi[-3:]}")
