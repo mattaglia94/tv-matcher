@@ -17,7 +17,7 @@ jobs:
         with: { python-version: "3.12" }
       - run: pip install playwright==1.56.0 openpyxl
       - run: python -m playwright install --with-deps chromium
-      - run: python app/tv_matcher.py --input input_tv_matcher.xlsx --paese ${{ inputs.paese || 'IT' }} --output output
+      - run: python -u app/tv_matcher.py --input input_tv_matcher.xlsx --paese ${{ inputs.paese || 'IT' }} --output output
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: Output_matching, path: output/ }

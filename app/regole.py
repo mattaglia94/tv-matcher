@@ -44,6 +44,18 @@ def trova_marca(t: str) -> str:
     return ""
 
 
+def marca_da_codice(t: str) -> str:
+    """Se il testo non nomina la marca, la deduce dal formato del codice modello."""
+    T = _norm(t)
+    if re.search(r"\b(?:QE|UE|GQ|GU|TQ|TU)\d{2,3}[A-Z]", T):
+        return "SAMSUNG"
+    if re.search(r"\bOLED\d{2,3}[A-Z]\d|\b\d{2,3}(?:QNED|NANO)\d|\b\d{2,3}U[ATRQ]\d{2}", T):
+        return "LG"
+    if re.search(r"\b\d{2,3}[AEU][4-9][A-Z0-9]*\b", T):
+        return "HISENSE"
+    return ""
+
+
 def trova_pollici_testo(t: str) -> int | None:
     T = _norm(t)
     m = re.search(r"\b(\d{2,3})\s?(?:\"|POLLICI|POLL\.|INCH|ZOLL|PULGADAS|POUCES|'')", T)
@@ -252,7 +264,7 @@ def analizza(testo: str, codice_noto: str = "") -> InfoTV:
     """Analizza titolo prodotto (+ eventuale codice modello già noto)."""
     T = _norm(f"{codice_noto} {testo}")
     info = InfoTV(testo=testo or "")
-    info.marca = trova_marca(T)
+    info.marca = trova_marca(T) or marca_da_codice(codice_noto or T)
     info.risoluzione = trova_risoluzione(T)
     info.hz = trova_hz(T)
     info.pollici = trova_pollici_testo(T)

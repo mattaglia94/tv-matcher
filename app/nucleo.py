@@ -5,7 +5,8 @@ import re
 from regole import analizza, confronta_param, stesso_modello, unisci_parametri
 
 ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
-         "nessun_simile": "Nessun modello simile", "errore": "Ricerca non riuscita"}
+         "nessun_simile": "Nessun modello simile", "errore": "Ricerca non riuscita",
+         "saltato": "Saltato: modello Amazon mancante"}
 
 AMAZON_DOMINIO = {"IT": "amazon.it", "DE": "amazon.de", "FR": "amazon.fr",
                   "ES": "amazon.es", "UK": "amazon.co.uk"}
@@ -48,25 +49,54 @@ def info_dict(i):
             "anno": i.anno}
 
 
-def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False):
+def riconosci_amazon(br, riga, anagrafica=None, log=print):
+    """Ricava titolo/modello dell'ASIN. Ordine: modello scritto a mano -> anagrafica -> Amazon -> ricerca web.
+    Ritorna (nome, modello, img, fonte, nota)."""
+    paese = (riga.get("paese") or "IT").upper()
+    nome, modello = riga.get("nome", ""), (riga.get("modello") or "").strip()
+    if modello:
+        return nome, modello, "", "inserito a mano", ""
+    noto = (anagrafica or {}).get(f"{riga['asin']}|{paese}") or (anagrafica or {}).get(riga["asin"])
+    if noto and noto.get("modello"):
+        return noto.get("titolo", ""), noto["modello"], noto.get("img", ""), "anagrafica", ""
+    a = br.amazon(riga["asin"], AMAZON_DOMINIO.get(paese, "amazon.it"))
+    info = analizza(a["titolo"], a["modello"])
+    if info.marca and info.pollici and info.codice:
+        return a["titolo"], a["modello"] or info.codice, a.get("img", ""), "Amazon", ""
+    # piano B: Amazon bloccato o pagina illeggibile -> motore di ricerca
+    log(f"   Amazon non leggibile ({a['errore'] or 'modello non trovato'}): provo la ricerca web")
+    try:
+        titoli = br.cerca_web(riga["asin"])
+    except Exception:
+        titoli = []
+    voti = {}
+    for t in titoli:
+        i = analizza(t)
+        if i.marca and i.pollici and i.codice:
+            k = (i.marca, i.core)
+            voti.setdefault(k, [0, t, i.codice])[0] += 1
+    if voti:
+        _, t, cod = max(voti.values(), key=lambda v: v[0])
+        return t, cod, a.get("img", ""), "ricerca web", "modello ricavato da ricerca web: verificare"
+    return a["titolo"], a["modello"], a.get("img", ""), "", a["errore"] or "modello Amazon non riconosciuto"
+
+
+def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, anagrafica=None):
     """riga: {asin, paese, nome?, modello?}; retailer: [{nome, url}] del paese della riga.
     Ritorna dict con dati Amazon, match per retailer e righe di dettaglio."""
     P = unisci_parametri(parametri)
     paese = (riga.get("paese") or "IT").upper()
-    out = {"asin": riga["asin"], "paese": paese, "amazon": {}, "match": {}, "dettaglio": [], "errore": ""}
-    nome, modello, img, url_amz, nota = riga.get("nome", ""), riga.get("modello", ""), "", "", ""
-    dominio = AMAZON_DOMINIO.get(paese, "amazon.it")
-    url_amz = f"https://www.{dominio}/dp/{riga['asin']}"
-    if not nome or not modello:
-        a = br.amazon(riga["asin"], dominio)
-        nome, modello, img, nota = nome or a["titolo"], modello or a["modello"], a.get("img", ""), a["errore"]
+    out = {"asin": riga["asin"], "paese": paese, "amazon": {}, "match": {}, "esito": {}, "dettaglio": [], "errore": ""}
+    url_amz = f"https://www.{AMAZON_DOMINIO.get(paese, 'amazon.it')}/dp/{riga['asin']}"
+    nome, modello, img, fonte, nota = riconosci_amazon(br, riga, anagrafica, log)
     info = analizza(nome, modello)
     out["amazon"] = {"titolo": nome, "modello": info.codice or modello, "img": img, "url": url_amz,
-                     "nota": nota, **info_dict(info)}
-    log(f"   Amazon: {info.marca} {info.codice} {info.pollici}\" {info.famiglia} {nota}")
+                     "fonte": fonte, "nota": nota, **info_dict(info)}
+    log(f"   Amazon ({fonte or 'non riconosciuto'}): {info.marca} {info.codice} {info.pollici}\" {info.famiglia}")
     if not info.marca or not info.pollici:
         out["errore"] = nota or "modello Amazon non riconosciuto"
-        log("   ⚠ modello Amazon non riconosciuto: indicare il modello a mano")
+        out["esito"] = {r["nome"]: "saltato" for r in retailer}
+        log("   ⚠ modello Amazon non riconosciuto: scrivere il modello a mano")
         return out
     max_m = max(1, int(P.get("max_match") or 1))
     for r in retailer:
@@ -147,7 +177,7 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False):
             esito = "non_presente"
         else:
             esito = "errore"
-        out.setdefault("esito", {})[r["nome"]] = esito
+        out["esito"][r["nome"]] = esito
         testo = ", ".join(s["modello"] for s in scelti) or ESITI[esito]
         if esito == "errore" and errori:
             testo += f" ({errori[-1]})"

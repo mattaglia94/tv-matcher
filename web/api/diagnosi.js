@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
   const esito = {
     "1_token_presente": t ? `sì (${t.length} caratteri, inizia con "${t.slice(0, 11)}…")` : "NO: manca GITHUB_TOKEN su Vercel",
     "1b_spazi_nel_token": /\s/.test(t) ? "SÌ: il token contiene spazi o a capo, va reincollato" : "no",
-    "2_repo_usato": JSON.stringify(REPO),
+    "2_repo_usato": /^(github_pat_|ghp_|gho_)/.test(REPO) ? "ATTENZIONE: GITHUB_REPO contiene un token (variabili invertite?)" : JSON.stringify(REPO),
     "2b_spazi_nel_repo": /\s/.test(REPO) ? "SÌ: GITHUB_REPO contiene spazi o a capo" : "no",
   };
   if (!t) return send(res, 200, esito);

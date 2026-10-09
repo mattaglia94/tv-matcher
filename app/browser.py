@@ -107,21 +107,39 @@ class Browser:
         return r
 
     # ------------------------------------------------------------ Amazon
+    def _amazon_bloccato(self):
+        html = self.page.content().lower()
+        return ("validatecaptcha" in html or "captcha" in html or "robot check" in html) \
+            and "producttitle" not in html and 'id="title"' not in html
+
     def amazon(self, asin, dominio):
-        url = f"https://www.{dominio}/dp/{asin}"
-        self._vai(url)
-        self._pausa()
-        html = self.page.content()
-        if "captcha" in html.lower() and "productTitle" not in html:
+        """Legge titolo, numero modello e foto. Prova più indirizzi prima di arrendersi al captcha."""
+        if dominio not in self._cookie_ok:  # prima visita: home page per ottenere i cookie di sessione
+            self._vai(f"https://www.{dominio}/")
+            self._cookie_ok.add(dominio)
+            self._pausa(2, 4)
+        tentativi = [f"https://www.{dominio}/dp/{asin}",
+                     f"https://www.{dominio}/gp/product/{asin}?psc=1",
+                     f"https://www.{dominio}/gp/aw/d/{asin}"]  # versione mobile
+        url = tentativi[0]
+        for i, u in enumerate(tentativi):
+            self._vai(u)
+            self._pausa()
+            if not self._amazon_bloccato():
+                url = u
+                break
+            self.log(f"   Amazon: captcha al tentativo {i + 1}/{len(tentativi)}")
+            time.sleep(random.uniform(6, 12))
+        else:
             return {"url": url, "titolo": "", "modello": "", "img": "", "errore": "captcha Amazon"}
         titolo = ""
         try:
-            titolo = self.page.locator("#productTitle").first.inner_text(timeout=5000).strip()
+            titolo = self.page.locator("#productTitle, #title").first.inner_text(timeout=5000).strip()
         except Exception:
             pass
         modello = ""
         try:
-            righe = self.page.locator("tr, #detailBullets_feature_div li").all_inner_texts()
+            righe = self.page.locator("tr, #detailBullets_feature_div li, #productDetails_techSpec_section_1 tr").all_inner_texts()
             for r in righe:
                 r1 = re.sub(r"[\u200e\u200f]", "", r)
                 for et in MODELLO_ETICHETTE:
@@ -134,12 +152,28 @@ class Browser:
             pass
         img = ""
         try:
-            el = self.page.locator("#landingImage, #imgTagWrapperId img").first
+            el = self.page.locator("#landingImage, #imgTagWrapperId img, #main-image").first
             img = el.get_attribute("data-old-hires", timeout=2000) or el.get_attribute("src", timeout=2000) or ""
         except Exception:
             pass
         return {"url": url, "titolo": titolo, "modello": modello, "img": img,
                 "errore": "" if titolo else "titolo non trovato"}
+
+    def cerca_web(self, asin):
+        """Piano B quando Amazon blocca: cerca l'ASIN su un motore di ricerca e ritorna i titoli trovati."""
+        titoli = []
+        for url in (f"https://html.duckduckgo.com/html/?q={asin}",
+                    f"https://www.bing.com/search?q=%22{asin}%22&setlang=it"):
+            try:
+                self._vai(url)
+                self._pausa(1, 2)
+                titoli += self.page.evaluate("""() => [...document.querySelectorAll(
+                    '.result__title, .result__snippet, li.b_algo h2, li.b_algo p')].map(e => e.innerText).slice(0, 20)""")
+            except Exception:
+                continue
+            if titoli:
+                break
+        return titoli
 
     # ------------------------------------------------------------ Retailer
     def cerca(self, url_template, query):

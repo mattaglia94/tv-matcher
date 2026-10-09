@@ -43,6 +43,18 @@ def assicura_branch():
     _req("POST", f"{API}/repos/{REPO}/git/refs", {"ref": f"refs/heads/{BRANCH}", "sha": ref["object"]["sha"]})
 
 
+def leggi_json(percorso):
+    if not REPO or not TOKEN:
+        return None
+    st, info = _req("GET", f"{API}/repos/{REPO}/contents/{percorso}?ref={BRANCH}")
+    if st != 200:
+        return None
+    try:
+        return json.loads(base64.b64decode(info["content"]).decode())
+    except Exception:
+        return None
+
+
 class Pubblicatore:
     def __init__(self, percorso):
         self.percorso = percorso
@@ -63,7 +75,7 @@ class Pubblicatore:
             if self.sha is None:
                 st, info = _req("GET", f"{API}/repos/{REPO}/contents/{self.percorso}?ref={BRANCH}")
                 self.sha = info.get("sha") if st == 200 else None
-            corpo = {"message": f"run {RUN_ID}: {dati['stato']}", "content": contenuto, "branch": BRANCH}
+            corpo = {"message": f"run {RUN_ID}: {dati.get('stato', 'anagrafica') if isinstance(dati, dict) else ''}", "content": contenuto, "branch": BRANCH}
             if self.sha:
                 corpo["sha"] = self.sha
             st, res = _req("PUT", f"{API}/repos/{REPO}/contents/{self.percorso}", corpo)
@@ -91,6 +103,8 @@ def main():
     if REPO and TOKEN:
         assicura_branch()
     pub = Pubblicatore(f"runs/{RUN_ID}/stato.json")
+    anagrafica = leggi_json("config/anagrafica_asin.json") or {}
+    anagrafica_nuova = {}
     stato = {"id": RUN_ID, "nome": cfg.get("nome", ""), "stato": "in_corso",
              "github_run": os.environ.get("GITHUB_RUN_ID", ""),
              "iniziato": dt.datetime.utcnow().isoformat() + "Z", "finito": None,
@@ -117,7 +131,12 @@ def main():
                 if m.strip().split(":")[0] in {r["nome"] for r in ret}:
                     stato["avanzamento"]["fatti"] += 1
                 log(m)
-            res = elabora_asin(br, a, ret, parametri, log=log_ret)
+            res = elabora_asin(br, a, ret, parametri, log=log_ret, anagrafica=anagrafica)
+            am = res.get("amazon", {})
+            if am.get("fonte") in ("Amazon", "inserito a mano", "ricerca web") and am.get("modello") and am.get("pollici"):
+                anagrafica_nuova[f"{a['asin']}|{paese}"] = {
+                    "modello": am["modello"], "titolo": am.get("titolo", ""), "img": am.get("img", ""),
+                    "fonte": am["fonte"], "aggiornato": dt.datetime.utcnow().strftime("%Y-%m-%d")}
             if res.get("errore") and not res["match"]:
                 stato["avanzamento"]["fatti"] += len(ret)
             stato["risultati"].append(res)
@@ -133,6 +152,11 @@ def main():
         stato["finito"] = dt.datetime.utcnow().isoformat() + "Z"
         stato["avanzamento"]["corrente"] = {"completato": "Completato", "errore": "Interrotto per errore"}.get(stato["stato"], "")
         pub.salva(stato, forza=True)
+        if anagrafica_nuova and REPO and TOKEN:
+            ana = leggi_json("config/anagrafica_asin.json") or {}
+            ana.update(anagrafica_nuova)
+            Pubblicatore("config/anagrafica_asin.json").salva(ana, forza=True)
+            print(f"Anagrafica ASIN aggiornata: {len(anagrafica_nuova)} modelli")
     if stato["stato"] == "errore":
         sys.exit(1)
 

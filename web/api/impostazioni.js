@@ -5,7 +5,10 @@ const PERCORSO = "config/impostazioni.json";
 
 module.exports = async (req, res) => {
   if (!protezione(req, res)) return;
-  if (req.method === "GET") return send(res, 200, { impostazioni: await leggiJSON(PERCORSO) });
+  if (req.method === "GET") {
+    const [impostazioni, anagrafica] = await Promise.all([leggiJSON(PERCORSO), leggiJSON("config/anagrafica_asin.json")]);
+    return send(res, 200, { impostazioni, anagrafica: anagrafica || {} });
+  }
   if (req.method === "PUT") {
     const b = await leggiCorpo(req);
     if (!b || !Array.isArray(b.retailer)) return send(res, 400, { errore: "Formato non valido" });

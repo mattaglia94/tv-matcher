@@ -37,7 +37,7 @@
     play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
     tv: '<svg viewBox="0 0 64 48" fill="none"><rect x="2" y="2" width="60" height="38" rx="7" stroke="#A9A3D6" stroke-width="3"/><path d="M22 46h20" stroke="#A9A3D6" stroke-width="3" stroke-linecap="round"/><g opacity=".8"><rect x="10" y="10" width="8.8" height="22" fill="#FFD23F"/><rect x="18.8" y="10" width="8.8" height="22" fill="#2EE6F0"/><rect x="27.6" y="10" width="8.8" height="22" fill="#4BE38E"/><rect x="36.4" y="10" width="8.8" height="22" fill="#FF4FA3"/><rect x="45.2" y="10" width="8.8" height="22" fill="#7B61FF"/></g></svg>',
   };
-  const ESITI = { trovato: "Trovato", non_presente: "Prodotto non presente", nessun_simile: "Nessun modello simile", errore: "Ricerca non riuscita" };
+  const ESITI = { saltato: "Saltato", trovato: "Trovato", non_presente: "Prodotto non presente", nessun_simile: "Nessun modello simile", errore: "Ricerca non riuscita" };
   const ESITI_NOTA = {
     non_presente: "Nessun TV di questa marca e diagonale nel catalogo del retailer.",
     nessun_simile: "Ci sono TV della stessa marca e diagonale, ma nessuno rispetta i criteri.",
@@ -62,6 +62,7 @@
   // ------------------------------------------------------------------ stato
   const S = {
     impostazioni: { retailer: clona(T.retailer), preset: [] },
+    anagrafica: {},
     bozza: memoria.leggi("bozza", null) || { asin: [], nome: "", paeseDefault: "IT", parametri: clona(T.parametriDefault), preset: "" },
     passo: 1,
     polling: null,
@@ -76,7 +77,8 @@
 
   async function caricaImpostazioni() {
     try {
-      const { impostazioni } = await api("impostazioni");
+      const { impostazioni, anagrafica } = await api("impostazioni");
+      S.anagrafica = anagrafica || {};
       if (impostazioni && Array.isArray(impostazioni.retailer) && impostazioni.retailer.length) {
         S.impostazioni = { retailer: impostazioni.retailer, preset: impostazioni.preset || [] };
       }
@@ -208,7 +210,12 @@
   function aggiungiAsin(lista) {
     const presenti = new Set(S.bozza.asin.map((a) => a.asin + a.paese));
     let nuovi = 0;
-    lista.forEach((a) => { if (!presenti.has(a.asin + a.paese)) { S.bozza.asin.push(a); presenti.add(a.asin + a.paese); nuovi++; } });
+    lista.forEach((a) => {
+      if (presenti.has(a.asin + a.paese)) return;
+      const noto = S.anagrafica[`${a.asin}|${a.paese}`];
+      if (!a.modello && noto && noto.modello) a.modello = noto.modello;
+      S.bozza.asin.push(a); presenti.add(a.asin + a.paese); nuovi++;
+    });
     salvaBozza();
     toast(nuovi ? `${nuovi} ASIN aggiunti` : "Nessun ASIN nuovo trovato", nuovi ? "ok" : "");
   }
@@ -219,7 +226,8 @@
       <section class="scheda">
         <div class="scheda-testa">
           <div><h2>Quali TV vuoi confrontare?</h2>
-          <p class="tenue">Incolla gli ASIN in qualsiasi formato: uno per riga, separati da virgole o copiati da Excel. Se sulla riga c'è anche il paese (IT, DE, FR, ES, UK) viene letto in automatico.</p></div>
+          <p class="tenue">Incolla gli ASIN in qualsiasi formato: uno per riga, separati da virgole o copiati da Excel. Se sulla riga c'è anche il paese (IT, DE, FR, ES, UK) viene letto in automatico.
+          Se conosci il modello scrivilo nella colonna Modello: il motore salta Amazon, che a volte blocca le ricerche automatiche. I modelli trovati vengono ricordati per le ricerche successive.</p></div>
         </div>
         <div class="griglia-2">
           <div>
@@ -244,12 +252,13 @@
             ${b.asin.length ? `
               <div class="lista-scroll" style="margin-top:12px">
                 <table class="tabella-asin">
-                  <thead><tr><th>ASIN</th><th>Paese</th><th title="Facoltativo: se Amazon non risponde, il motore usa questo codice">Modello (facolt.)</th><th></th></tr></thead>
+                  <thead><tr><th>ASIN</th><th>Paese</th><th title="Facoltativo: se lo scrivi, il motore non apre Amazon">Modello (facolt.)</th><th></th></tr></thead>
                   <tbody>${b.asin.map((a, i) => `
                     <tr>
                       <td>${esc(a.asin)}</td>
                       <td><select data-i="${i}" data-campo="paese">${T.paesi.map((p) => `<option value="${p.codice}" ${p.codice === a.paese ? "selected" : ""}>${p.bandiera} ${p.codice}</option>`).join("")}</select></td>
-                      <td><input type="text" data-i="${i}" data-campo="modello" value="${esc(a.modello)}" placeholder="es. 55E7Q" style="padding:5px 8px"></td>
+                      <td><input type="text" data-i="${i}" data-campo="modello" value="${esc(a.modello)}" placeholder="${b.mancanti && b.mancanti.includes(a.asin) ? "scrivi il modello" : "es. 55E7Q"}" style="padding:5px 8px${b.mancanti && b.mancanti.includes(a.asin) && !a.modello ? ";border-color:var(--giallo)" : ""}"
+                        title="${S.anagrafica[`${a.asin}|${a.paese}`] ? "Modello già noto da una ricerca precedente" : ""}"></td>
                       <td><button class="btn fantasma piccolo" type="button" data-rimuovi="${i}" aria-label="Rimuovi ${esc(a.asin)}">✕</button></td>
                     </tr>`).join("")}</tbody>
                 </table>
@@ -573,6 +582,7 @@
 
   function disegnaRun(id, dati, st, primo) {
     const s = dati.stato || {}, gh = dati.github || {};
+    S.statoRun = s; // i pulsanti leggono sempre l'ultimo stato ricevuto
     const av = s.avanzamento || { fatti: 0, totale: 1, corrente: st.testo };
     const perc = st.cod === "completato" ? 100 : Math.min(99, Math.round((av.fatti / Math.max(1, av.totale)) * 100));
     const inCorso = st.cod === "corso" || st.cod === "coda";
@@ -591,6 +601,7 @@
       document.getElementById("btnAnnulla").hidden = !inCorso;
       document.getElementById("notaPrep").hidden = !(!dati.stato && inCorso);
       document.getElementById("btnExport").disabled = !risultati.length;
+      document.getElementById("btnMancanti").hidden = !(risultati.some((r) => r.errore) && !inCorso);
       const n = document.getElementById("risultatiZona");
       if (n.dataset.conta !== String(risultati.length) || !inCorso) { n.dataset.conta = risultati.length; disegnaRisultati(n, s, inCorso); }
       return;
@@ -608,6 +619,7 @@
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button class="btn pericolo" type="button" id="btnAnnulla" ${inCorso ? "" : "hidden"}>Annulla</button>
+            <button class="btn" type="button" id="btnMancanti" ${risultati.some((r) => r.errore) && !inCorso ? "" : "hidden"}>Completa i modelli mancanti</button>
             <button class="btn" type="button" id="btnDuplica">Riusa le impostazioni</button>
             <button class="btn primario" type="button" id="btnExport" ${risultati.length ? "" : "disabled"}>${ICONE.scarica} Scarica xlsx</button>
           </div>
@@ -631,14 +643,27 @@
       try { await api("annulla", { metodo: "POST", corpo: { id } }); toast("Annullamento richiesto"); } catch (e) { toast(e.message, "errore"); }
     };
     document.getElementById("btnDuplica").onclick = () => {
-      const c = s.config;
+      const c = S.statoRun.config;
       if (!c) return toast("Configurazione non ancora disponibile", "errore");
       S.bozza = { asin: c.asin.map((a) => ({ modello: "", ...a })), nome: "", paeseDefault: c.asin[0]?.paese || "IT", parametri: Object.assign(clona(T.parametriDefault), c.parametri), preset: "" };
       salvaBozza();
       toast("Impostazioni caricate: controlla e avvia", "ok");
       location.hash = "#/nuova/1";
     };
-    document.getElementById("btnExport").onclick = () => esportaXlsx(s);
+    document.getElementById("btnExport").onclick = () => esportaXlsx(S.statoRun);
+    document.getElementById("btnMancanti").onclick = () => {
+      const s = S.statoRun;
+      const falliti = (s.risultati || []).filter((r) => r.errore);
+      S.bozza = {
+        asin: falliti.map((r) => ({ asin: r.asin, paese: r.paese, modello: "" })),
+        mancanti: falliti.map((r) => r.asin),
+        nome: `${s.nome || "Ricerca"}: modelli mancanti`, paeseDefault: falliti[0]?.paese || "IT",
+        parametri: Object.assign(clona(T.parametriDefault), s.config?.parametri || {}), preset: "",
+      };
+      salvaBozza();
+      toast("Scrivi il modello accanto a ogni ASIN evidenziato, poi avvia", "ok");
+      location.hash = "#/nuova/1";
+    };
     disegnaRisultati(document.getElementById("risultatiZona"), s, inCorso);
   }
 
@@ -746,12 +771,15 @@
             <div class="modello">${esc(a.modello || "Modello non riconosciuto")}</div>
             <div class="etichette">${etichetteInfo(a)}</div>
             ${a.titolo ? `<p class="titolo-amz">${esc(a.titolo)}</p>` : ""}
-            ${r.errore ? `<span class="chip errore" style="white-space:normal">${esc(r.errore)}</span>` : ""}
+            ${r.errore ? `<span class="chip errore" style="white-space:normal">${esc(r.errore === "captcha Amazon" ? "Amazon ha bloccato la lettura (captcha): scrivi il modello e rilancia" : r.errore)}</span>` : ""}
+            ${!r.errore && a.fonte && a.fonte !== "Amazon" ? `<span class="chip ${a.fonte === "ricerca web" ? "attenzione" : "info"}" style="white-space:normal">${a.fonte === "ricerca web" ? "Modello ricavato dal web: verificalo" : a.fonte === "anagrafica" ? "Modello da ricerche precedenti" : "Modello inserito a mano"}</span>` : ""}
           </div>
           <div class="match-griglia">
             ${retDi(r).map((ret) => {
               const m = (r.match || {})[ret.nome];
-              if (m === undefined) return `<div class="match-tile nessuno"><div class="retailer">${esc(ret.nome)}</div><span>Non ancora cercato</span></div>`;
+              const es = (r.esito || {})[ret.nome];
+              if (es === "saltato" || (m === undefined && r.errore)) return `<div class="match-tile nessuno"><div class="retailer">${esc(ret.nome)}</div><span class="piccolo">Saltato: serve il modello Amazon</span></div>`;
+              if (m === undefined) return `<div class="match-tile nessuno"><div class="retailer">${esc(ret.nome)}</div><span>In attesa</span></div>`;
               if (!m.length) {
                 const e = (r.esito || {})[ret.nome] || "nessun_simile";
                 return `<div class="match-tile nessuno ${e}"><div class="retailer">${esc(ret.nome)}<span class="chip ${e === "errore" ? "errore" : ""}">${ESITI[e]}</span></div><span class="piccolo">${ESITI_NOTA[e] || ""}</span></div>`;
@@ -901,7 +929,8 @@
           <aside class="scheda faq">
             <h3>Domande frequenti</h3>
             <details><summary>Perché un retailer non trova niente?</summary><p>Il sito può aver cambiato l'indirizzo di ricerca o bloccato l'accesso automatico. Controlla l'URL nel passo Marketplace e guarda il foglio Dettaglio: "ricerca: timeout" o "HTTP 403" indicano un blocco.</p></details>
-            <details><summary>Cosa vuol dire "anno da verificare"?</summary><p>Il codice non dichiara l'anno e il titolo non lo riporta. Il modello rispetta gli altri criteri: verifica l'anno sulla pagina prodotto o spegni "Accetta anno non ricavabile".</p></details>
+            <details><summary>Amazon ha bloccato la lettura (captcha): cosa faccio?</summary><p>Amazon a volte blocca le visite automatiche. Il motore riprova con indirizzi diversi e poi cerca l'ASIN sul web. Se non basta, apri la ricerca, premi "Completa i modelli mancanti", scrivi il modello accanto all'ASIN (basta il codice, es. 85U8075F) e avvia. Il modello resta salvato per le ricerche successive.</p></details>
+                        <details><summary>Cosa vuol dire "anno da verificare"?</summary><p>Il codice non dichiara l'anno e il titolo non lo riporta. Il modello rispetta gli altri criteri: verifica l'anno sulla pagina prodotto o spegni "Accetta anno non ricavabile".</p></details>
             <details><summary>Posso lanciare più ricerche insieme?</summary><p>Sì, girano in parallelo su GitHub. Ognuna compare nello Storico con il suo stato.</p></details>
             <details><summary>Il prezzo viene letto?</summary><p>No: il confronto si basa solo su codice modello, pollici e caratteristiche tecniche.</p></details>
           </aside>
