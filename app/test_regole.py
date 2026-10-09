@@ -16,6 +16,8 @@ RICONOSCIMENTO = [
     ("XIAOMI TV F 65 2025, 65 pollici (165 cm),4K UHD,Smart TV, Fire TV", ("XIAOMI", "LED", "ENTRY")),
     ("xiaomi tv a pro 32 2026 tv nero", ("XIAOMI", "QLED", "MID")),
     ("Xiaomi TV A 32 TV LED piatto 32 HD", ("XIAOMI", "LED", "BASE")),
+    ("XIAOMI A 32 EU TV LED, SMART TV, 32 \", LCD, HD, Processore Cortex-A55, Black, Classe E", ("XIAOMI", "LED", "BASE")),
+    ("Xiaomi 50APRO2 TV 127 cm (50\") 4K Ultra HD Smart TV Wi-Fi Grigio", ("XIAOMI", "QLED", "MID")),
     ("TCL 75C6K QD-Mini LED 4K 144Hz 2025", ("TCL", "MINILED", "ENTRY")),
     ("TCL 65C7L SQD Mini LED", ("TCL", "MINILED", "MID")),
     ("TCL 55C655 QLED", ("TCL", "QLED", "ENTRY")),
@@ -56,6 +58,8 @@ SOMIGLIANZA = [
     ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED", "Xiaomi TV A Pro 75 2026 QLED 4K", "stessa_marca", True),
     ("XIAOMI TV F 32 2025, 32 pollici (81 cm), HD, Smart TV, Fire TV", "Xiaomi TV A 32 2026", "stessa_marca", True),
     ("XIAOMI TV F 50, 50 pollici (127 cm), 4K UHD, Smart TV, Fire TV", "Xiaomi TV A 50 2026 4K", "stessa_marca", True),
+    ("XIAOMI TV F 50, 50 pollici (127 cm), 4K UHD, Smart TV, Fire TV", "Xiaomi 50APRO2 TV 127 cm (50\") 4K Ultra HD", "stessa_marca", False),
+    ("XIAOMI TV F Pro 50 2025, 50 pollici, 4K UHD QLED", "Xiaomi 50APRO2 TV 127 cm (50\") 4K Ultra HD", "stessa_marca", True),
     ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED", "XIAOMI TV F Pro 75 QLED", "stessa_marca", False),  # stesso modello
     ("Hisense 55E7Q 4K QLED 2026", "Hisense 55A7Q QLED 4K 2026", "stessa_marca", True),
     ("Hisense 55E7Q 4K QLED 2026", "Hisense 55U7Q Mini LED 2026", "stessa_marca", False),  # altra tecnologia

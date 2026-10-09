@@ -312,17 +312,18 @@ def _xiaomi(T: str, info: InfoTV):
     (es. "TV F PRO 75" -> F PRO 75, core 75FPRO; anche dagli URL tipo pidXIA65FPRO).
     Famiglia: A e F (Google TV / Fire TV) sono la stessa fascia; S = Mini LED; MAX = grandi formati."""
     m = (re.search(r"\bXIA(\d{2,3})(A|F|S|MAX|Q)(PRO)?\d?\b", T)
+         or re.search(r"\b(\d{2,3})(A|F|S|Q)(PRO)?\d?\b", T)           # codici tipo 50APRO2, 32A2 (titoli Unieuro)
          or re.search(r"\b(?:TV\s+)?(A|F|S|MAX|Q\d?)(\s+PRO)?\s*(MINI\s?LED)?\b[^0-9]{0,20}?(\d{2,3})\b", T))
     if not m:
         return _xiaomi_codice(T, info)
-    if m.re.pattern.startswith("\\bXIA"):
+    if m.re.pattern.startswith("\\bXIA") or m.re.pattern.startswith("\\b(\\d"):
         poll, serie, pro = int(m.group(1)), m.group(2), bool(m.group(3))
     else:
         serie, pro, poll = m.group(1)[0] if m.group(1) != "MAX" else "MAX", bool(m.group(2)), int(m.group(4))
     if not 24 <= poll <= 115:
         return False
     info.pollici = info.pollici or poll
-    info.pro = pro or " PRO" in T
+    info.pro = pro or bool(re.search(r"\bPRO\b", T))
     info.codice = f"{serie}{' PRO' if info.pro else ''} {info.pollici}"
     info.core = f"{info.pollici}{serie}{'PRO' if info.pro else ''}"
     # i 32"/40" HD della linea base formano una famiglia a sé; un PRO resta PRO anche se HD
@@ -344,7 +345,7 @@ def _xiaomi_codice(T: str, info: InfoTV):
     info.pollici = info.pollici or int(m.group(1))
     suff = m.group(2) or ""
     serie = "F" if suff.startswith("F") or "FIRE TV" in T else "A"
-    info.pro = "PRO" in suff or " PRO" in T
+    info.pro = "PRO" in suff or bool(re.search(r"\bPRO\b", T))
     info.codice = m.group(0)
     info.core = f"{info.pollici}{serie}{'PRO' if info.pro else ''}"
     info.tecnologia = tecnologia_testo(T) or ("QLED" if info.pro else "LED")
@@ -363,7 +364,7 @@ def _generica(T: str, info: InfoTV):
     altrimenti famiglia = marca + serie letterale (es. SHARP-GR8), senza la tecnologia del titolo."""
     m = re.search(r"\b(?:[A-Z]{1,4})?(\d{2,3})([A-Z]{1,4})(\d{1,4})([A-Z0-9]*)\b", T)
     tec_titolo = tecnologia_testo(T)
-    info.pro = " PRO" in T
+    info.pro = bool(re.search(r"\bPRO\b", T))
     info.regola = "GENERICA"
     if not m and info.marca == "SONY":
         b = re.search(r"BRAVIA\s?([2-9])\b", T)
