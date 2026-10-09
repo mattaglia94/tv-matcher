@@ -188,7 +188,15 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
                 errori.append(stato)
                 out["dettaglio"].append({"retailer": r["nome"], "esito": f"ricerca: {stato}", "url": url_s, "ricerca": q})
             for l in links:
+                if l["url"].split("?")[0] == url_s.split("?")[0]:
+                    continue  # filtri della pagina di ricerca (marca, prezzo...), non prodotti
                 c = analizza(l["testo"])
+                if not c.codice:
+                    # molti retailer mettono il codice modello solo nell'indirizzo (es. _tcl-75t69c-..., pidSAMQE75QN70H)
+                    slug = re.sub(r"pid[A-Z]{3}", " ", l["url"].split("?")[0].rsplit("/", 1)[-1])
+                    c2 = analizza(f"{l['testo']} {re.sub(r'[-_.]+', ' ', slug)}")
+                    if c2.codice and c2.marca == c.marca and (not c.pollici or c2.pollici == c.pollici):
+                        c = c2
                 if not c.marca or not c.pollici:
                     continue
                 tv_letti += 1
@@ -238,8 +246,8 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
                                              "esito": f"scartato: anno {full.anno} (da pagina)"})
                     continue
-                if full.anno:
-                    motivo = "ok"
+                if full.anno:  # anno letto sulla pagina: non è più "da verificare"
+                    motivo = ", ".join(x for x in motivo.split(", ") if x != "anno da verificare") or "ok"
                 im = og or im
                 nome_pag = titolo_pag.strip()
                 # il codice sulla pagina prodotto è il più affidabile: se c'è, vince

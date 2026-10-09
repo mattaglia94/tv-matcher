@@ -294,6 +294,13 @@ def _xiaomi_codice(T: str, info: InfoTV):
 # Servono a dare a ogni modello una tecnologia e una fascia stabili, che NON dipendono
 # da quali parole compaiono nel titolo del retailer.
 SERIE = {
+    "HISENSE": [  # serie non coperte dalle regole del documento (_hisense)
+        (r"^UR9|^UXQ|^UX", "MINILED", "TOP"),
+        (r"^UR8", "MINILED", "PREMIUM"),
+        (r"^Q8", "MINILED", "MID"),
+        (r"^Q[67]", "QLED", "ENTRY"),
+        (r"^S[5-9]", "QLED", "MID"),          # linea Deco/design
+    ],
     "TCL": [
         (r"^X\d", "MINILED", "TOP"),
         (r"^QM\d", "MINILED", "MID"),
@@ -344,6 +351,13 @@ SERIE = {
 }
 
 
+# Sony senza codice nel titolo: "BRAVIA 8 65"
+_SONY_BRAVIA = {"9": ("MINILED", "TOP"), "8": ("OLED", "PREMIUM"), "7": ("MINILED", "MID"),
+                "5": ("MINILED", "ENTRY"), "3": ("LED", "ENTRY"), "2": ("LED", "BASE")}
+# marche economiche senza tabella: fascia predefinita (BASE se HD/Full HD)
+_MARCHE_ECONOMICHE = {"TOSHIBA", "METZ", "TELEFUNKEN", "THOMSON", "SHARP", "GRUNDIG", "VIDAA"}
+
+
 def _generica(T: str, info: InfoTV):
     """Altre marche (TCL, Philips, Sony...): codice = primo token con pollici+lettere.
     Se la serie è nella tabella SERIE: famiglia = marca + tecnologia + fascia della tabella;
@@ -352,10 +366,29 @@ def _generica(T: str, info: InfoTV):
     tec_titolo = tecnologia_testo(T)
     info.pro = " PRO" in T
     info.regola = "GENERICA"
+    if not m and info.marca == "SONY":
+        b = re.search(r"BRAVIA\s?([2-9])\b", T)
+        if b and not info.pollici:  # "SONY 65 BRAVIA 8": diagonale come numero isolato
+            n = re.search(r"\b(3[2-9]|[4-9]\d|1[01]\d)\b", T)
+            info.pollici = int(n.group(1)) if n else None
+        if b and info.pollici:
+            info.tecnologia, info.fascia = _SONY_BRAVIA[b.group(1)]
+            info.codice = f"BRAVIA {b.group(1)} {info.pollici}"
+            info.core = f"{info.pollici}BRAVIA{b.group(1)}"
+            info.famiglia = f"SONY-{info.tecnologia}-{info.fascia}"
+            info.regola = "SONY-bravia"
+            return True
+    if not m:  # codici tipo TE43759S48U4P (Telefunken): lettere + pollici + cifre
+        m2 = re.search(r"\b[A-Z]{1,3}(\d{2})\d{2,4}[A-Z][A-Z0-9]{2,}\b", T)
+        if m2 and (not info.pollici or int(m2.group(1)) == info.pollici):
+            info.codice = m2.group(0)
+            info.pollici = info.pollici or int(m2.group(1))
+            info.core = m2.group(0)
     if not m:
         info.tecnologia = tec_titolo
         info.famiglia = f"{info.marca}-"
-        return False
+        _fascia_economica(T, info)
+        return bool(info.codice)
     info.codice = m.group(0)
     info.pollici = info.pollici or int(m.group(1))
     info.core = m.group(1) + m.group(2) + m.group(3)
@@ -369,7 +402,14 @@ def _generica(T: str, info: InfoTV):
             return True
     info.tecnologia = tec_titolo
     info.famiglia = f"{info.marca}-{m.group(2)}{m.group(3)[0]}"
+    _fascia_economica(T, info)
     return True
+
+
+def _fascia_economica(T: str, info: InfoTV):
+    if info.marca in _MARCHE_ECONOMICHE and not info.fascia:
+        info.fascia = "BASE" if trova_risoluzione(T) in ("HD", "FHD") else "ENTRY"
+        info.tecnologia = info.tecnologia or "LED"
 
 
 # fascia comune per le marche con regole proprie (LG, Hisense, Samsung): ricavata dalla famiglia
@@ -521,7 +561,10 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
         return False, "PRO vs non-PRO", 0
     if P["risoluzione"]["attivo"] and amz.risoluzione and cand.risoluzione \
             and amz.risoluzione != cand.risoluzione:
-        return False, f"risoluzione {cand.risoluzione}", 0
+        if not (concorrente and {amz.risoluzione, cand.risoluzione} <= {"HD", "FHD"}):
+            return False, f"risoluzione {cand.risoluzione}", 0
+        note.append(f"risoluzione {cand.risoluzione}")
+        score += 10
     if P["refresh"]["attivo"] and classe_hz(amz.hz) and classe_hz(cand.hz) \
             and classe_hz(amz.hz) != classe_hz(cand.hz):
         return False, f"refresh {cand.hz}Hz", 0
