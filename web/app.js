@@ -37,11 +37,12 @@
     play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
     tv: '<svg viewBox="0 0 64 48" fill="none"><rect x="2" y="2" width="60" height="38" rx="7" stroke="#A9A3D6" stroke-width="3"/><path d="M22 46h20" stroke="#A9A3D6" stroke-width="3" stroke-linecap="round"/><g opacity=".8"><rect x="10" y="10" width="8.8" height="22" fill="#FFD23F"/><rect x="18.8" y="10" width="8.8" height="22" fill="#2EE6F0"/><rect x="27.6" y="10" width="8.8" height="22" fill="#4BE38E"/><rect x="36.4" y="10" width="8.8" height="22" fill="#FF4FA3"/><rect x="45.2" y="10" width="8.8" height="22" fill="#7B61FF"/></g></svg>',
   };
-  const ESITI = { saltato: "Saltato", trovato: "Trovato", non_presente: "Prodotto non presente", nessun_simile: "Nessun modello simile", errore: "Ricerca non riuscita" };
+  const ESITI = { saltato: "Saltato", trovato: "Trovato", non_presente: "Prodotto non presente", nessun_simile: "Nessun modello simile", errore: "Ricerca non riuscita", illeggibile: "Risultati non leggibili" };
   const ESITI_NOTA = {
     non_presente: "Nessun TV di questa marca e diagonale nel catalogo del retailer.",
     nessun_simile: "Ci sono TV della stessa marca e diagonale, ma nessuno rispetta i criteri.",
     errore: "Il sito non ha risposto o ha bloccato la ricerca: riprova più tardi.",
+    illeggibile: "La pagina si è aperta ma non mostrava TV leggibili (probabile blocco): verifica a mano.",
   };
   const barre = '<div class="barre" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>';
 
@@ -88,16 +89,17 @@
   // ------------------------------------------------------------------ router
   async function router() {
     clearInterval(S.polling);
+    S.polling = null;
     const [, vista, arg] = (location.hash || "#/nuova").split("/");
     document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("attivo", a.dataset.nav === vista || (vista === "run" && a.dataset.nav === "esecuzioni")));
     document.getElementById("topbar").hidden = vista === "login";
     if (vista === "login") return vistaLogin();
+    aggiornaPill();
     if (vista === "run" && arg) return vistaRun(arg);
     if (vista === "esecuzioni") return vistaStorico();
     if (vista === "guida") return vistaGuida();
     if (arg) S.passo = Math.min(4, Math.max(1, Number(arg) || 1));
     vistaNuova();
-    aggiornaPill();
   }
   window.addEventListener("hashchange", router);
 
@@ -109,6 +111,8 @@
     try {
       const { runs } = await api("runs");
       const attive = runs.filter((r) => r.status !== "completed");
+      clearTimeout(S.timerPill);
+      if (attive.length) S.timerPill = setTimeout(() => aggiornaPill(true), 20000);
       const pill = document.getElementById("pillAttiva");
       pill.hidden = !attive.length;
       if (attive.length) {
@@ -782,7 +786,7 @@
               if (m === undefined) return `<div class="match-tile nessuno"><div class="retailer">${esc(ret.nome)}</div><span>In attesa</span></div>`;
               if (!m.length) {
                 const e = (r.esito || {})[ret.nome] || "nessun_simile";
-                return `<div class="match-tile nessuno ${e}"><div class="retailer">${esc(ret.nome)}<span class="chip ${e === "errore" ? "errore" : ""}">${ESITI[e]}</span></div><span class="piccolo">${ESITI_NOTA[e] || ""}</span></div>`;
+                return `<div class="match-tile nessuno ${e}"><div class="retailer">${esc(ret.nome)}<span class="chip ${e === "errore" || e === "illeggibile" ? "errore" : ""}">${ESITI[e]}</span></div><span class="piccolo">${ESITI_NOTA[e] || ""}</span></div>`;
               }
               const [x, ...altri] = m;
               return `

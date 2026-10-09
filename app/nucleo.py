@@ -6,6 +6,7 @@ from regole import analizza, confronta_param, stesso_modello, unisci_parametri
 
 ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
          "nessun_simile": "Nessun modello simile", "errore": "Ricerca non riuscita",
+         "illeggibile": "Risultati non leggibili",
          "saltato": "Saltato: modello Amazon mancante"}
 
 AMAZON_DOMINIO = {"IT": "amazon.it", "DE": "amazon.de", "FR": "amazon.fr",
@@ -103,7 +104,7 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
         if stop():
             break
         validi = {}
-        pertinenti, ricerche_ok, errori = 0, 0, []
+        pertinenti, ricerche_ok, errori, tv_letti = 0, 0, [], 0
         for q in query_ricerca(info, P):
             url_s, links, stato = br.cerca(r["url"], q)
             # 404 su una pagina di ricerca = nessun risultato, non un errore
@@ -116,6 +117,7 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
                 c = analizza(l["testo"])
                 if not c.marca or not c.pollici:
                     continue
+                tv_letti += 1
                 if c.marca == info.marca and c.pollici == info.pollici:
                     pertinenti += 1
                 if P["stessa_marca"]["attivo"] and c.marca != info.marca:
@@ -173,8 +175,11 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
             esito = "trovato"
         elif pertinenti:
             esito = "nessun_simile"
-        elif ricerche_ok:
+        elif ricerche_ok and tv_letti:
             esito = "non_presente"
+        elif ricerche_ok:
+            # pagina caricata ma nessun TV riconoscibile: quasi sempre blocco anti-bot o pagina dinamica
+            esito = "illeggibile"
         else:
             esito = "errore"
         out["esito"][r["nome"]] = esito

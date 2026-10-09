@@ -241,6 +241,32 @@ def _samsung(T: str, info: InfoTV):
     return True
 
 
+# ----------------------------------------------------------------- Xiaomi
+def _xiaomi(T: str, info: InfoTV):
+    """Xiaomi non usa codici modello nei titoli: il "codice" è serie + pollici
+    (es. "TV F PRO 75" -> F PRO 75, core 75FPRO; anche dagli URL tipo pidXIA65FPRO).
+    Famiglia: A e F (Google TV / Fire TV) sono la stessa fascia; S = Mini LED; MAX = grandi formati."""
+    m = (re.search(r"\bXIA(\d{2,3})(A|F|S|MAX|Q)(PRO)?\d?\b", T)
+         or re.search(r"\b(?:TV\s+)?(A|F|S|MAX|Q\d?)(\s+PRO)?\s*(MINI\s?LED)?\b[^0-9]{0,20}?(\d{2,3})\b", T))
+    if not m:
+        return False
+    if m.re.pattern.startswith("\\bXIA"):
+        poll, serie, pro = int(m.group(1)), m.group(2), bool(m.group(3))
+    else:
+        serie, pro, poll = m.group(1)[0] if m.group(1) != "MAX" else "MAX", bool(m.group(2)), int(m.group(4))
+    if not 24 <= poll <= 115:
+        return False
+    info.pollici = info.pollici or poll
+    info.pro = pro or " PRO" in T
+    info.codice = f"{serie}{' PRO' if info.pro else ''} {info.pollici}"
+    info.core = f"{info.pollici}{serie}{'PRO' if info.pro else ''}"
+    info.tecnologia = tecnologia_testo(T) or ("MINILED" if serie == "S" else "QLED" if (info.pro or serie == "MAX") else "LED")
+    fascia = {"A": "AF", "F": "AF", "Q": "AF", "S": "S", "MAX": "MAX"}[serie]
+    info.famiglia = f"XIAOMI-{info.tecnologia}-{fascia}"
+    info.regola = "XIAOMI"
+    return True
+
+
 # ----------------------------------------------------------------- generica
 def _generica(T: str, info: InfoTV):
     """Altre marche (TCL, Philips, Sony...): codice = primo token con pollici+lettere,
@@ -277,6 +303,8 @@ def analizza(testo: str, codice_noto: str = "") -> InfoTV:
         ok = _hisense(T, info)
     elif info.marca == "SAMSUNG":
         ok = _samsung(T, info)
+    elif info.marca == "XIAOMI":
+        ok = _xiaomi(T, info)
     if not ok:
         _generica(T, info)
     if pollici_testo and info.pollici != pollici_testo:
