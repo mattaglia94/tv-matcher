@@ -152,8 +152,10 @@ def classe_hz(hz):
 
 
 def trova_anno_testo(t: str) -> int | None:
+    # il PRIMO anno è quello del nome del modello ("A Pro 75 2026 ... uscita 2025"): gli anni successivi
+    # sono di solito data di lancio, etichetta energetica o altro
     m = re.findall(r"\b(20[2-3]\d)\b", _norm(t))
-    return int(m[-1]) if m else None
+    return int(m[0]) if m else None
 
 
 def tecnologia_testo(t: str) -> str:

@@ -150,6 +150,9 @@ SCHEDE = [  # (titolo ASIN, scheda Amazon, titolo negozio, scheda negozio, param
     (F75, {"_idealo": [("Xiaomi A Pro 75 (2025)", "Herstellernummer L75M9-A2EU"),
                        ("Xiaomi A Pro 75 (2026) 4K QLED", "Herstellernummer: L75MB-APEU")]}, OTTO75, {"_stato": 400}, STRETTO, True, None),
     (F75, {"_idealo": [("Xiaomi A Pro 75 (2025)", "Herstellernummer: L75MB-APEU")]}, OTTO75, {"_stato": 400}, STRETTO, False, None),
+    # idealo reale: nome "A Pro 75 2026" seguito dalla data di lancio 2025
+    (F75, {"_idealo": [("Xiaomi A Pro 75 2026 Xiaomi A Pro 75 2026 4K-Fernseher, 2025, HDR, 3.840 x 2.160",
+                        "Zum Shop | Xiaomi L75MB-APEU QLED-Fernseher (189 cm/75 Zoll)")]}, OTTO75, {"_stato": 400}, STRETTO, True, None),
     # stesso nome, ma il codice non compare da nessuna parte: l'anno NON va indovinato
     (F75, {"_idealo": [("Xiaomi A Pro 75 (2025)", "nessun codice"), ("Xiaomi A Pro 75 (2026)", "nessun codice")]},
      OTTO75, {"_stato": 400}, STRETTO, False, None),
