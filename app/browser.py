@@ -205,14 +205,14 @@ class Browser:
         try:  # riga "Marca" della scheda tecnica, altrimenti il link "Visita lo Store di ..."
             for r in self.page.locator("tr, #detailBullets_feature_div li, #productOverview_feature_div tr").all_inner_texts():
                 r1 = re.sub(r"[\u200e\u200f]", "", r).strip()
-                mm = re.match(r"(?:Marca|Marke|Marque|Brand)\s*[:\t\n]+\s*(.+)", r1, re.I)
+                mm = re.match(r"(?:Marchio|Marca|Marke|Marque|Brand)\s*[:\t\n]+\s*(.+)", r1, re.I)
                 if mm:
                     marca = mm.group(1).split("\n")[0].strip()
                     break
             if not marca:
                 by = self.page.locator("#bylineInfo").first.inner_text(timeout=2000)
                 mm = re.search(r"(?:Store di|Store von|boutique|Store de|Visit the)\s+(.+?)(?:\s+Store)?$", by.strip(), re.I) or \
-                    re.search(r"(?:Marca|Marke|Marque|Brand)\s*:\s*(.+)", by, re.I)
+                    re.search(r"(?:Marchio|Marca|Marke|Marque|Brand)\s*:\s*(.+)", by, re.I)
                 marca = mm.group(1).strip() if mm else ""
         except Exception:
             pass

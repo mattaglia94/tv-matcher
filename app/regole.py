@@ -325,7 +325,7 @@ def _xiaomi(T: str, info: InfoTV):
     info.pro = pro or " PRO" in T
     info.codice = f"{serie}{' PRO' if info.pro else ''} {info.pollici}"
     info.core = f"{info.pollici}{serie}{'PRO' if info.pro else ''}"
-    info.chiave = serie
+    info.chiave = serie + ("-HD" if trova_risoluzione(T) in ("HD", "FHD") and serie in ("A", "F") else "")
     info.tecnologia = tecnologia_testo(T) or ("MINILED" if serie == "S" else "QLED" if (info.pro or serie == "MAX") else "LED")
     fam = {"A": "AF", "F": "AF", "Q": "AF", "S": "S", "MAX": "MAX"}[serie]
     info.famiglia = f"XIAOMI-{info.tecnologia}-{fam}"
