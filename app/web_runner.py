@@ -87,15 +87,55 @@ class Pubblicatore:
         print(f"⚠ salvataggio stato non riuscito ({st})")
 
 
-def main():
+MAX_PROCESSI = int(os.environ.get("MAX_PROCESSI", "6"))  # browser in parallelo (uno per gruppo di negozi)
+
+
+def lavoratore(retailer_gruppo, P, catalogo, cache, coda_in, coda_out):
+    """Processo per uno o più negozi: ha un browser suo e confronta gli ASIN man mano che arrivano.
+    Negozi diversi lavorano in parallelo; sullo stesso negozio le richieste restano una alla volta."""
+    import traceback as tb
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from browser import Browser
-    from nucleo import elabora_asin
-    from regole import catalogo_predefinito, imposta_catalogo, unisci_catalogo
+    from nucleo import confronta_retailer
+    from regole import imposta_catalogo
+    imposta_catalogo(catalogo)
+    log = lambda m: coda_out.put(("log", m))  # noqa: E731
+    br = None
+    try:
+        br = Browser(visibile=False, log=log, cache=cache)
+        while True:
+            job = coda_in.get()
+            if job is None:
+                break
+            idx, info, paese, nome_r = job
+            r = retailer_gruppo[nome_r]
+            try:
+                parte = confronta_retailer(br, info, r, P, paese, log)
+            except Exception as e:  # un errore su un negozio non ferma gli altri
+                log(f"   {nome_r}: errore ({e})")
+                print(tb.format_exc(), flush=True)
+                parte = {"match": {nome_r: []}, "esito": {nome_r: "errore"}, "ponte": {},
+                         "dettaglio": [{"retailer": nome_r, "esito": f"errore del motore: {e}"}]}
+            coda_out.put(("ris", idx, nome_r, parte))
+    finally:
+        nuova = br.cache_nuova() if br else {}
+        if br:
+            br.chiudi()
+        coda_out.put(("fine", list(retailer_gruppo), nuova))
+
+
+def main():
+    import multiprocessing as mp
+    import queue as q_mod
+    from browser import Browser
+    from nucleo import prepara_asin, unisci_retailer
+    from regole import catalogo_predefinito, imposta_catalogo, unisci_catalogo, unisci_parametri
 
     cfg = json.loads(os.environ.get("CONFIG") or open(sys.argv[1], encoding="utf-8").read())
     asins = cfg.get("asin", [])
     retailer = [r for r in cfg.get("retailer", []) if r.get("attivo", True)]
     parametri = cfg.get("parametri", {})
+    P = unisci_parametri(parametri)
     per_paese = {}
     for r in retailer:
         per_paese.setdefault(r["paese"].upper(), []).append(r)
@@ -106,7 +146,9 @@ def main():
     pub = Pubblicatore(f"runs/{RUN_ID}/stato.json")
     anagrafica = leggi_json("config/anagrafica_asin.json") or {}
     # catalogo marche e serie: predefinito + modifiche fatte dal sito
-    imposta_catalogo(unisci_catalogo(catalogo_predefinito(), leggi_json("config/catalogo.json")))
+    catalogo = unisci_catalogo(catalogo_predefinito(), leggi_json("config/catalogo.json"))
+    imposta_catalogo(catalogo)
+    cache = pulisci_cache(leggi_json("cache/pagine.json") or {})
     anagrafica_nuova = {}
     stato = {"id": RUN_ID, "nome": cfg.get("nome", ""), "stato": "in_corso",
              "github_run": os.environ.get("GITHUB_RUN_ID", ""),
@@ -122,29 +164,79 @@ def main():
 
     pub.salva(stato, forza=True)
     br = None
+    ctx = mp.get_context("spawn")
+    coda_out = ctx.Queue()
+    processi, code_in, gruppo_di = [], [], {}
+    attesi = 0
+    cache_nuova = {}
+
+    def raccogli(blocca=False):
+        nonlocal attesi
+        while True:
+            try:
+                ev = coda_out.get(timeout=2 if blocca else 0.05)
+            except q_mod.Empty:
+                return
+            if ev[0] == "log":
+                log(ev[1])
+            elif ev[0] == "ris":
+                _, idx, nome_r, parte = ev
+                unisci_retailer(stato["risultati"][idx], parte)
+                stato["avanzamento"]["fatti"] += 1
+                attesi -= 1
+                pub.salva(stato)
+            elif ev[0] == "fine":
+                cache_nuova.update(ev[2])
+            if blocca and attesi <= 0:
+                return
+
     try:
-        br = Browser(visibile=False, log=log)
+        # negozi divisi in gruppi: ogni gruppo ha un processo con il suo browser
+        nomi = [r["nome"] for r in retailer]
+        n_proc = max(1, min(MAX_PROCESSI, len(nomi)))
+        for k in range(n_proc):
+            gruppo = {r["nome"]: r for j, r in enumerate(retailer) if j % n_proc == k}
+            qi = ctx.Queue()
+            pr = ctx.Process(target=lavoratore, args=(gruppo, P, catalogo, cache, qi, coda_out), daemon=True)
+            pr.start()
+            processi.append(pr)
+            code_in.append(qi)
+            for n in gruppo:
+                gruppo_di[n] = k
+        log(f"Motore avviato: {len(nomi)} negozi su {n_proc} browser in parallelo")
+        br = Browser(visibile=False, log=log, cache=cache)  # Amazon: un ASIN alla volta
         for i, a in enumerate(asins, 1):
             paese = a.get("paese", "IT").upper()
             ret = per_paese.get(paese, [])
             stato["avanzamento"]["corrente"] = f"ASIN {i}/{len(asins)} · {a['asin']} ({paese})"
             log(f"[{i}/{len(asins)}] {a['asin']} · {paese}")
-
-            def log_ret(m):
-                if m.strip().split(":")[0] in {r["nome"] for r in ret}:
-                    stato["avanzamento"]["fatti"] += 1
-                log(m)
-            res = elabora_asin(br, a, ret, parametri, log=log_ret, anagrafica=anagrafica)
-            am = res.get("amazon", {})
+            out, info = prepara_asin(br, a, ret, P, log, anagrafica)
+            stato["risultati"].append(out)
+            idx = len(stato["risultati"]) - 1
+            am = out.get("amazon", {})
             if am.get("fonte") in ("Amazon", "inserito a mano", "ricerca web") and am.get("modello") and am.get("pollici"):
                 anagrafica_nuova[f"{a['asin']}|{paese}"] = {
                     "modello": am["modello"], "titolo": am.get("titolo", ""), "img": am.get("img", ""),
                     "marca": am.get("marca_amazon", ""),
                     "fonte": am["fonte"], "aggiornato": dt.datetime.utcnow().strftime("%Y-%m-%d")}
-            if res.get("errore") and not res["match"]:
+            if info is None:
                 stato["avanzamento"]["fatti"] += len(ret)
-            stato["risultati"].append(res)
+            else:
+                for r in ret:
+                    code_in[gruppo_di[r["nome"]]].put((idx, info, paese, r["nome"]))
+                    attesi += 1
             pub.salva(stato, forza=True)
+            raccogli()
+        br.chiudi()
+        br = None
+        stato["avanzamento"]["corrente"] = "Confronto sui negozi in corso"
+        for qi in code_in:
+            qi.put(None)
+        while attesi > 0 and any(p.is_alive() for p in processi):
+            raccogli(blocca=True)
+        raccogli()
+        if attesi > 0:
+            raise RuntimeError(f"{attesi} confronti non completati (un browser si è chiuso)")
         stato["stato"] = "completato"
     except Exception as e:
         stato["stato"] = "errore"
@@ -153,6 +245,9 @@ def main():
     finally:
         if br:
             br.chiudi()
+        for p in processi:
+            p.join(timeout=20)
+        raccogli()
         stato["finito"] = dt.datetime.utcnow().isoformat() + "Z"
         stato["avanzamento"]["corrente"] = {"completato": "Completato", "errore": "Interrotto per errore"}.get(stato["stato"], "")
         pub.salva(stato, forza=True)
@@ -161,8 +256,20 @@ def main():
             ana.update(anagrafica_nuova)
             Pubblicatore("config/anagrafica_asin.json").salva(ana, forza=True)
             print(f"Anagrafica ASIN aggiornata: {len(anagrafica_nuova)} modelli")
+        if cache_nuova and REPO and TOKEN:
+            tutta = pulisci_cache({**(leggi_json("cache/pagine.json") or {}), **cache_nuova})
+            Pubblicatore("cache/pagine.json").salva(tutta, forza=True)
+            print(f"Cache pagine aggiornata: {len(cache_nuova)} nuove, {len(tutta)} totali")
     if stato["stato"] == "errore":
         sys.exit(1)
+
+
+def pulisci_cache(c, giorni=30, massimo=4000):
+    """Tiene solo le voci recenti (pagine prodotto e anni letti negli ultimi 30 giorni)."""
+    limite = (dt.datetime.utcnow() - dt.timedelta(days=giorni)).strftime("%Y-%m-%d")
+    voci = [(k, v) for k, v in c.items() if isinstance(v, dict) and v.get("data", "") >= limite]
+    voci.sort(key=lambda kv: kv[1].get("data", ""), reverse=True)
+    return dict(voci[:massimo])
 
 
 if __name__ == "__main__":

@@ -79,6 +79,9 @@ def anno_da_idealo(br, c, paese, log=print):
     chiave = (dom, c.codice)
     if chiave in _ANNI_IDEALO:
         return _ANNI_IDEALO[chiave]
+    noto = br.cache_get(f"anno:{dom}:{c.codice}") if hasattr(br, "cache_get") else None
+    if noto:
+        return noto.get("anno")
     cod = re.sub(r"[^A-Z0-9]", "", c.codice.upper())
     anno = None
     try:
@@ -100,6 +103,8 @@ def anno_da_idealo(br, c, paese, log=print):
     except Exception:
         anno = None
     _ANNI_IDEALO[chiave] = anno
+    if anno and hasattr(br, "cache_put"):
+        br.cache_put(f"anno:{dom}:{c.codice}", {"anno": anno})
     return anno
 
 
@@ -215,11 +220,8 @@ def riconosci_amazon(br, riga, anagrafica=None, log=print):
     return {**dati, "nota": a["errore"] or "modello Amazon non riconosciuto"}
 
 
-def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, anagrafica=None):
-    """riga: {asin, paese, nome?, modello?}; retailer: [{nome, url}] del paese della riga.
-    Ritorna dict con dati Amazon, match per retailer e righe di dettaglio."""
-    P = unisci_parametri(parametri)
-    concorrente = P["modalita"] == "concorrente"
+def prepara_asin(br, riga, retailer, P, log=print, anagrafica=None):
+    """Fase 1 (sequenziale, Amazon): riconosce l'ASIN. Ritorna (out, info); info è None se l'ASIN va saltato."""
     paese = (riga.get("paese") or "IT").upper()
     out = {"asin": riga["asin"], "paese": paese, "amazon": {}, "match": {}, "esito": {}, "dettaglio": [], "errore": ""}
     url_amz = f"https://www.{AMAZON_DOMINIO.get(paese, 'amazon.it')}/dp/{riga['asin']}"
@@ -238,156 +240,183 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
         out["errore"] = nota or ("fascia del modello Amazon non riconosciuta" if non_classificato else "modello Amazon non riconosciuto")
         out["esito"] = {r["nome"]: "saltato" for r in retailer}
         log("   ⚠ modello Amazon non riconosciuto: scrivere il modello a mano")
-        return out
-    max_m = max(1, int(P.get("max_match") or 1))
+        return out, None
     out["ponte"] = {}
+    return out, info
+
+
+def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
+    """Fase 2 (un negozio): cerca i modelli simili all'ASIN su un retailer.
+    Ritorna {match, esito, dettaglio, ponte} per quel retailer (indipendente dagli altri: si può parallelizzare)."""
+    concorrente = P["modalita"] == "concorrente"
+    max_m = max(1, int(P.get("max_match") or 1))
+    out = {"match": {}, "esito": {}, "dettaglio": [], "ponte": {}}
+    r = {**r, "url": URL_CORRETTI.get(r["url"], r["url"])}
+    validi = {}
+    pertinenti, ricerche_ok, errori, tv_letti = 0, 0, [], 0
+    for q in query_ricerca(info, P):
+        url_s, links, stato = br.cerca(r["url"], q)
+        # 404 su una pagina di ricerca = nessun risultato, non un errore
+        if stato == "ok" or stato == "HTTP 404":
+            ricerche_ok += 1
+        else:
+            errori.append(stato)
+            out["dettaglio"].append({"retailer": r["nome"], "esito": f"ricerca: {stato}", "url": url_s, "ricerca": q})
+        for l in links:
+            if l["url"].split("?")[0] == url_s.split("?")[0]:
+                continue  # filtri della pagina di ricerca (marca, prezzo...), non prodotti
+            c = analizza(l["testo"], prezzo=leggi_prezzo(l["testo"]))
+            if not c.codice or "caratteristiche" in c.note:
+                # molti retailer mettono il codice modello solo nell'indirizzo (es. _tcl-75t69c-..., pidSAMQE75QN70H)
+                # Unieuro: pid + 3 lettere della marca (pidSAMQE75QN70H, pidXIA50APRO2)
+                slug = l["url"].split("?")[0].rsplit("/", 1)[-1]
+                slug = re.sub(r"pid([A-Z]{3})", lambda m: f" {PID_MARCHE.get(m.group(1), '')} " + ("XIA" if m.group(1) == "XIA" else ""), slug)
+                c2 = analizza(f"{l['testo']} {re.sub(r'[-_.]+', ' ', slug)}", prezzo=leggi_prezzo(l["testo"]))
+                if c2.codice and "caratteristiche" not in c2.note and (not c.marca or c2.marca == c.marca) and \
+                        (not c.pollici or c2.pollici == c.pollici):
+                    c = c2
+            if not c.marca or not c.pollici:
+                continue
+            tv_letti += 1
+            if (c.marca != info.marca) == concorrente:
+                if c.pollici == info.pollici:
+                    pertinenti += 1
+            else:
+                continue  # stessa marca in modalità concorrente, o altra marca in modalità stessa marca
+            ok, motivo, score = confronta_param(info, c, P)
+            out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "famiglia": c.famiglia,
+                                     "pollici": c.pollici, "anno": c.anno, "url": l["url"],
+                                     "esito": ("VALIDO " if ok else "scartato: ") + motivo, "ricerca": q})
+            if ok and l["url"] not in validi:
+                validi[l["url"]] = (score, c, l.get("img", ""), motivo)
+        if len(validi) >= max_m + 2:  # qualche riserva: la verifica della pagina può scartarne
+            break
+    scelti, codici = [], set()
+    for url, (score, c, im, motivo) in sorted(validi.items(), key=lambda x: x[1][0]):
+        nome_pag = ""
+        if len(scelti) >= max_m:
+            break
+        if c.codice in codici:
+            continue
+        if P.get("verifica_url", True):
+            res = br.verifica(url)
+            vivo, titolo_pag, corpo, og = res[:4]
+            sch_raw = res[4] if len(res) > 4 else {}
+            sp = leggi_scheda({k: v for k, v in sch_raw.items() if not k.startswith("_")})
+            if not vivo:
+                stato_p = sch_raw.get("_stato")
+                if stato_p in (404, 410):  # prodotto davvero non più in vendita
+                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url, "esito": "URL non attivo"})
+                    continue
+                # pagina bloccata dal sito (anti-bot) o lenta: il prodotto c'è, si usano i dati della ricerca
+                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                         "esito": f"pagina prodotto non apribile ({stato_p or 'timeout'}): uso i dati della ricerca"})
+                titolo_pag, corpo, og = c.testo, "", ""
+                motivo = ", ".join(x for x in [motivo if motivo != "ok" else "", "pagina non verificabile"] if x)
+            cp = analizza(titolo_pag)
+            n_voci = len([k for k in sch_raw if not k.startswith("_")])
+            letti = ", ".join(f"{k} {v}" for k, v in sp.items() if k in ("anno", "pollici", "risoluzione", "tecnologia", "hz") and v)
+            if vivo:
+                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                         "esito": f"scheda tecnica: {letti or 'nessun dato utile'} ({n_voci} voci)"})
+            pol_pag = sp.get("pollici") or (cp.pollici if cp.codice else None)
+            if pol_pag and P["pollici"]["attivo"] and abs(pol_pag - info.pollici) > int(P["pollici"].get("tolleranza") or 0):
+                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                         "esito": f"pagina prodotto non coerente ({pol_pag}\")"})
+                continue
+            # caratteristiche: scheda tecnica, poi titolo; il testo libero della pagina solo per le funzioni HDR/HDMI
+            full = arricchisci(analizza(f"{titolo_pag} {corpo[:20000]}", c.codice), sp)
+            mancanti = [n for k, n in (("dolby_vision", "Dolby Vision"), ("hdr10plus", "HDR10+"),
+                                       ("hdmi21", "HDMI 2.1"))
+                        if P[k]["attivo"] and getattr(info, k) and not getattr(full, k)]
+            # anno e risoluzione: scheda tecnica, altrimenti SOLO il titolo del prodotto (il resto della pagina
+            # contiene menu, banner, copyright ed etichette energetiche con altri anni e risoluzioni)
+            ris_pag = sp.get("risoluzione") or cp.risoluzione
+            if P["risoluzione"]["attivo"] and info.risoluzione and ris_pag and ris_pag != info.risoluzione and \
+                    not (P["modalita"] == "concorrente" and {ris_pag, info.risoluzione} <= {"HD", "FHD"}):
+                mancanti.append(f"risoluzione {info.risoluzione} (pagina: {ris_pag})")
+            hz_pag = sp.get("hz")
+            if P["refresh"]["attivo"] and info.hz and hz_pag and classe_hz(hz_pag) != classe_hz(info.hz):
+                mancanti.append(f"frequenza {info.hz} Hz (pagina: {hz_pag} Hz)")
+            if P["tecnologia"]["attivo"] and sp.get("tecnologia") and c.fascia_fonte != "catalogo" and info.tecnologia and \
+                    sp["tecnologia"] != info.tecnologia and not _tec_equivalenti(info.tecnologia, sp["tecnologia"],
+                                                                                P["tecnologia"].get("equivalenze")):
+                mancanti.append(f"tecnologia {info.tecnologia} (pagina: {sp['tecnologia']})")
+            if mancanti:
+                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                         "esito": "scartato: " + ", ".join(mancanti)})
+                continue
+            anno_pag = sp.get("anno") or cp.anno or c.anno
+            if not anno_pag and P["anno"]["attivo"] and c.codice:
+                anno_pag = anno_da_idealo(br, c, paese, log)
+                if anno_pag:
+                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                             "esito": f"anno {anno_pag} letto su {IDEALO.get(paese, 'idealo')}"})
+                    motivo = ", ".join(x for x in motivo.split(", ") if x and x != "ok") + (", " if motivo not in ("", "ok") else "") + f"anno da {IDEALO.get(paese, 'idealo')}"
+            if anno_pag and P["anno"]["attivo"] and anno_pag != int(P["anno"]["valore"]):
+                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                         "esito": f"scartato: anno {anno_pag} (da pagina)"})
+                continue
+            if not anno_pag and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True):
+                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                         "esito": "scartato: anno non indicato nemmeno nella scheda tecnica"})
+                continue
+            if anno_pag:  # anno letto in scheda, nel titolo o su idealo: non è più "da verificare"
+                c.anno = anno_pag
+                motivo = ", ".join(x for x in motivo.split(", ") if x and x != "anno da verificare") or "ok"
+            im = og or im
+            nome_pag = titolo_pag.strip()
+            # il codice sulla pagina prodotto è il più affidabile: se c'è, vince
+            if cp.codice and cp.marca == c.marca and cp.pollici == c.pollici and not stesso_modello(info, cp):
+                c.codice = cp.codice
+        codici.add(c.codice)
+        scelti.append({"modello": c.codice, "url": url, "img": im, "nota": "" if motivo == "ok" else motivo,
+                       "titolo": (nome_pag or c.testo)[:160], **info_dict(c)})
+    out["match"][r["nome"]] = scelti
+    if scelti:
+        esito = "trovato"
+    elif pertinenti:
+        esito = "nessun_simile"
+    elif ricerche_ok and tv_letti:
+        esito = "non_presente"
+    elif ricerche_ok:
+        # pagina caricata ma nessun TV riconoscibile: quasi sempre blocco anti-bot o pagina dinamica
+        esito = "illeggibile"
+    else:
+        esito = "errore"
+    if esito in ("errore", "illeggibile") and P.get("ponte_idealo", True) and not stop():
+        log(f"   {r['nome']}: sito non leggibile, provo tramite {IDEALO.get(paese, 'comparatore')}")
+        via = ponte_idealo(br, info, r, P, paese, out, max_m, log)
+        out["ponte"][r["nome"]] = IDEALO.get(paese, "")
+        if via:
+            scelti = via
+            out["match"][r["nome"]] = scelti
+            esito = "trovato"
+    out["esito"][r["nome"]] = esito
+    testo = ", ".join(s["modello"] + (f" (via {s['via']})" if s.get("via") else "") for s in scelti) or ESITI[esito]
+    if esito == "errore" and errori:
+        testo += f" ({errori[-1]})"
+    log(f"   {r['nome']}: {testo}")
+    return out
+
+
+def unisci_retailer(out, parte):
+    out["match"].update(parte["match"])
+    out["esito"].update(parte["esito"])
+    out["dettaglio"].extend(parte["dettaglio"])
+    out.setdefault("ponte", {}).update(parte["ponte"])
+    return out
+
+
+def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, anagrafica=None):
+    """Versione sequenziale (exe e test): Amazon, poi un retailer alla volta.
+    riga: {asin, paese, nome?, modello?}; retailer: [{nome, url}] del paese della riga."""
+    P = unisci_parametri(parametri)
+    out, info = prepara_asin(br, riga, retailer, P, log, anagrafica)
+    if info is None:
+        return out
     for r in retailer:
-        r = {**r, "url": URL_CORRETTI.get(r["url"], r["url"])}
         if stop():
             break
-        validi = {}
-        pertinenti, ricerche_ok, errori, tv_letti = 0, 0, [], 0
-        for q in query_ricerca(info, P):
-            url_s, links, stato = br.cerca(r["url"], q)
-            # 404 su una pagina di ricerca = nessun risultato, non un errore
-            if stato == "ok" or stato == "HTTP 404":
-                ricerche_ok += 1
-            else:
-                errori.append(stato)
-                out["dettaglio"].append({"retailer": r["nome"], "esito": f"ricerca: {stato}", "url": url_s, "ricerca": q})
-            for l in links:
-                if l["url"].split("?")[0] == url_s.split("?")[0]:
-                    continue  # filtri della pagina di ricerca (marca, prezzo...), non prodotti
-                c = analizza(l["testo"], prezzo=leggi_prezzo(l["testo"]))
-                if not c.codice or "caratteristiche" in c.note:
-                    # molti retailer mettono il codice modello solo nell'indirizzo (es. _tcl-75t69c-..., pidSAMQE75QN70H)
-                    # Unieuro: pid + 3 lettere della marca (pidSAMQE75QN70H, pidXIA50APRO2)
-                    slug = l["url"].split("?")[0].rsplit("/", 1)[-1]
-                    slug = re.sub(r"pid([A-Z]{3})", lambda m: f" {PID_MARCHE.get(m.group(1), '')} " + ("XIA" if m.group(1) == "XIA" else ""), slug)
-                    c2 = analizza(f"{l['testo']} {re.sub(r'[-_.]+', ' ', slug)}", prezzo=leggi_prezzo(l["testo"]))
-                    if c2.codice and "caratteristiche" not in c2.note and (not c.marca or c2.marca == c.marca) and \
-                            (not c.pollici or c2.pollici == c.pollici):
-                        c = c2
-                if not c.marca or not c.pollici:
-                    continue
-                tv_letti += 1
-                if (c.marca != info.marca) == concorrente:
-                    if c.pollici == info.pollici:
-                        pertinenti += 1
-                else:
-                    continue  # stessa marca in modalità concorrente, o altra marca in modalità stessa marca
-                ok, motivo, score = confronta_param(info, c, P)
-                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "famiglia": c.famiglia,
-                                         "pollici": c.pollici, "anno": c.anno, "url": l["url"],
-                                         "esito": ("VALIDO " if ok else "scartato: ") + motivo, "ricerca": q})
-                if ok and l["url"] not in validi:
-                    validi[l["url"]] = (score, c, l.get("img", ""), motivo)
-            if len(validi) >= max_m + 2:  # qualche riserva: la verifica della pagina può scartarne
-                break
-        scelti, codici = [], set()
-        for url, (score, c, im, motivo) in sorted(validi.items(), key=lambda x: x[1][0]):
-            nome_pag = ""
-            if len(scelti) >= max_m:
-                break
-            if c.codice in codici:
-                continue
-            if P.get("verifica_url", True):
-                res = br.verifica(url)
-                vivo, titolo_pag, corpo, og = res[:4]
-                sch_raw = res[4] if len(res) > 4 else {}
-                sp = leggi_scheda({k: v for k, v in sch_raw.items() if not k.startswith("_")})
-                if not vivo:
-                    stato_p = sch_raw.get("_stato")
-                    if stato_p in (404, 410):  # prodotto davvero non più in vendita
-                        out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url, "esito": "URL non attivo"})
-                        continue
-                    # pagina bloccata dal sito (anti-bot) o lenta: il prodotto c'è, si usano i dati della ricerca
-                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                             "esito": f"pagina prodotto non apribile ({stato_p or 'timeout'}): uso i dati della ricerca"})
-                    titolo_pag, corpo, og = c.testo, "", ""
-                    motivo = ", ".join(x for x in [motivo if motivo != "ok" else "", "pagina non verificabile"] if x)
-                cp = analizza(titolo_pag)
-                n_voci = len([k for k in sch_raw if not k.startswith("_")])
-                letti = ", ".join(f"{k} {v}" for k, v in sp.items() if k in ("anno", "pollici", "risoluzione", "tecnologia", "hz") and v)
-                if vivo:
-                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                             "esito": f"scheda tecnica: {letti or 'nessun dato utile'} ({n_voci} voci)"})
-                pol_pag = sp.get("pollici") or (cp.pollici if cp.codice else None)
-                if pol_pag and P["pollici"]["attivo"] and abs(pol_pag - info.pollici) > int(P["pollici"].get("tolleranza") or 0):
-                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                             "esito": f"pagina prodotto non coerente ({pol_pag}\")"})
-                    continue
-                # caratteristiche: scheda tecnica, poi titolo; il testo libero della pagina solo per le funzioni HDR/HDMI
-                full = arricchisci(analizza(f"{titolo_pag} {corpo[:20000]}", c.codice), sp)
-                mancanti = [n for k, n in (("dolby_vision", "Dolby Vision"), ("hdr10plus", "HDR10+"),
-                                           ("hdmi21", "HDMI 2.1"))
-                            if P[k]["attivo"] and getattr(info, k) and not getattr(full, k)]
-                # anno e risoluzione: scheda tecnica, altrimenti SOLO il titolo del prodotto (il resto della pagina
-                # contiene menu, banner, copyright ed etichette energetiche con altri anni e risoluzioni)
-                ris_pag = sp.get("risoluzione") or cp.risoluzione
-                if P["risoluzione"]["attivo"] and info.risoluzione and ris_pag and ris_pag != info.risoluzione and \
-                        not (P["modalita"] == "concorrente" and {ris_pag, info.risoluzione} <= {"HD", "FHD"}):
-                    mancanti.append(f"risoluzione {info.risoluzione} (pagina: {ris_pag})")
-                hz_pag = sp.get("hz")
-                if P["refresh"]["attivo"] and info.hz and hz_pag and classe_hz(hz_pag) != classe_hz(info.hz):
-                    mancanti.append(f"frequenza {info.hz} Hz (pagina: {hz_pag} Hz)")
-                if P["tecnologia"]["attivo"] and sp.get("tecnologia") and c.fascia_fonte != "catalogo" and info.tecnologia and \
-                        sp["tecnologia"] != info.tecnologia and not _tec_equivalenti(info.tecnologia, sp["tecnologia"],
-                                                                                    P["tecnologia"].get("equivalenze")):
-                    mancanti.append(f"tecnologia {info.tecnologia} (pagina: {sp['tecnologia']})")
-                if mancanti:
-                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                             "esito": "scartato: " + ", ".join(mancanti)})
-                    continue
-                anno_pag = sp.get("anno") or cp.anno or c.anno
-                if not anno_pag and P["anno"]["attivo"] and c.codice:
-                    anno_pag = anno_da_idealo(br, c, paese, log)
-                    if anno_pag:
-                        out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                                 "esito": f"anno {anno_pag} letto su {IDEALO.get(paese, 'idealo')}"})
-                        motivo = ", ".join(x for x in motivo.split(", ") if x and x != "ok") + (", " if motivo not in ("", "ok") else "") + f"anno da {IDEALO.get(paese, 'idealo')}"
-                if anno_pag and P["anno"]["attivo"] and anno_pag != int(P["anno"]["valore"]):
-                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                             "esito": f"scartato: anno {anno_pag} (da pagina)"})
-                    continue
-                if not anno_pag and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True):
-                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                             "esito": "scartato: anno non indicato nemmeno nella scheda tecnica"})
-                    continue
-                if anno_pag:  # anno letto in scheda, nel titolo o su idealo: non è più "da verificare"
-                    c.anno = anno_pag
-                    motivo = ", ".join(x for x in motivo.split(", ") if x and x != "anno da verificare") or "ok"
-                im = og or im
-                nome_pag = titolo_pag.strip()
-                # il codice sulla pagina prodotto è il più affidabile: se c'è, vince
-                if cp.codice and cp.marca == c.marca and cp.pollici == c.pollici and not stesso_modello(info, cp):
-                    c.codice = cp.codice
-            codici.add(c.codice)
-            scelti.append({"modello": c.codice, "url": url, "img": im, "nota": "" if motivo == "ok" else motivo,
-                           "titolo": (nome_pag or c.testo)[:160], **info_dict(c)})
-        out["match"][r["nome"]] = scelti
-        if scelti:
-            esito = "trovato"
-        elif pertinenti:
-            esito = "nessun_simile"
-        elif ricerche_ok and tv_letti:
-            esito = "non_presente"
-        elif ricerche_ok:
-            # pagina caricata ma nessun TV riconoscibile: quasi sempre blocco anti-bot o pagina dinamica
-            esito = "illeggibile"
-        else:
-            esito = "errore"
-        if esito in ("errore", "illeggibile") and P.get("ponte_idealo", True) and not stop():
-            log(f"   {r['nome']}: sito non leggibile, provo tramite {IDEALO.get(paese, 'comparatore')}")
-            via = ponte_idealo(br, info, r, P, paese, out, max_m, log)
-            out["ponte"][r["nome"]] = IDEALO.get(paese, "")
-            if via:
-                scelti = via
-                out["match"][r["nome"]] = scelti
-                esito = "trovato"
-        out["esito"][r["nome"]] = esito
-        testo = ", ".join(s["modello"] + (f" (via {s['via']})" if s.get("via") else "") for s in scelti) or ESITI[esito]
-        if esito == "errore" and errori:
-            testo += f" ({errori[-1]})"
-        log(f"   {r['nome']}: {testo}")
+        unisci_retailer(out, confronta_retailer(br, info, r, P, out["paese"], log, stop))
     return out
