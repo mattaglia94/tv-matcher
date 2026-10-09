@@ -70,21 +70,31 @@ _ANNI_IDEALO = {}
 
 
 def anno_da_idealo(br, c, paese, log=print):
-    """Anno di un modello che né il titolo né la scheda riportano: lo cerca su idealo per codice
-    (es. L75MB-APEU -> "Xiaomi A Pro 75 (2026)"). Accetta solo un risultato con stessa marca e diagonale."""
+    """Anno di un modello che né il titolo né la scheda riportano: lo cerca su idealo.
+    Lo stesso nome commerciale (es. "A Pro 75") esiste in più anni: vale solo un prodotto idealo
+    la cui pagina riporta ESATTAMENTE il codice modello (es. L75MB-APEU). Altrimenti l'anno resta sconosciuto."""
     dom = IDEALO.get(paese)
     if not dom or not hasattr(br, "idealo_cerca"):
         return None
     chiave = (dom, c.codice)
     if chiave in _ANNI_IDEALO:
         return _ANNI_IDEALO[chiave]
+    cod = re.sub(r"[^A-Z0-9]", "", c.codice.upper())
     anno = None
     try:
+        visti = 0
         for l in br.idealo_cerca(dom, c.codice)[:12]:
             i = analizza(l["testo"])
-            T = l["testo"].upper().replace("-", "")
-            if i.anno and i.marca == c.marca and i.pollici == c.pollici and \
-                    (c.codice.replace("-", "") in T or (i.chiave and i.chiave == c.chiave and i.pro == c.pro)):
+            if not (i.anno and i.marca == c.marca and i.pollici == c.pollici):
+                continue
+            if cod in re.sub(r"[^A-Z0-9]", "", l["testo"].upper()):
+                anno = i.anno
+                break
+            if visti >= 3:
+                continue
+            visti += 1  # il codice non è nel nome: lo cerco nella pagina del prodotto su idealo
+            vivo, titolo, corpo, _ = br.verifica(l["url"])[:4]
+            if vivo and cod in re.sub(r"[^A-Z0-9]", "", f"{titolo} {corpo}".upper()):
                 anno = i.anno
                 break
     except Exception:
