@@ -40,6 +40,45 @@ JS_RISULTATI = r"""
 """
 
 
+def cerca_amazon(br, dom, testo):
+    url = f"https://www.{dom}/s?k={urllib.parse.quote_plus(testo)}"
+    for tentativo in range(3):
+        br._vai(url)
+        br._pausa()
+        if br._amazon_continua():
+            br._vai(url)
+        try:
+            righe = br.page.evaluate(JS_RISULTATI)
+        except Exception:
+            righe = []
+        if righe:
+            return righe
+        time.sleep(random.uniform(5, 10))
+    return []
+
+
+def cerca_motore(br, dom, testo):
+    """Piano B: Amazon blocca le ricerche dai server, i motori di ricerca no. Prende i link /dp/<ASIN>."""
+    righe, visti = [], set()
+    for url in (f"https://www.bing.com/search?q={urllib.parse.quote_plus('site:' + dom + ' ' + testo)}&count=30",
+                f"https://html.duckduckgo.com/html/?q={urllib.parse.quote_plus('site:' + dom + ' ' + testo)}"):
+        try:
+            br._vai(url)
+            br._pausa(1, 2)
+            link = br.page.evaluate("""() => [...document.querySelectorAll('a[href]')].map(a => [a.href, a.innerText])""")
+        except Exception:
+            continue
+        for href, tit in link:
+            href = urllib.parse.unquote(href)
+            m = re.search(r"amazon\.[a-z.]+/(?:[^\s\"]*?/)?(?:dp|gp/product)/([A-Z0-9]{10})", href)
+            if m and m.group(1) not in visti and len(tit.strip()) > 15:
+                visti.add(m.group(1))
+                righe.append({"asin": m.group(1), "titolo": tit.strip().split("\n")[0], "prezzo": "", "fonte": "motore"})
+        if righe:
+            break
+    return righe
+
+
 def raccogli(paese, per_marca=5):
     from browser import Browser
     from regole import trova_marca, trova_pollici_testo as trova_pollici
@@ -57,13 +96,8 @@ def raccogli(paese, per_marca=5):
             for p in pollici[:3]:
                 if presi >= per_marca:
                     break
-                q = urllib.parse.quote_plus(f"{marca} " + PAROLA[paese].format(p=p))
-                br._vai(f"https://www.{dom}/s?k={q}")
-                br._pausa()
-                try:
-                    righe = br.page.evaluate(JS_RISULTATI)
-                except Exception:
-                    righe = []
+                testo = f"{marca} " + PAROLA[paese].format(p=p)
+                righe = cerca_amazon(br, dom, testo) or cerca_motore(br, dom, testo)
                 print(f"{paese} {marca} {p}\": {len(righe)} risultati", flush=True)
                 if len(diario) < 400:
                     try:

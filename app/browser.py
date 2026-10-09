@@ -222,6 +222,23 @@ class Browser:
         self._pausa(1.5, 3)
 
     # ------------------------------------------------------------ Amazon
+    def _amazon_continua(self):
+        """Pagina intermedia "Fai clic sul pulsante qui sotto per continuare a fare acquisti": basta un clic."""
+        try:
+            corpo = self.page.inner_text("body", timeout=3000)[:400].lower()
+        except Exception:
+            return False
+        if not any(x in corpo for x in ("continua con gli acquisti", "continue shopping", "weiter einkaufen",
+                                        "continuer les achats", "seguir comprando")):
+            return False
+        try:
+            self.page.locator("button, input[type=submit], a.a-button-text").first.click(timeout=4000)
+            self.page.wait_for_load_state("domcontentloaded", timeout=15000)
+            time.sleep(random.uniform(1.5, 3))
+            return True
+        except Exception:
+            return False
+
     def _amazon_bloccato(self):
         html = self.page.content().lower()
         return ("validatecaptcha" in html or "captcha" in html or "robot check" in html) \
@@ -240,6 +257,8 @@ class Browser:
         for i, u in enumerate(tentativi):
             self._vai(u)
             self._pausa()
+            if self._amazon_continua():
+                self._vai(u)
             if not self._amazon_bloccato():
                 url = u
                 break
