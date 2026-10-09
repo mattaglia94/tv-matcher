@@ -311,6 +311,8 @@ def _xiaomi(T: str, info: InfoTV):
     """Xiaomi non usa codici modello nei titoli: il "codice" è serie + pollici
     (es. "TV F PRO 75" -> F PRO 75, core 75FPRO; anche dagli URL tipo pidXIA65FPRO).
     Famiglia: A e F (Google TV / Fire TV) sono la stessa fascia; S = Mini LED; MAX = grandi formati."""
+    if re.search(r"\bL\d{2,3}M[A-Z]", T):  # codice ufficiale (L65MB-APEU): è il dato più affidabile
+        return _xiaomi_codice(T, info)
     m = (re.search(r"\bXIA(\d{2,3})(A|F|S|MAX|Q)(PRO)?\d?\b", T)
          or re.search(r"\b(\d{2,3})(A|F|S|Q)(PRO)?\d?\b", T)           # codici tipo 50APRO2, 32A2 (titoli Unieuro)
          or re.search(r"\b(?:TV\s+)?(A|F|S|MAX|Q\d?)(\s+PRO)?\s*(MINI\s?LED)?\b[^0-9]{0,20}?(\d{2,3})\b", T))
@@ -337,22 +339,32 @@ def _xiaomi(T: str, info: InfoTV):
     return True
 
 
+_XIAOMI_ANNO = {"A": 2024, "B": 2025, "C": 2026, "D": 2027}
+
+
 def _xiaomi_codice(T: str, info: InfoTV):
-    """Titoli Xiaomi senza nome di serie ma con codice tipo L43MB-FAVEU (F = Fire TV, A = Google TV)."""
-    m = re.search(r"\bL(\d{2,3})M[A-Z0-9]{1,3}(?:-([A-Z]{2,6}))?", T)
+    """Codici Xiaomi ufficiali: L<pollici>M<anno>[..]-<serie><P=Pro>..EU
+    es. L65MB-APEU = 65" 2025 A Pro, L65MC-SEU = 65" 2026 S Mini LED, L43MB-FAVEU = 43" 2025 F (Fire TV)."""
+    m = re.search(r"\bL(\d{2,3})M([A-Z])[A-Z0-9]{0,2}(?:-([A-Z]{2,6}))?", T)
     if not m:
         return False
     info.pollici = info.pollici or int(m.group(1))
-    suff = m.group(2) or ""
-    serie = "F" if suff.startswith("F") or "FIRE TV" in T else "A"
-    info.pro = "PRO" in suff or bool(re.search(r"\bPRO\b", T))
+    info.anno = info.anno or trova_anno_testo(T) or _XIAOMI_ANNO.get(m.group(2))  # l'anno scritto nel titolo prevale
+    suff = m.group(3) or ""
+    tec_t = tecnologia_testo(T)
+    if suff[:1] in ("A", "F", "S", "Q"):
+        serie = suff[0]
+        info.pro = suff[1:2] == "P" or bool(re.search(r"\bPRO\b", T))
+    else:  # codice senza suffisso: serie dal testo; un A/F QLED è sempre un PRO
+        serie = "F" if "FIRE TV" in T else "A"
+        info.pro = bool(re.search(r"\bPRO\b", T)) or tec_t == "QLED"
     info.codice = m.group(0)
     info.core = f"{info.pollici}{serie}{'PRO' if info.pro else ''}"
-    info.tecnologia = tecnologia_testo(T) or ("QLED" if info.pro else "LED")
-    ris = trova_risoluzione(T)
-    info.fascia = "MID" if info.pro else "BASE" if ris in ("HD", "FHD") else "ENTRY"
-    info.famiglia = f"XIAOMI-{info.tecnologia}-AF{'-' + ris if ris in ('HD', 'FHD') else ''}"
-    info.chiave = serie + ("-HD" if ris in ("HD", "FHD") and not info.pro else "")
+    info.tecnologia = tec_t or ("MINILED" if serie == "S" else "QLED" if info.pro else "LED")
+    ris = trova_risoluzione(T) or ("HD" if info.pollici <= 32 else "")
+    info.fascia = "PREMIUM" if serie == "S" else "MID" if info.pro else "BASE" if ris in ("HD", "FHD") else "ENTRY"
+    info.famiglia = f"XIAOMI-{info.tecnologia}-{serie if serie == 'S' else 'AF'}{'-' + ris if ris in ('HD', 'FHD') and not info.pro else ''}"
+    info.chiave = serie + ("-HD" if ris in ("HD", "FHD") and serie in ("A", "F") and not info.pro else "")
     info.regola = "XIAOMI-codice"
     return True
 

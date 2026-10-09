@@ -18,6 +18,11 @@ RICONOSCIMENTO = [
     ("Xiaomi TV A 32 TV LED piatto 32 HD", ("XIAOMI", "LED", "BASE")),
     ("XIAOMI A 32 EU TV LED, SMART TV, 32 \", LCD, HD, Processore Cortex-A55, Black, Classe E", ("XIAOMI", "LED", "BASE")),
     ("Xiaomi 50APRO2 TV 127 cm (50\") 4K Ultra HD Smart TV Wi-Fi Grigio", ("XIAOMI", "QLED", "MID")),
+    # codici Xiaomi ufficiali (Amazon.de, Otto)
+    ("Xiaomi TV F 65 Zoll 2025, 4K UHD, Smart TV, Fire OS8, HDR10, L65MB-FAEU", ("XIAOMI", "LED", "ENTRY")),
+    ("Xiaomi L65MB-APEU 165 cm (65 Zoll) 4K Ultra HD Smart TV Google TV", ("XIAOMI", "QLED", "MID")),
+    ("Xiaomi L65MB-SEU 165 cm (65 Zoll) 4K Ultra HD Smart TV Google TV", ("XIAOMI", "MINILED", "PREMIUM")),
+    ("Xiaomi L32MB-FPEU LED-Fernseher 80 cm (32 Zoll) HD Smart TV", ("XIAOMI", "QLED", "MID")),
     ("TCL 75C6K QD-Mini LED 4K 144Hz 2025", ("TCL", "MINILED", "ENTRY")),
     ("TCL 65C7L SQD Mini LED", ("TCL", "MINILED", "MID")),
     ("TCL 55C655 QLED", ("TCL", "QLED", "ENTRY")),
@@ -62,6 +67,8 @@ SOMIGLIANZA = [
     ("XIAOMI TV F Pro 50 2025, 50 pollici, 4K UHD QLED", "Xiaomi 50APRO2 TV 127 cm (50\") 4K Ultra HD", "stessa_marca", True),
     ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED", "XIAOMI TV F Pro 75 QLED", "stessa_marca", False),  # stesso modello
     ("Hisense 55E7Q 4K QLED 2026", "Hisense 55A7Q QLED 4K 2026", "stessa_marca", True),
+    ("Xiaomi TV F 65 Zoll 2026, 4K UHD, Smart TV, Fire OS8, L65MC-FAEU", "Xiaomi L65MC-AUEU 165 cm (65 Zoll) 4K Ultra HD", "stessa_marca", True),
+    ("Xiaomi TV F 65 Zoll 2025, 4K UHD, Smart TV, Fire OS8, L65MB-FAEU", "Xiaomi L65MB-SEU 165 cm (65 Zoll) 4K Mini LED", "stessa_marca", False),
     ("Hisense 55E7Q 4K QLED 2026", "Hisense 55U7Q Mini LED 2026", "stessa_marca", False),  # altra tecnologia
     ("Samsung QE65QN90HATXZT Neo QLED 2026", "Samsung QE65QN92HATXZT Neo QLED 2026", "stessa_marca", True),
     ("LG OLED55C64LA 2026", "LG OLED55C65LA 2026", "stessa_marca", True),
