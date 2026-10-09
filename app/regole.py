@@ -458,12 +458,14 @@ def stima_fascia(prezzo: float | None, pollici: int | None, tecnologia: str = ""
 
 
 def leggi_prezzo(t: str) -> float | None:
-    m = re.search(r"(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})?|\d+(?:\.\d{2})?)\s?€|€\s?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)", t or "")
+    m = re.search(r"(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})?|\d+(?:\.\d{2})?)\s?[€£]|[€£]\s?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)", t or "")
     if not m:
         return None
     x = (m.group(1) or m.group(2)).replace(" ", "")
     if re.search(r",\d{2}$", x):
         x = x.replace(".", "").replace(",", ".")
+    elif re.search(r"\.\d{2}$", x):  # formato inglese 1,099.00
+        x = x.replace(",", "")
     else:
         x = x.replace(",", "").replace(".", "") if re.search(r"[.,]\d{3}$", x) else x
     try:
