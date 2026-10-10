@@ -233,9 +233,7 @@
     let nuovi = 0;
     lista.forEach((a) => {
       if (presenti.has(a.asin + a.paese)) return;
-      const noto = S.anagrafica[`${a.asin}|${a.paese}`];
-      if (!a.modello && noto && noto.modello) a.modello = noto.modello;
-      a._nuovo = true;
+      a._nuovo = true;  // il modello non si precompila più: la base è sempre la pagina Amazon
       S.bozza.asin.push(a); presenti.add(a.asin + a.paese); nuovi++;
     });
     salvaBozza();
@@ -245,8 +243,8 @@
   function statoAsin(a) {
     const noto = S.anagrafica[`${a.asin}|${a.paese}`];
     if (S.bozza.mancanti?.includes(a.asin) && !a.modello) return { cls: "attenzione", t: "Serve il modello" };
-    if (a.modello && noto && noto.modello === a.modello) return { cls: "ok", t: "Modello noto" };
-    if (a.modello) return { cls: "info", t: "Modello a mano" };
+    if (a.modello) return { cls: "info", t: "Modello a mano (solo se Amazon non basta)" };
+    if (noto && noto.modello) return { cls: "ok", t: `Già cercato: ${noto.modello}` };
     return { cls: "", t: "Letto da Amazon" };
   }
 
@@ -994,7 +992,7 @@
             ${r.errore ? `<span class="chip errore" style="white-space:normal">${esc(r.errore === "captcha Amazon" ? "Amazon ha bloccato la lettura (captcha): scrivi il modello e rilancia" : r.errore)}</span>` : ""}
             ${a.marca_nuova ? `<span class="chip attenzione" style="white-space:normal">Marca nuova: ${esc(a.marca)} non è nel catalogo</span>` : ""}
             ${a.fascia_fonte === "stimata" ? `<span class="chip attenzione" style="white-space:normal">Fascia stimata dal prezzo${a.prezzo ? ` (${esc(a.prezzo)})` : ""}</span>` : ""}
-            ${!r.errore && a.fonte && a.fonte !== "Amazon" ? `<span class="chip ${a.fonte === "ricerca web" ? "attenzione" : "info"}" style="white-space:normal">${a.fonte === "ricerca web" ? "Modello ricavato dal web: verificalo" : a.fonte === "anagrafica" ? "Modello da ricerche precedenti" : "Modello inserito a mano"}</span>` : ""}
+            ${!r.errore && a.fonte && !/^Amazon( \(letto[^)]*\))?$/.test(a.fonte) ? `<span class="chip ${a.fonte === "ricerca web" ? "attenzione" : "info"}" style="white-space:normal">${a.fonte === "ricerca web" ? "Modello ricavato dal web: verificalo" : a.fonte.includes("modello inserito") ? "Codice non scritto su Amazon: usato il modello a mano" : a.fonte === "inserito a mano" ? "Amazon non leggibile: usato il modello a mano" : esc(a.fonte)}</span>` : ""}
           </div>
           <div class="match-griglia">
             ${retDi(r).map((ret) => {

@@ -16,9 +16,33 @@ on:
 permissions:
   contents: write
 jobs:
+  piano:
+    # ricerche grandi divise in parti, ognuna su una macchina GitHub diversa (in parallelo)
+    runs-on: ubuntu-latest
+    outputs:
+      parti: ${{ steps.p.outputs.parti }}
+      n: ${{ steps.p.outputs.n }}
+    steps:
+      - id: p
+        env:
+          CONFIG: ${{ inputs.config }}
+        run: |
+          python3 - <<'PY'
+          import json, os, math
+          n = len(json.loads(os.environ["CONFIG"]).get("asin", []))
+          k = max(1, min(8, math.ceil(n / 12)))   # ~12 ASIN per macchina, al massimo 8 macchine
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"parti={json.dumps(list(range(k)))}\n")
+              f.write(f"n={k}\n")
+          PY
   matching:
+    needs: piano
     runs-on: ubuntu-latest
     timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        parte: ${{ fromJSON(needs.piano.outputs.parti) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,6 +53,8 @@ jobs:
         env:
           CONFIG: ${{ inputs.config }}
           RUN_ID: ${{ inputs.run_id }}
+          PARTE: ${{ matrix.parte }}
+          PARTI: ${{ needs.piano.outputs.n }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: python -u app/web_runner.py

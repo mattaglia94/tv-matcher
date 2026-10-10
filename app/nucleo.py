@@ -10,6 +10,8 @@ ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
          "saltato": "Saltato: modello Amazon mancante"}
 
 # indirizzi di ricerca vecchi o sbagliati salvati nelle impostazioni -> indirizzo corretto
+GIORNI_ARCHIVIO_AMAZON = 20  # una pagina Amazon letta da meno di 20 giorni si riusa (stessi dati, più veloce)
+
 URL_CORRETTI = {  # indirizzi di ricerca cambiati dai negozi (vale anche per le configurazioni salvate dal sito)
     "https://www.expert.it/search?q={q}": "https://www.expert.it/it/it/exp/shop/search?terms={q}",
     "https://www.joybuy.de/search?keyword={q}": "https://www.joybuy.de/s?k={q}",
@@ -171,46 +173,50 @@ def info_dict(i):
 
 
 def riconosci_amazon(br, riga, anagrafica=None, log=print):
-    """Ricava i dati dell'ASIN. Ordine: modello scritto a mano -> anagrafica -> Amazon -> ricerca web.
-    Ritorna dict: titolo, modello, img, fonte, nota, marca, prezzo."""
+    """Ricava i dati dell'ASIN. La base è SEMPRE la pagina Amazon (titolo, scheda tecnica, prezzo), letta ora o
+    nelle ultime settimane (archivio): così il risultato non cambia se il modello è scritto a mano oppure no.
+    Il modello scritto a mano serve solo quando dalla pagina Amazon il codice non si ricava (o Amazon blocca).
+    Ritorna dict: titolo, modello, img, fonte, nota, marca, prezzo, scheda (+ letto_amazon, modello_amazon)."""
+    import datetime as _dt
     paese = (riga.get("paese") or "IT").upper()
-    nome, modello = riga.get("nome", ""), (riga.get("modello") or "").strip()
+    nome, manuale = riga.get("nome", ""), (riga.get("modello") or "").strip()
     noto = (anagrafica or {}).get(f"{riga['asin']}|{paese}") or (anagrafica or {}).get(riga["asin"]) or {}
-    vuoto = {"titolo": nome or noto.get("titolo", ""), "modello": "", "img": noto.get("img", ""), "fonte": "", "nota": "",
-             "marca": riga.get("marca", "") or noto.get("marca", ""), "prezzo": "",
-             "scheda": noto.get("scheda") or {}}  # scheda tecnica letta su Amazon in una ricerca precedente
-
-    def basta(titolo, mod, marca):
-        """Il TV è riconoscibile? Serve marca, diagonale e codice (o tecnologia + fascia).
-        Un modello come "F PRO 32" da solo non dice la marca: allora serve anche il titolo."""
-        i = analizza(titolo, mod, marca)
-        return bool(i.marca and i.pollici and (i.codice or (i.tecnologia and i.fascia)))
-
-    if modello and basta(vuoto["titolo"], modello, vuoto["marca"]):
-        return {**vuoto, "modello": modello, "fonte": "inserito a mano"}
-    if noto.get("modello") and not modello and basta(noto.get("titolo", ""), noto["modello"], noto.get("marca", "")):
-        return {**vuoto, "modello": noto["modello"], "fonte": "anagrafica"}
-    if modello:
-        log(f"   modello '{modello}' non basta a riconoscere il TV: leggo anche la pagina Amazon")
-    a = br.amazon(riga["asin"], AMAZON_DOMINIO.get(paese, "amazon.it"))
-    if modello and not a["modello"]:
-        a = {**a, "modello": modello}  # il modello scritto a mano resta, il titolo Amazon aggiunge marca e diagonale
-    sch = leggi_scheda(a.get("scheda"))
-    dati = {**vuoto, "titolo": a["titolo"] or vuoto["titolo"], "modello": a["modello"] or sch.get("modello", ""),
-            "img": a.get("img", "") or vuoto["img"], "marca": a.get("marca", "") or sch.get("marca", "") or vuoto["marca"],
-            "prezzo": a.get("prezzo", ""), "scheda": sch}
-    a = {**a, "modello": dati["modello"]}
-    info = arricchisci(analizza(dati["titolo"], a["modello"], dati["marca"], leggi_prezzo(dati["prezzo"])), sch)
-    if info.marca and info.pollici and info.codice:
-        return {**dati, "modello": a["modello"] or info.codice, "fonte": "Amazon"}
-    if info.marca and info.pollici and info.tecnologia and info.fascia:
+    limite = (_dt.date.today() - _dt.timedelta(days=GIORNI_ARCHIVIO_AMAZON)).isoformat()
+    if noto.get("letto_amazon") and noto.get("titolo") and noto.get("aggiornato", "") >= limite:
+        # pagina Amazon già letta di recente: stessi dati, senza riaprirla
+        a = {"titolo": noto["titolo"], "modello": noto.get("modello_amazon", ""), "img": noto.get("img", ""),
+             "marca": noto.get("marca", ""), "prezzo": noto.get("prezzo", ""), "errore": ""}
+        sch, fonte_base = dict(noto.get("scheda") or {}), "Amazon (letto il " + noto["aggiornato"] + ")"
+    else:
+        a = br.amazon(riga["asin"], AMAZON_DOMINIO.get(paese, "amazon.it"))
+        sch, fonte_base = leggi_scheda(a.get("scheda")), "Amazon"
+    letto = bool(a.get("titolo"))
+    titolo = a.get("titolo") or nome or noto.get("titolo", "")
+    mod_amz = a.get("modello") or sch.get("modello", "")
+    marca = a.get("marca", "") or sch.get("marca", "") or riga.get("marca", "") or noto.get("marca", "")
+    dati = {"titolo": titolo, "modello": mod_amz, "img": a.get("img", "") or noto.get("img", ""), "fonte": "", "nota": "",
+            "marca": marca, "prezzo": a.get("prezzo", ""), "scheda": sch,
+            "letto_amazon": letto, "modello_amazon": mod_amz}
+    prezzo = leggi_prezzo(dati["prezzo"])
+    info = arricchisci(analizza(titolo, mod_amz, marca, prezzo), sch)
+    if letto and info.marca and info.pollici and info.codice:
+        if manuale:
+            log(f"   modello scritto a mano '{manuale}' non necessario: Amazon dice {info.codice}")
+        return {**dati, "modello": mod_amz or info.codice, "fonte": fonte_base}
+    if manuale:
+        im = arricchisci(analizza(titolo, manuale, marca, prezzo), sch)
+        if im.marca and im.pollici and (im.codice or (im.tecnologia and im.fascia)):
+            return {**dati, "modello": manuale,
+                    "fonte": (fonte_base + " + modello inserito") if letto else "inserito a mano",
+                    "nota": "" if letto else (a.get("errore") or "pagina Amazon non leggibile") + ": usato il modello scritto a mano"}
+    if letto and info.marca and info.pollici and info.tecnologia and info.fascia:
         # modello non in archivio (marca o serie nuova): si procede con i dati letti da Amazon
         nota = "modello non in archivio: dati ricavati dalla pagina Amazon"
         if info.fascia_fonte == "stimata":
             nota += f", fascia stimata dal prezzo ({dati['prezzo']})"
-        return {**dati, "fonte": "Amazon", "nota": nota}
+        return {**dati, "fonte": fonte_base, "nota": nota}
     # piano B: Amazon bloccato o pagina illeggibile -> motore di ricerca
-    log(f"   Amazon non leggibile ({a['errore'] or 'modello non trovato'}): provo la ricerca web")
+    log(f"   Amazon non leggibile ({a.get('errore') or 'modello non trovato'}): provo la ricerca web")
     try:
         titoli = br.cerca_web(riga["asin"])
     except Exception:
@@ -224,7 +230,7 @@ def riconosci_amazon(br, riga, anagrafica=None, log=print):
     if voti:
         _, t, cod = max(voti.values(), key=lambda v: v[0])
         return {**dati, "titolo": t, "modello": cod, "fonte": "ricerca web", "nota": "modello ricavato da ricerca web: verificare"}
-    return {**dati, "nota": a["errore"] or "modello Amazon non riconosciuto"}
+    return {**dati, "nota": a.get("errore") or "modello Amazon non riconosciuto"}
 
 
 def prepara_asin(br, riga, retailer, P, log=print, anagrafica=None):
@@ -239,6 +245,8 @@ def prepara_asin(br, riga, retailer, P, log=print, anagrafica=None):
                      "fonte": fonte, "nota": nota, "marca_amazon": am.get("marca", ""), "prezzo": am.get("prezzo", ""),
                      "fascia_fonte": info.fascia_fonte, "marca_nuova": info.marca_nuova, "regola": info.regola,
                      "scheda": {k: v for k, v in (am.get("scheda") or {}).items() if k in ("anno", "pollici", "risoluzione", "tecnologia", "hz", "modello")},
+                     "scheda_completa": am.get("scheda") or {}, "letto_amazon": am.get("letto_amazon", False),
+                     "modello_amazon": am.get("modello_amazon", ""),
                      **info_dict(info)}
     log(f"   Amazon ({fonte or 'non riconosciuto'}): {info.marca} {info.codice} {info.pollici}\" {info.famiglia}")
     # per cercare un concorrente servono tecnologia e fascia dell'ASIN, altrimenti il confronto è casuale

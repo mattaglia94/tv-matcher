@@ -17,6 +17,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 REPO = os.environ.get("REPO", "")
 TOKEN = os.environ.get("GH_TOKEN", "")
 RUN_ID = os.environ.get("RUN_ID", "locale")
+# ricerche grandi: divise in "parti" su più macchine GitHub in parallelo; ogni parte scrive runs/<id>/parte_<k>.json
+PARTE, PARTI = int(os.environ.get("PARTE", "0")), max(1, int(os.environ.get("PARTI", "1")))
 BRANCH = "dati"
 API = "https://api.github.com"
 
@@ -43,6 +45,36 @@ def assicura_branch():
     _req("POST", f"{API}/repos/{REPO}/git/refs", {"ref": f"refs/heads/{BRANCH}", "sha": ref["object"]["sha"]})
 
 
+def aggiorna_json(percorso, modifica, tentativi=6):
+    """Legge-modifica-scrive con controllo di versione: più parti possono aggiornare lo stesso file senza perdere dati."""
+    for _ in range(tentativi):
+        st, info = _req("GET", f"{API}/repos/{REPO}/contents/{percorso}?ref={BRANCH}")
+        attuale, sha = None, None
+        if st == 200:
+            sha = info.get("sha")
+            try:
+                attuale = json.loads(base64.b64decode(info["content"]).decode()) if info.get("content") else None
+            except Exception:
+                attuale = None
+            if attuale is None and info.get("download_url"):  # file > 1 MB: contenuto da scaricare a parte
+                try:
+                    r = urllib.request.Request(info["download_url"], headers={"Authorization": f"Bearer {TOKEN}"})
+                    attuale = json.loads(urllib.request.urlopen(r, timeout=60).read())
+                except Exception:
+                    attuale = None
+        nuovo = modifica(attuale)
+        corpo = {"message": f"run {RUN_ID}: {percorso}", "branch": BRANCH,
+                 "content": base64.b64encode(json.dumps(nuovo, ensure_ascii=False).encode()).decode()}
+        if sha:
+            corpo["sha"] = sha
+        st, _ = _req("PUT", f"{API}/repos/{REPO}/contents/{percorso}", corpo)
+        if st in (200, 201):
+            return True
+        time.sleep(2 + PARTE)
+    print(f"⚠ {percorso} non aggiornato")
+    return False
+
+
 def leggi_json(percorso):
     if not REPO or not TOKEN:
         return None
@@ -50,7 +82,10 @@ def leggi_json(percorso):
     if st != 200:
         return None
     try:
-        return json.loads(base64.b64decode(info["content"]).decode())
+        if info.get("content"):
+            return json.loads(base64.b64decode(info["content"]).decode())
+        r = urllib.request.Request(info["download_url"], headers={"Authorization": f"Bearer {TOKEN}"})  # file > 1 MB
+        return json.loads(urllib.request.urlopen(r, timeout=60).read())
     except Exception:
         return None
 
@@ -133,7 +168,8 @@ def main():
     from regole import catalogo_predefinito, imposta_catalogo, unisci_catalogo, unisci_parametri
 
     cfg = json.loads(os.environ.get("CONFIG") or open(sys.argv[1], encoding="utf-8").read())
-    asins = cfg.get("asin", [])
+    tutti = cfg.get("asin", [])
+    asins = [dict(a, _i=i) for i, a in enumerate(tutti) if i % PARTI == PARTE]
     retailer = [r for r in cfg.get("retailer", []) if r.get("attivo", True)]
     parametri = cfg.get("parametri", {})
     P = unisci_parametri(parametri)
@@ -144,7 +180,7 @@ def main():
 
     if REPO and TOKEN:
         assicura_branch()
-    pub = Pubblicatore(f"runs/{RUN_ID}/stato.json")
+    pub = Pubblicatore(f"runs/{RUN_ID}/stato.json" if PARTI == 1 else f"runs/{RUN_ID}/parte_{PARTE}.json")
     anagrafica = leggi_json("config/anagrafica_asin.json") or {}
     # catalogo marche e serie: predefinito + modifiche fatte dal sito
     catalogo = unisci_catalogo(catalogo_predefinito(), leggi_json("config/catalogo.json"))
@@ -154,7 +190,8 @@ def main():
     stato = {"id": RUN_ID, "nome": cfg.get("nome", ""), "stato": "in_corso",
              "github_run": os.environ.get("GITHUB_RUN_ID", ""),
              "iniziato": dt.datetime.utcnow().isoformat() + "Z", "finito": None,
-             "config": {"asin": asins, "retailer": retailer, "parametri": parametri},
+             "config": {"asin": tutti, "retailer": retailer, "parametri": parametri},
+             "parte": PARTE, "parti": PARTI,
              "avanzamento": {"fatti": 0, "totale": totale, "corrente": "Avvio del browser"},
              "log": [], "risultati": []}
 
@@ -219,16 +256,17 @@ def main():
             stato["avanzamento"]["corrente"] = f"ASIN {i}/{len(asins)} · {a['asin']} ({paese})"
             log(f"[{i}/{len(asins)}] {a['asin']} · {paese}")
             out, info = prepara_asin(br, a, ret, P, log, anagrafica)
+            out["_i"] = a["_i"]  # posizione nella lista originale (per riunire le parti)
             stato["risultati"].append(out)
             idx = len(stato["risultati"]) - 1
             am = out.get("amazon", {})
-            if am.get("fonte") in ("Amazon", "inserito a mano", "ricerca web") and am.get("modello") and am.get("pollici"):
+            if am.get("letto_amazon") and not am.get("fonte", "").startswith("Amazon (letto"):
+                # pagina Amazon appena letta: in archivio i dati grezzi, riusati per 20 giorni (con o senza modello a mano)
                 anagrafica_nuova[f"{a['asin']}|{paese}"] = {
-                    "modello": am["modello"], "titolo": am.get("titolo", ""), "img": am.get("img", ""),
-                    "marca": am.get("marca_amazon", ""), "scheda": am.get("scheda") or {},
-                    "fonte": am["fonte"], "aggiornato": dt.datetime.utcnow().strftime("%Y-%m-%d")}
-                if not am.get("scheda") and (anagrafica.get(f"{a['asin']}|{paese}") or {}).get("scheda"):
-                    anagrafica_nuova[f"{a['asin']}|{paese}"]["scheda"] = anagrafica[f"{a['asin']}|{paese}"]["scheda"]
+                    "titolo": am.get("titolo", ""), "img": am.get("img", ""), "marca": am.get("marca_amazon", ""),
+                    "prezzo": am.get("prezzo", ""), "scheda": am.get("scheda_completa") or {},
+                    "modello_amazon": am.get("modello_amazon", ""), "modello": am.get("modello", ""),
+                    "letto_amazon": True, "fonte": am["fonte"], "aggiornato": dt.date.today().isoformat()}
             if info is None:
                 stato["avanzamento"]["fatti"] += len(ret)
             else:
@@ -264,14 +302,11 @@ def main():
         stato["avanzamento"]["corrente"] = {"completato": "Completato", "errore": "Interrotto per errore"}.get(stato["stato"], "")
         pub.salva(stato, forza=True)
         if anagrafica_nuova and REPO and TOKEN:
-            ana = leggi_json("config/anagrafica_asin.json") or {}
-            ana.update(anagrafica_nuova)
-            Pubblicatore("config/anagrafica_asin.json").salva(ana, forza=True)
+            aggiorna_json("config/anagrafica_asin.json", lambda ana: {**(ana or {}), **anagrafica_nuova})
             print(f"Anagrafica ASIN aggiornata: {len(anagrafica_nuova)} modelli")
         if cache_nuova and REPO and TOKEN:
-            tutta = pulisci_cache({**(leggi_json("cache/pagine.json") or {}), **cache_nuova})
-            Pubblicatore("cache/pagine.json").salva(tutta, forza=True)
-            print(f"Cache pagine aggiornata: {len(cache_nuova)} nuove, {len(tutta)} totali")
+            aggiorna_json("cache/pagine.json", lambda c: pulisci_cache({**(c or {}), **cache_nuova}))
+            print(f"Cache pagine aggiornata: {len(cache_nuova)} nuove")
     if stato["stato"] == "errore":
         sys.exit(1)
 

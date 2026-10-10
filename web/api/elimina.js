@@ -19,9 +19,9 @@ module.exports = async (req, res) => {
   await Promise.all(runs.map(async (r) => {
     try {
       await gh(`/repos/${REPO}/actions/runs/${r.github_id}`, { metodo: "DELETE" });
-      const f = await gh(`/repos/${REPO}/contents/runs/${r.id}/stato.json?ref=dati`);
-      if (f.status === 200 && f.dati.sha) {
-        await gh(`/repos/${REPO}/contents/runs/${r.id}/stato.json`, { metodo: "DELETE", corpo: { message: `elimina ricerca ${r.id}`, sha: f.dati.sha, branch: "dati" } });
+      const dir = await gh(`/repos/${REPO}/contents/runs/${r.id}?ref=dati`);  // stato.json o parte_<k>.json
+      for (const f of (dir.status === 200 && Array.isArray(dir.dati) ? dir.dati : [])) {
+        await gh(`/repos/${REPO}/contents/${f.path}`, { metodo: "DELETE", corpo: { message: `elimina ricerca ${r.id}`, sha: f.sha, branch: "dati" } });
       }
     } catch { /* resta comunque nascosta */ }
   }));

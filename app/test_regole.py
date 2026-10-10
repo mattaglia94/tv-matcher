@@ -229,7 +229,34 @@ def main():
     tot = len(RICONOSCIMENTO) + len(SOMIGLIANZA) + len(PAGINE) + len(CASI_ASIN) + len(SCHEDE)
     print(f"{tot - errori}/{tot} casi corretti")
     errori += banco_amazon()
+    errori += invarianza_modello()
     sys.exit(1 if errori else 0)
+
+
+def invarianza_modello():
+    """Con o senza modello scritto a mano il motore deve vedere lo STESSO TV (stesse caratteristiche, stessi match)."""
+    import json
+    import os
+    from nucleo import prepara_asin
+    f = os.path.join(os.path.dirname(os.path.abspath(__file__)), "banco_campioni.json")
+    righe = json.load(open(f, encoding="utf-8"))[::4]
+    campi = ("marca", "pollici", "tecnologia", "fascia", "famiglia", "risoluzione", "hz", "anno", "pro")
+    errori = 0
+    P = unisci_parametri({"modalita": "stessa_marca"})
+    for r in righe:
+        br = _BrowserFinto(r["titolo"], [], "", {}, {})
+        base, info0 = prepara_asin(br, {"asin": r["asin"], "paese": r["paese"]}, [], P, log=lambda m: None)
+        if info0 is None:
+            continue
+        for manuale in (info0.codice, info0.codice.lower(), f"{info0.marca} {info0.codice}"):
+            out, info = prepara_asin(br, {"asin": r["asin"], "paese": r["paese"], "modello": manuale}, [], P, log=lambda m: None)
+            diff = [c for c in campi if info is None or getattr(info, c) != getattr(info0, c)]
+            if diff:
+                errori += 1
+                print(f"✗ modello a mano {manuale!r} cambia {diff}: {r['titolo'][:60]}")
+                break
+    print(f"{'✓' if not errori else '✗'} modello scritto a mano: nessuna differenza su {len(righe)} TV" if not errori else "")
+    return errori
 
 
 # Banco Amazon: ~280 TV reali (IT/DE/FR/ES/UK, 40-75", brand principali) raccolte da app/banco.py.
