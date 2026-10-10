@@ -154,6 +154,13 @@ def trova_hz(t: str) -> int | None:
     return max(vals) if vals else None
 
 
+def hz_diverse(a, b) -> bool:
+    """Frequenze davvero diverse: 50/60 Hz contro 144 Hz e oltre. 60 vs 120 e 120 vs 144 non bastano a scartare:
+    schede e titoli mescolano spesso frequenza nativa e valori di marketing (Game Boost, Motion Xcelerator, VRR)."""
+    ca, cb = classe_hz(a), classe_hz(b)
+    return bool(ca and cb) and {ca, cb} == {60, 144}
+
+
 def classe_hz(hz):
     if hz is None:
         return None
@@ -204,6 +211,9 @@ _LG_FAM = [  # (regex sul codice, tecnologia, famiglia)
 ]
 
 
+_LG_ANNO = {"Q": 2022, "R": 2023, "T": 2024, "A": 2025, "B": 2026}
+
+
 def _lg(T: str, info: InfoTV):
     # OLED: OLED65C64LA  /  altri: 65QNED86A6A, 65NANO81T6A, 55UA73006LA
     m = re.search(r"\bOLED(\d{2,3})([A-Z])(\d)([A-Z0-9]*)", T)
@@ -224,6 +234,9 @@ def _lg(T: str, info: InfoTV):
         info.core = m.group(1) + m.group(2)
         key = m.group(2)
         info.chiave = key
+        # anno dalla lettera: serie U (UA7 = 2025) o lettera dopo la serie (QNED82A6 = 2025, NANO81T6 = 2024)
+        lett = key[1] if re.match(r"U[A-Z]\d", key) else (m.group(3)[:1] if re.match(r"[A-Z]\d", m.group(3)) else "")
+        info.anno = _LG_ANNO.get(lett)
     for rx, tec, fam in _LG_FAM:
         if re.match(rx, key) or re.search(rx, info.codice):
             info.tecnologia, info.famiglia, info.regola = tec, fam, "LG"
@@ -574,11 +587,43 @@ def fascia_da_famiglia(fam: str) -> str:
     return ""
 
 
+_ACCESSORIO = re.compile(
+    r"TELECOMANDO|FERNBEDIENUNG|T[EÉ]L[EÉ]COMMANDE|MANDO A DISTANCIA|REMOTE CONTROL|STAFFA|SUPPORTO A PARETE|"
+    r"WANDHALTERUNG|HALTERUNG|SUPPORT MURAL|SOPORTE DE PARED|WALL MOUNT|BRACKET|\bBEZEL\b|"
+    r"FRIGORIFERO|K[UÜ]HLSCHRANK|R[EÉ]FRIG[EÉ]RATEUR|FRIGOR[IÍ]FICO|FRIDGE|"
+    r"LAVATRICE|WASCHMASCHINE|LAVE-LINGE|LAVADORA|WASHING MACHINE|ERSATZ|RICAMBIO|REPLACEMENT|PIÈCE DE RECHANGE|"
+    r"LED STRIP|STRIP LED|BACKLIGHT|RETROILLUMINAZIONE|R[EÉ]TRO[EÉ]CLAIRAGE|TIRA DE LED|SCHUTZFOLIE|PELLICOLA|"
+    r"PROIETTORE|BEAMER|PROJECTOR|VID[EÉ]OPROJECTEUR|PROYECTOR")
+_ACC_DEBOLE = re.compile(r"CORNICE|\bRAHMEN\b|\bMONITOR\b|\bCAVO\b|\bKABEL\b|\bC[AÂ]BLE\b")  # solo se non è un TV
+_ACC_URL = re.compile(r"/(accessori|zubehoer|zubehor|accessoires|accesorios|accessories|elettrodomestici|haushalt|"
+                      r"electromenager|electrodomesticos)[/-]", re.I)
+
+
+def e_accessorio(testo: str, url: str = "") -> bool:
+    """Accessori e altri prodotti che le ricerche dei negozi mescolano ai TV (telecomandi, staffe, cornici, frigoriferi...)."""
+    T = _norm(testo)
+    if _ACC_URL.search(url or ""):
+        return True
+    if re.search(r"SOUNDBAR|SOUND BAR|BARRA DE SONIDO|BARRE DE SON", T) and not re.search(r"BUNDLE|\+ ?TV|TV ?\+", T):
+        return True
+    if _ACCESSORIO.search(T):
+        return True
+    return bool(_ACC_DEBOLE.search(T)) and not re.search(r"SMART ?TV|\bTV (LED|QLED|OLED)|FERNSEHER|T[EÉ]L[EÉ]VISEUR|TELEVISOR", T)
+
+
+def _unisci_codici(T: str) -> str:
+    """Codici scritti a pezzi (MediaMarkt/Saturn): "LG 50 QNED 82 A 6 BAEU" -> 50QNED82A6BAEU, "OLED 55 C 5 ELB" -> OLED55C5ELB."""
+    T = re.sub(r"\b(\d{2,3}) (QNED|NANO|UA|UT|UR|UQ|QN|Q|U) ?(\d{1,3}) ?([A-Z]) ?(\d) ?([A-Z]{2,4})\b",
+               lambda m: "".join(m.groups()), T)
+    T = re.sub(r"\bOLED ?(\d{2,3}) ?([A-Z]) ?(\d) ?([A-Z]{2,4})\b", lambda m: "OLED" + "".join(m.groups()), T)
+    return T
+
+
 def analizza(testo: str, codice_noto: str = "", marca_nota: str = "", prezzo: float | None = None) -> InfoTV:
     """Analizza titolo prodotto (+ eventuale codice modello già noto, marca e prezzo letti da Amazon)."""
     if not _CAT["marche"]:
         imposta_catalogo(catalogo_predefinito())
-    T = _norm(f"{codice_noto} {testo}")
+    T = _unisci_codici(_norm(f"{codice_noto} {testo}"))
     info = InfoTV(testo=testo or "")
     info.marca = trova_marca(T) or marca_da_codice(codice_noto or T)
     if not info.marca and marca_nota:
@@ -708,9 +753,16 @@ def leggi_scheda(scheda: dict | None) -> dict:
     cand = [c for c in cand if c]
     if cand:
         out["tecnologia"] = max(cand, key=lambda c: _RANGO_TEC.get(c, 0))
-    v = _voce(scheda, "hz")
-    if v and trova_hz(v if re.search(r"HZ", v, re.I) else f"{v} Hz"):
-        out["hz"] = trova_hz(v if re.search(r"HZ", v, re.I) else f"{v} Hz")
+    # frequenza: la voce della scheda, ma se altrove la scheda dice esplicitamente la nativa ("60Hz with 120Hz
+    # Game Boost") vale quella; valori oltre 165 Hz sono sempre marketing (es. "288 Hz")
+    voci_hz = [scheda.get(n) for n in _VOCI["hz"] if scheda.get(n)] + \
+        [v for k, v in scheda.items() if isinstance(v, str) and re.search(r"(hertz|hercios|hz)$", k)]
+    vals = [trova_hz(v if re.search(r"HZ", v, re.I) else f"{v} Hz") for v in voci_hz]
+    vals = [x for x in vals if x and x <= 165]
+    altro = " | ".join(str(v) for k, v in scheda.items() if isinstance(v, str) and v not in voci_hz)
+    nativa = trova_hz(altro) if re.search(r"\d\s?HZ\s+(WITH|CON|MIT|AVEC)\b", _norm(altro)) else None
+    if nativa or vals:
+        out["hz"] = nativa or min(vals)
     for k in ("marca", "modello"):
         v = _voce(scheda, k)
         if v:
@@ -826,8 +878,7 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
             return False, f"risoluzione {cand.risoluzione}", 0
         note.append(f"risoluzione {cand.risoluzione}")
         score += 10
-    if P["refresh"]["attivo"] and classe_hz(amz.hz) and classe_hz(cand.hz) \
-            and classe_hz(amz.hz) != classe_hz(cand.hz):
+    if P["refresh"]["attivo"] and hz_diverse(amz.hz, cand.hz):
         return False, f"refresh {cand.hz}Hz", 0
     # Dolby Vision / HDR10+ / HDMI 2.1 si controllano sulla pagina prodotto (nucleo.elabora_asin)
     if P["anno"]["attivo"]:
@@ -896,7 +947,7 @@ def confronta(amz: InfoTV, cand: InfoTV, anno_target: int, accetta_anno_ignoto: 
         return False, "PRO vs non-PRO", 0
     if amz.risoluzione and cand.risoluzione and amz.risoluzione != cand.risoluzione:
         return False, f"risoluzione {cand.risoluzione}", 0
-    if classe_hz(amz.hz) and classe_hz(cand.hz) and classe_hz(amz.hz) != classe_hz(cand.hz):
+    if hz_diverse(amz.hz, cand.hz):
         return False, f"refresh {cand.hz}Hz", 0
     nota = ""
     if cand.anno is not None and cand.anno != anno_target:

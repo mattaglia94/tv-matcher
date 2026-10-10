@@ -202,10 +202,12 @@ def esiti(file):
                 per_neg[f"{r['paese']} {neg}"][e] += 1
             for d in r.get("dettaglio", []):
                 e = d.get("esito", "")
+                if e.startswith(("errore", "illeggibile", "bloccato")) or "errore" in e[:30]:
+                    motivi["NEGOZIO " + d.get("retailer", "") + ": " + e[:90]] += 1
                 if e.startswith("scartato"):
                     m = re.sub(r"[\d.,]+", "#", e.split("(")[0])[:60]
                     motivi[m] += 1
-                    if d.get("pollici") == am.get("pollici") and not re.search(r"pollici|stesso modello|marca", e):
+                    if d.get("pollici") == am.get("pollici") and not re.search(r"pollici|stesso modello|marca|tecnologia|fascia|anno 20", e):
                         sospetti.append((r["asin"], am.get("codice") or am.get("modello"), d["retailer"], d.get("modello"), e[:120], d.get("url", "")[:110]))
     print(f"{n_asin} ASIN")
     for neg, c in sorted(per_neg.items()):

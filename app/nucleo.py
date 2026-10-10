@@ -2,7 +2,7 @@
 Usato sia dall'exe/CLI (motore.py) sia dal runner del sito (web_runner.py)."""
 import re
 
-from regole import _tec_equivalenti, analizza, arricchisci, classe_hz, confronta_param, leggi_prezzo, leggi_scheda, stesso_modello, unisci_parametri
+from regole import _tec_equivalenti, analizza, e_accessorio, arricchisci, classe_hz, hz_diverse, confronta_param, leggi_prezzo, leggi_scheda, stesso_modello, unisci_parametri
 
 ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
          "nessun_simile": "Nessun modello simile", "errore": "Ricerca non riuscita",
@@ -253,7 +253,7 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
     max_m = max(1, int(P.get("max_match") or 1))
     out = {"match": {}, "esito": {}, "dettaglio": [], "ponte": {}}
     r = {**r, "url": URL_CORRETTI.get(r["url"], r["url"])}
-    validi = {}
+    validi, da_leggere = {}, {}
     pertinenti, ricerche_ok, errori, tv_letti = 0, 0, [], 0
     for q in query_ricerca(info, P):
         url_s, links, stato = br.cerca(r["url"], q)
@@ -266,6 +266,8 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
         for l in links:
             if l["url"].split("?")[0] == url_s.split("?")[0]:
                 continue  # filtri della pagina di ricerca (marca, prezzo...), non prodotti
+            if e_accessorio(l["testo"], l["url"]):
+                continue  # telecomandi, staffe, cornici, elettrodomestici: non sono TV
             c = analizza(l["testo"], prezzo=leggi_prezzo(l["testo"]))
             if not c.codice or "caratteristiche" in c.note:
                 # molti retailer mettono il codice modello solo nell'indirizzo (es. _tcl-75t69c-..., pidSAMQE75QN70H)
@@ -285,6 +287,9 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
             else:
                 continue  # stessa marca in modalità concorrente, o altra marca in modalità stessa marca
             ok, motivo, score = confronta_param(info, c, P)
+            if not ok and motivo.startswith("codice modello non leggibile") and P.get("verifica_url", True) and \
+                    abs(c.pollici - info.pollici) <= int(P["pollici"].get("tolleranza") or 0) and l["url"] not in da_leggere:
+                da_leggere[l["url"]] = l  # titolo senza modello: si legge la scheda dell'inserzione (dopo, se serve)
             out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "famiglia": c.famiglia,
                                      "pollici": c.pollici, "anno": c.anno, "url": l["url"],
                                      "esito": ("VALIDO " if ok else "scartato: ") + motivo, "ricerca": q})
@@ -292,6 +297,28 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
                 validi[l["url"]] = (score, c, l.get("img", ""), motivo)
         if len(validi) >= max_m + 1:  # una riserva: la verifica della pagina può scartarne
             break
+    # inserzioni della diagonale giusta ma senza modello nel titolo (es. "Téléviseur QLED 4K noir"):
+    # si apre la pagina e si usano titolo completo e scheda tecnica (modello, tecnologia, anno...)
+    for url, l in list(da_leggere.items())[:4]:
+        if len(validi) >= max_m + 1 or (stop and stop()):
+            break
+        res = br.verifica(url)
+        if not res[0]:
+            continue
+        sch_raw = res[4] if len(res) > 4 else {}
+        sp = leggi_scheda({k: v for k, v in sch_raw.items() if not k.startswith("_")})
+        c = arricchisci(analizza(f"{res[1]} {l['testo']}", sp.get("modello", ""), sp.get("marca", ""),
+                                 prezzo=leggi_prezzo(l["testo"])), sp)
+        if sp.get("pollici"):
+            c.pollici = sp["pollici"]
+        if not c.marca or not c.pollici or (c.marca != info.marca) != concorrente:
+            continue
+        ok, motivo, score = confronta_param(info, c, P)
+        out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "famiglia": c.famiglia,
+                                 "pollici": c.pollici, "anno": c.anno, "url": url,
+                                 "esito": ("VALIDO " if ok else "scartato: ") + motivo + " (modello letto nella scheda dell'inserzione)"})
+        if ok:
+            validi[url] = (score, c, l.get("img", ""), motivo + ", modello dalla scheda")
     scelti, codici = [], set()
     for url, (score, c, im, motivo) in sorted(validi.items(), key=lambda x: x[1][0]):
         nome_pag = ""
@@ -337,7 +364,7 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
                     not (P["modalita"] == "concorrente" and {ris_pag, info.risoluzione} <= {"HD", "FHD"}):
                 mancanti.append(f"risoluzione {info.risoluzione} (pagina: {ris_pag})")
             hz_pag = sp.get("hz")
-            if P["refresh"]["attivo"] and info.hz and hz_pag and classe_hz(hz_pag) != classe_hz(info.hz):
+            if P["refresh"]["attivo"] and info.hz and hz_pag and hz_diverse(hz_pag, info.hz):
                 mancanti.append(f"frequenza {info.hz} Hz (pagina: {hz_pag} Hz)")
             # la voce "tecnologia" delle schede è spesso generica o sbagliata (un QLED è anche "LED", un LED a volte
             # "Mini LED"): si scarta solo se una è OLED e l'altra no, oppure se anche il titolo della pagina la contraddice

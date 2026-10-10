@@ -135,6 +135,9 @@ PAGINE = [  # (titolo ASIN, risultati di ricerca, titolo pagina prodotto, modali
      "Xiaomi TV A Pro 50 2026 QLED 4K", "stessa_marca", "A PRO 50"),
     ("Samsung QE75QN80HATXZT Neo QLED 2026", [("Neo QLED 75 Vision AI 2026", "https://www.unieuro.it/online/TV-Neo-QLED/75-Neo-QLED-QN70H-pidSAMQE75QN70H")],
      "Samsung 75\" Neo QLED QN70H 4K 2026", "concorrente", None),
+    # titolo della ricerca senza modello (Cdiscount): il modello si legge aprendo l'inserzione
+    ("Samsung QE55Q7HAAUXZT QLED 4K 55 pollici 2026", [("Téléviseur QLED 4K noir 55 pouces Samsung", "https://www.cdiscount.com/f-10626-x.html")],
+     "Samsung QE55Q6HAAUXZT TV QLED 4K 55\" 2026", "stessa_marca", "QE55Q6HAAUXZT"),
 ]
 
 

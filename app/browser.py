@@ -345,10 +345,20 @@ class Browser:
         if r is None:
             return url, [], "timeout"
         self._pausa(0.5, 1.2)
-        try:
-            links = self.page.evaluate(JS_LINKS)
-        except Exception as e:
-            return url, [], f"errore lettura: {e}"
+        links = None
+        for tentativo in range(3):  # la pagina può ricaricarsi da sola (redirect via script): si aspetta e si riprova
+            try:
+                links = self.page.evaluate(JS_LINKS)
+                break
+            except Exception as e:
+                errore = e
+                try:
+                    self.page.wait_for_load_state("domcontentloaded", timeout=10000)
+                except Exception:
+                    pass
+                time.sleep(1.5)
+        if links is None:
+            return url, [], f"errore lettura: {errore}"
         visti, out = set(), []
         for l in links:
             h = l["href"].split("#")[0]
