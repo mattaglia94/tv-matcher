@@ -547,6 +547,12 @@
      "fascia": "TOP",
      "descrizione": "UX / UXQ ammiraglia",
      "famiglia": "MINILED-TOP"
+    },
+    {
+     "serie": "E4",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "E4 Full HD/HD"
     }
    ]
   },
@@ -931,6 +937,12 @@
      "tecnologia": "OLED",
      "fascia": "MID",
      "descrizione": "POS7 OLED"
+    },
+    {
+     "serie": "HFL",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "HFL televisori per hotel"
     }
    ]
   },

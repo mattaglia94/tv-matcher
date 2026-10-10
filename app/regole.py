@@ -605,7 +605,7 @@ _ACCESSORIO = re.compile(
     r"WANDHALTERUNG|HALTERUNG|SUPPORT MURAL|SOPORTE DE PARED|WALL MOUNT|BRACKET|\bBEZEL\b|"
     r"FRIGORIFERO|K[UÜ]HLSCHRANK|R[EÉ]FRIG[EÉ]RATEUR|FRIGOR[IÍ]FICO|FRIDGE|"
     r"LAVATRICE|WASCHMASCHINE|LAVE-LINGE|LAVADORA|WASHING MACHINE|ERSATZ|RICAMBIO|REPLACEMENT|PIÈCE DE RECHANGE|"
-    r"LIGHTSTRIP|HUE PLAY|RUBAN LED|LED STRIP|STRIP LED|STRISCIA LED|STRISCE LED|LED-STREIFEN|BACKLIGHT|RETROILLUMINAZIONE|R[EÉ]TRO[EÉ]CLAIRAGE|TIRA DE LED|SCHUTZFOLIE|PELLICOLA|"
+    r"\bPEZZI\b|\bPCS\b|\bST[UÜ]CK\b|\bPI[EÈ]CES\b|LIGHTSTRIP|HUE PLAY|RUBAN LED|LED STRIP|STRIP LED|STRISCIA LED|STRISCE LED|LED-STREIFEN|BACKLIGHT|RETROILLUMINAZIONE|R[EÉ]TRO[EÉ]CLAIRAGE|TIRA DE LED|SCHUTZFOLIE|PELLICOLA|"
     r"PROIETTORE|BEAMER|PROJECTOR|VID[EÉ]OPROJECTEUR|PROYECTOR|ST[AÄ]NDER|TV-BEINE|\bBEINE\b|PIEDINI|PIEDS TV|PATAS|"
     r"T-?CON\b|SCHEDA LOGICA|LOGIC BOARD|MAINBOARD|SCHEDA MADRE|ALIMENTATORE|NETZTEIL|POWER SUPPLY|CARICATORE|CHARGER|"
     r"MULTIPRESA|FILM PROTECTEUR|PROTECTOR DE PANTALLA|SCREEN PROTECTOR|DISPLAYSCHUTZ|BEFESTIGUNGS|CLIPS?\b|"
@@ -682,6 +682,10 @@ def analizza(testo: str, codice_noto: str = "", marca_nota: str = "", prezzo: fl
     if not info.fascia and prezzo:
         info.fascia = stima_fascia(prezzo, info.pollici, info.tecnologia)
         info.fascia_fonte = "stimata"
+    if not info.fascia and info.tecnologia == "LED" and info.risoluzione:
+        # serie sconosciuta e nessun prezzo: un LED Full HD/HD è per forza di fascia base, un LED 4K al più entry
+        info.fascia = "BASE" if info.risoluzione in ("HD", "FHD") else "ENTRY" if info.risoluzione == "4K" else ""
+        info.fascia_fonte = "presunta" if info.fascia else ""
     if not info.codice and info.marca and info.pollici and info.tecnologia and info.fascia:
         # nessun codice leggibile, ma le caratteristiche bastano: modello "per caratteristiche"
         info.codice = f"{info.marca.title()} {info.pollici}\" {info.tecnologia}"
