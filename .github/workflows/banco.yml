@@ -36,6 +36,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
+          LOTTO: ${{ inputs.config != '{}' && inputs.config || '' }}
         run: python -u app/banco.py raccogli ${{ matrix.paese }}
       - name: Sonda
         if: inputs.fase == 'sonda'

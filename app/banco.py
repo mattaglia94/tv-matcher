@@ -41,8 +41,8 @@ JS_RISULTATI = r"""
 """
 
 
-def cerca_amazon(br, dom, testo):
-    url = f"https://www.{dom}/s?k={urllib.parse.quote_plus(testo)}"
+def cerca_amazon(br, dom, testo, pagina=1):
+    url = f"https://www.{dom}/s?k={urllib.parse.quote_plus(testo)}" + (f"&page={pagina}" if pagina > 1 else "")
     for tentativo in range(3):
         br._vai(url)
         br._pausa()
@@ -80,7 +80,7 @@ def cerca_motore(br, dom, testo):
     return righe
 
 
-def raccogli(paese, per_marca=5):
+def raccogli(paese, per_marca=5, lotto=""):
     from browser import Browser
     from regole import catalogo_predefinito, imposta_catalogo, trova_marca, trova_pollici_testo as trova_pollici
     imposta_catalogo(catalogo_predefinito())
@@ -88,6 +88,12 @@ def raccogli(paese, per_marca=5):
     dom = DOMINIO[paese]
     br = Browser(visibile=False)
     visti, scelti, diario = set(), [], []
+    if lotto:  # lotto nuovo: niente ASIN già nel banco, risultati della seconda pagina
+        try:
+            visti |= {x["asin"] for x in json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "banco_campioni.json")))}
+        except Exception:
+            pass
+        random.seed(f"{paese}{lotto}")
     try:
         br._vai(f"https://www.{dom}/")
         br._pausa(2, 4)
@@ -99,7 +105,7 @@ def raccogli(paese, per_marca=5):
                 if presi >= per_marca:
                     break
                 testo = f"{marca} " + PAROLA[paese].format(p=p)
-                righe = cerca_amazon(br, dom, testo) or cerca_motore(br, dom, testo)
+                righe = cerca_amazon(br, dom, testo, pagina=2 if lotto else 1) or cerca_motore(br, dom, testo)
                 print(f"{paese} {marca} {p}\": {len(righe)} risultati", flush=True)
                 if len(diario) < 400:
                     try:
@@ -138,8 +144,9 @@ def raccogli(paese, per_marca=5):
         br.chiudi()
     if REPO and TOKEN:
         assicura_branch()
-        Pubblicatore(f"banco/asin_{paese}.json").salva(scelti, forza=True)
-        Pubblicatore(f"banco/diario_{paese}.json").salva(diario, forza=True)
+        suff = f"_{lotto}" if lotto else ""
+        Pubblicatore(f"banco/asin_{paese}{suff}.json").salva(scelti, forza=True)
+        Pubblicatore(f"banco/diario_{paese}{suff}.json").salva(diario, forza=True)
     os.makedirs("output", exist_ok=True)
     json.dump(scelti, open(f"output/asin_{paese}.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
@@ -254,7 +261,7 @@ def sonda(urls):
 
 if __name__ == "__main__":
     if sys.argv[1] == "raccogli":
-        raccogli(sys.argv[2].upper())
+        raccogli(sys.argv[2].upper(), lotto=os.environ.get("LOTTO", ""))
     elif sys.argv[1] == "sonda":
         sonda(json.loads(os.environ.get("URLS") or "[]") or sys.argv[2:])
     elif sys.argv[1] == "esiti":
