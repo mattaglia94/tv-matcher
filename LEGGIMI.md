@@ -65,6 +65,14 @@ Anno dal codice:
 - **Opzione A**: su un PC Windows con Python installato, doppio click su `build_exe.bat`.
 - **Opzione B**: carica la cartella su GitHub. Il workflow `.github/workflows/build.yml` crea l'exe in automatico (scheda Actions → artifact *Radar_TV*).
 
+## Banco di prova (`app/banco.py`, workflow "Banco di prova")
+Serve a verificare il motore su tanti TV veri, senza passare dal sito.
+- **raccogli**: pesca da Amazon (5 paesi, brand principali, 40–75") TV con la loro scheda tecnica → `banco/asin_<paese>.json` nel branch `dati`.
+- **confronta**: lancia il motore completo su un campione di quegli ASIN in tutti i negozi del paese → `runs/banco-…/stato.json`.
+- **sonda**: apre pagine di negozi problematici e salva cosa vede il browser.
+- In locale: `python app/banco.py valuta <file>` (titolo vs scheda Amazon) e `python app/banco.py esiti <stato.json>` (statistiche per negozio e motivi di scarto).
+- `app/banco_campioni.json` (~270 TV reali) è usato da `test_regole.py`: soglie minime di marca, pollici, risoluzione e tecnologia, e nessun TV vero scambiato per un accessorio.
+
 ## Limiti noti
-- I siti cambiano layout e protezioni anti-bot. L'estrazione è generica (legge tutti i link della pagina di ricerca), quindi regge bene, ma se un retailer smette di restituire risultati va controllato il suo URL di ricerca nel foglio Retailer.
-- Gli URL di ricerca preimpostati per DE/FR/ES/UK sono ancora da testare.
+- I siti cambiano layout e protezioni anti-bot. L'estrazione è generica (legge tutti i link della pagina di ricerca), quindi regge bene, ma se un retailer smette di restituire risultati va controllato il suo URL di ricerca.
+- Dai server di GitHub alcuni negozi bloccano sempre (AO.com e PCComponentes con Cloudflare, Euronics-DE, Argos spesso) o a volte (Darty, Fnac, Joybuy). Se non sono su idealo, risultano "non leggibili". Dal PC di casa (exe) di solito funzionano.
