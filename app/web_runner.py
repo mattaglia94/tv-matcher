@@ -116,10 +116,53 @@ class Pubblicatore:
             st, res = _req("PUT", f"{API}/repos/{REPO}/contents/{self.percorso}", corpo)
             if st in (200, 201):
                 self.sha = res["content"]["sha"]
+                if self.percorso.endswith(f"parte_{PARTE}.json"):
+                    scrivi_unito(forza=isinstance(dati, dict) and dati.get("stato") != "in_corso")
                 return
             self.sha = None  # conflitto: rilegge lo sha e riprova
             time.sleep(2)
         print(f"⚠ salvataggio stato non riuscito ({st})")
+
+
+def unisci_parti(parti):
+    """Stato unico da più parti (stessa logica del sito, web/api/stato.js)."""
+    parti = sorted([p for p in parti if p], key=lambda p: p.get("parte", 0))
+    if not parti:
+        return None
+    attesi = parti[0].get("parti", len(parti))
+    stati = [p.get("stato") for p in parti]
+    in_corso = "in_corso" in stati or len(parti) < attesi
+    fatti = sum((p.get("avanzamento") or {}).get("fatti", 0) for p in parti)
+    totale = sum((p.get("avanzamento") or {}).get("totale", 0) for p in parti)
+    log = sorted(r.replace(" ", f" [{k + 1}] ", 1) for k, p in enumerate(parti) for r in p.get("log", []))[-120:]
+    return {**parti[0], "stato": "in_corso" if in_corso else "errore" if "errore" in stati else "completato",
+            "errore": " · ".join(p["errore"] for p in parti if p.get("errore")) or None,
+            "iniziato": min(p.get("iniziato") or "9" for p in parti),
+            "finito": None if in_corso else max(p.get("finito") or "" for p in parti),
+            "avanzamento": {"fatti": fatti, "totale": max(totale, fatti, 1),
+                            "corrente": f"{attesi} parti in parallelo" if in_corso else "Completato"},
+            "log": log, "risultati": sorted((r for p in parti for r in p.get("risultati", [])), key=lambda r: r.get("_i", 0))}
+
+
+_ultimo_unito = [0.0]
+
+
+def scrivi_unito(forza=False):
+    """Con più parti, ognuna aggiorna anche runs/<id>/stato.json con la vista complessiva (al massimo ogni 60 s)."""
+    if PARTI == 1 or not REPO or not TOKEN or (not forza and time.time() - _ultimo_unito[0] < 60):
+        return
+    _ultimo_unito[0] = time.time()
+    st, elenco = _req("GET", f"{API}/repos/{REPO}/contents/runs/{RUN_ID}?ref={BRANCH}")
+    nomi = [f["name"] for f in elenco] if st == 200 and isinstance(elenco, list) else []
+    parti = [leggi_json(f"runs/{RUN_ID}/{n}") for n in nomi if n.startswith("parte_")]
+    unito = unisci_parti(parti)
+    if unito:
+        def piu_recente(vecchio):  # mai sostituire una vista più avanti (un'altra parte ha appena scritto dopo)
+            v = (vecchio or {}).get("avanzamento", {}).get("fatti", -1)
+            if vecchio and (vecchio.get("stato") != "in_corso" and unito["stato"] == "in_corso" or v > unito["avanzamento"]["fatti"]):
+                return vecchio
+            return unito
+        aggiorna_json(f"runs/{RUN_ID}/stato.json", piu_recente)
 
 
 MAX_PROCESSI = int(os.environ.get("MAX_PROCESSI", "8"))  # browser in parallelo in tutto
