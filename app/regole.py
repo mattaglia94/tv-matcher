@@ -308,7 +308,7 @@ def _samsung(T: str, info: InfoTV):
         info.pollici = int(pol)
     else:
         # codice senza pollici, es. "Crystal UHD U8075F", "DU7179", "The Frame LS03F", "Q7F5"
-        m = re.search(r"\bD?(QN|LS|Q|S|U)(\d{1,4})([A-H])(\d{0,3})\b", T)
+        m = re.search(r"\bD?(QN|LS|Q|S|U|M|R)(\d{1,4})([A-H])(\d{0,3}|A[A-Z]?)\b", T)
         if not m or not info.pollici or (m.group(1) == "S" and len(m.group(2)) < 2):
             return False
         pol, lett, num, anno_l = str(info.pollici), m.group(1), m.group(2), m.group(3)
