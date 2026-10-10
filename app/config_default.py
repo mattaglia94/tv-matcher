@@ -13,7 +13,7 @@ RETAILER = [
     ("IT", "Expert", "https://www.expert.it/it/it/exp/shop/search?terms={q}", "SI"),
 
     ("ES", "MediaMarkt-ES", "https://www.mediamarkt.es/es/search.html?query={q}", "SI"),
-    ("ES", "ElCorteIngles", "https://www.elcorteingles.es/search-nwx/1/?s={q}", "SI"),
+    ("ES", "ElCorteIngles", "https://www.elcorteingles.es/search-nwx/?s={q}", "SI"),
     ("ES", "Carrefour", "https://www.carrefour.es/?q={q}", "SI"),
     ("ES", "PCComponentes", "https://www.pccomponentes.com/search/?query={q}", "SI"),
     ("ES", "Alcampo", "https://www.compraonline.alcampo.es/search?q={q}", "SI"),
@@ -22,14 +22,14 @@ RETAILER = [
     ("DE", "MediaMarkt", "https://www.mediamarkt.de/de/search.html?query={q}", "SI"),
     ("DE", "Saturn", "https://www.saturn.de/de/search.html?query={q}", "SI"),
     ("DE", "Otto", "https://www.otto.de/suche/{q}/", "SI"),
-    ("DE", "Joybuy", "https://www.joybuy.de/search?keyword={q}", "SI"),
+    ("DE", "Joybuy", "https://www.joybuy.de/s?k={q}", "SI"),
 
     ("UK", "AO.com", "https://ao.com/search?search={q}", "SI"),
     ("UK", "Currys", "https://www.currys.co.uk/search?q={q}", "SI"),
     ("UK", "Very", "https://www.very.co.uk/e/q/{q}.end", "SI"),
     ("UK", "Argos", "https://www.argos.co.uk/search/{q}/", "SI"),
     ("UK", "John Lewis", "https://www.johnlewis.com/search?search-term={q}", "SI"),
-    ("UK", "Joybuy", "https://www.joybuy.co.uk/search?keyword={q}", "SI"),
+    ("UK", "Joybuy", "https://www.joybuy.co.uk/s?k={q}", "SI"),
 
     ("FR", "Boulanger", "https://www.boulanger.com/resultats?tr={q}", "SI"),
     ("FR", "Conforama", "https://www.conforama.fr/recherche-conforama/{q}", "SI"),
@@ -39,5 +39,5 @@ RETAILER = [
     ("FR", "Darty", "https://www.darty.com/nav/recherche?text={q}", "SI"),
     ("FR", "Cdiscount", "https://www.cdiscount.com/search/10/{q}.html", "SI"),
     ("FR", "Fnac", "https://www.fnac.com/SearchResult/ResultList.aspx?Search={q}", "SI"),
-    ("FR", "Joybuy", "https://www.joybuy.fr/search?keyword={q}", "SI"),
+    ("FR", "Joybuy", "https://www.joybuy.fr/s?k={q}", "SI"),
 ]

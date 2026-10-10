@@ -10,7 +10,13 @@ ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
          "saltato": "Saltato: modello Amazon mancante"}
 
 # indirizzi di ricerca vecchi o sbagliati salvati nelle impostazioni -> indirizzo corretto
-URL_CORRETTI = {"https://www.expert.it/search?q={q}": "https://www.expert.it/it/it/exp/shop/search?terms={q}"}
+URL_CORRETTI = {  # indirizzi di ricerca cambiati dai negozi (vale anche per le configurazioni salvate dal sito)
+    "https://www.expert.it/search?q={q}": "https://www.expert.it/it/it/exp/shop/search?terms={q}",
+    "https://www.joybuy.de/search?keyword={q}": "https://www.joybuy.de/s?k={q}",
+    "https://www.joybuy.fr/search?keyword={q}": "https://www.joybuy.fr/s?k={q}",
+    "https://www.joybuy.co.uk/search?keyword={q}": "https://www.joybuy.co.uk/s?k={q}",
+    "https://www.elcorteingles.es/search-nwx/1/?s={q}": "https://www.elcorteingles.es/search-nwx/?s={q}",
+}
 
 PID_MARCHE = {"SAM": "SAMSUNG", "XIA": "XIAOMI", "LGE": "LG", "HIS": "HISENSE", "TCL": "TCL", "PHI": "PHILIPS",
               "SON": "SONY", "PAN": "PANASONIC", "SHA": "SHARP", "TOS": "TOSHIBA", "HAI": "HAIER", "SAB": "SABA"}
