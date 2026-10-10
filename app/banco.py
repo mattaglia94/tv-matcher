@@ -221,9 +221,42 @@ def esiti(file):
         print(" ", *s_)
 
 
+def sonda(urls):
+    """Apre pagine problematiche e salva cosa vede il browser (titolo, stato, link, testo) per capire come leggerle."""
+    from browser import Browser, JS_LINKS
+    from web_runner import Pubblicatore, REPO, TOKEN
+    br = Browser(visibile=False)
+    out = []
+    try:
+        for u in urls:
+            br.riscalda(u)
+            r = br._vai(u)
+            time.sleep(4)
+            try:
+                links = br.page.evaluate(JS_LINKS)
+            except Exception as e:
+                links = [{"href": "ERR", "testo": str(e)}]
+            try:
+                corpo = br.page.inner_text("body")[:1500]
+                html = br.page.content()
+            except Exception:
+                corpo, html = "", ""
+            prod = [l for l in links if re.search(r"\d{2}", l.get("testo", "")) and len(l.get("testo", "")) > 25]
+            out.append({"url": u, "finale": br.page.url, "stato": getattr(r, "status", None), "titolo": br.page.title(),
+                        "n_link": len(links), "link_prodotto": prod[:15], "corpo": corpo,
+                        "html_len": len(html), "html_prodotti": [m.group(0)[:300] for m in re.finditer(r"<[^>]+(product|tile|card)[^>]*>", html, re.I)][:10]})
+            print(u, out[-1]["stato"], out[-1]["titolo"][:60], len(links), len(prod), flush=True)
+    finally:
+        br.chiudi()
+    if REPO and TOKEN:
+        Pubblicatore("banco/sonda.json").salva(out, forza=True)
+
+
 if __name__ == "__main__":
     if sys.argv[1] == "raccogli":
         raccogli(sys.argv[2].upper())
+    elif sys.argv[1] == "sonda":
+        sonda(json.loads(os.environ.get("URLS") or "[]") or sys.argv[2:])
     elif sys.argv[1] == "esiti":
         esiti(sys.argv[2:])
     elif sys.argv[1] == "valuta":

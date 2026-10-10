@@ -37,6 +37,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: python -u app/banco.py raccogli ${{ matrix.paese }}
+      - name: Sonda
+        if: inputs.fase == 'sonda'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          URLS: ${{ inputs.config }}
+        run: python -u app/banco.py sonda
       - name: Confronto
         if: inputs.fase == 'confronta'
         env:
