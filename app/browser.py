@@ -300,11 +300,18 @@ class Browser:
         except Exception:
             pass
         prezzo = ""
-        try:
-            prezzo = self.page.locator("#corePrice_feature_div .a-offscreen, #corePriceDisplay_desktop_feature_div .a-offscreen, "
-                                       "#apex_desktop .a-offscreen, .a-price .a-offscreen").first.inner_text(timeout=3000).strip()
-        except Exception:
-            pass
+        # un selettore alla volta: con l'elenco unico vinceva il primo prezzo nella pagina (rate, accessori, sponsorizzati)
+        for sel in ("#corePriceDisplay_desktop_feature_div .priceToPay .a-offscreen", "#corePrice_feature_div .a-offscreen",
+                    "#corePriceDisplay_desktop_feature_div .a-offscreen", "#apex_desktop .priceToPay .a-offscreen",
+                    "#apex_desktop .a-offscreen"):
+            try:
+                loc = self.page.locator(sel)
+                if loc.count():
+                    prezzo = loc.first.inner_text(timeout=2000).strip()
+                    if prezzo:
+                        break
+            except Exception:
+                continue
         img = ""
         try:
             el = self.page.locator("#landingImage, #imgTagWrapperId img, #main-image").first

@@ -907,6 +907,30 @@
      "tecnologia": "OLED",
      "fascia": "TOP",
      "descrizione": "OLED+ 9xx"
+    },
+    {
+     "serie": "PQS7",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "PQS7 QLED/LED 4K"
+    },
+    {
+     "serie": "POS9",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "POS9 OLED (fino al 2018)"
+    },
+    {
+     "serie": "POS8",
+     "tecnologia": "OLED",
+     "fascia": "MID",
+     "descrizione": "POS8 OLED"
+    },
+    {
+     "serie": "POS7",
+     "tecnologia": "OLED",
+     "fascia": "MID",
+     "descrizione": "POS7 OLED"
     }
    ]
   },
@@ -1032,6 +1056,30 @@
      "tecnologia": "LED",
      "fascia": "BASE",
      "descrizione": "W8x HD"
+    },
+    {
+     "serie": "XR8",
+     "tecnologia": "OLED",
+     "fascia": "PREMIUM",
+     "descrizione": "K-xxXR8 BRAVIA 8 II"
+    },
+    {
+     "serie": "XF9",
+     "tecnologia": "LED",
+     "fascia": "PREMIUM",
+     "descrizione": "XF90 (2018)"
+    },
+    {
+     "serie": "XF8",
+     "tecnologia": "LED",
+     "fascia": "MID",
+     "descrizione": "XF80 (2018)"
+    },
+    {
+     "serie": "XF7",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "XF70 (2018)"
     }
    ]
   },
@@ -1115,6 +1163,12 @@
      "tecnologia": "OLED",
      "fascia": "PREMIUM",
      "descrizione": "MZ OLED"
+    },
+    {
+     "serie": "S5",
+     "tecnologia": "LED",
+     "fascia": "BASE",
+     "descrizione": "S55 Full HD Fire TV"
     }
    ]
   },

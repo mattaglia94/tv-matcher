@@ -302,13 +302,16 @@ def _samsung_fascia(n: int, tre_cifre: bool):
 
 def _samsung(T: str, info: InfoTV):
     # QE65QN90FATXZT, UE55U8000F, QE65S90F, QE55Q7F, TQ65QN80H
-    m = re.search(r"\b(?:QE|UE|GQ|GU|TQ|TU|QN|MRE|MR)?(\d{2,3})(QN|LS|Q|S|U|M|R)(\d{1,4})([A-Z]?)([A-Z0-9]*)", T)
-    if m:
-        pol, lett, num, anno_l = m.group(1), m.group(2), m.group(3), m.group(4)
+    m = re.search(r"\b(?:QE|UE|GQ|GU|TQ|TU|QN|MRE|MR)?-?(\d{2,3})(D?)(QN|LS|Q|S|U|M|R)(\d{1,4})([A-Z]?)([A-Z0-9]*)", T)
+    if m and (not m.group(2) or m.group(3) == "U"):
+        pol, lett, num, anno_l = m.group(1), m.group(3), m.group(4), m.group(5)
+        if m.group(2):
+            anno_l = "D"  # 75DU8079 = gamma 2024
         info.pollici = int(pol)
     else:
         # codice senza pollici, es. "Crystal UHD U8075F", "DU7179", "The Frame LS03F", "Q7F5"
-        m = re.search(r"\bD?(QN|LS|Q|S|U|M|R)(\d{1,4})([A-H])(\d{0,3}|A[A-Z]?)\b", T)
+        m = re.search(r"\bD?(QN|LS|Q|S|U|M|R)(\d{1,4})([A-H])(\d{0,3}|A[A-Z]?)\b", T) or \
+            re.search(r"\b(U)(\d{4})()\b", T)  # U8005: serie Crystal senza lettera dell'anno
         if not m or not info.pollici or (m.group(1) == "S" and len(m.group(2)) < 2):
             return False
         pol, lett, num, anno_l = str(info.pollici), m.group(1), m.group(2), m.group(3)
@@ -538,6 +541,8 @@ _SOGLIE_PREZZO = [("BASE", 7), ("ENTRY", 12), ("MID", 20), ("PREMIUM", 32)]
 def stima_fascia(prezzo: float | None, pollici: int | None, tecnologia: str = "") -> str:
     if not prezzo or not pollici:
         return ""
+    if prezzo < pollici * 2.5:  # 14 € per un 55": rata mensile, accessorio o prezzo letto male, non il TV
+        return ""
     k = (pollici / 55) ** 0.6 * (1.4 if tecnologia == "OLED" else 1.0)
     al_pollice = prezzo / pollici
     for f, soglia in _SOGLIE_PREZZO:
@@ -592,7 +597,7 @@ _ACCESSORIO = re.compile(
     r"WANDHALTERUNG|HALTERUNG|SUPPORT MURAL|SOPORTE DE PARED|WALL MOUNT|BRACKET|\bBEZEL\b|"
     r"FRIGORIFERO|K[UÜ]HLSCHRANK|R[EÉ]FRIG[EÉ]RATEUR|FRIGOR[IÍ]FICO|FRIDGE|"
     r"LAVATRICE|WASCHMASCHINE|LAVE-LINGE|LAVADORA|WASHING MACHINE|ERSATZ|RICAMBIO|REPLACEMENT|PIÈCE DE RECHANGE|"
-    r"LED STRIP|STRIP LED|STRISCIA LED|STRISCE LED|LED-STREIFEN|BACKLIGHT|RETROILLUMINAZIONE|R[EÉ]TRO[EÉ]CLAIRAGE|TIRA DE LED|SCHUTZFOLIE|PELLICOLA|"
+    r"LIGHTSTRIP|HUE PLAY|RUBAN LED|LED STRIP|STRIP LED|STRISCIA LED|STRISCE LED|LED-STREIFEN|BACKLIGHT|RETROILLUMINAZIONE|R[EÉ]TRO[EÉ]CLAIRAGE|TIRA DE LED|SCHUTZFOLIE|PELLICOLA|"
     r"PROIETTORE|BEAMER|PROJECTOR|VID[EÉ]OPROJECTEUR|PROYECTOR|ST[AÄ]NDER|TV-BEINE|\bBEINE\b|PIEDINI|PIEDS TV|PATAS|"
     r"T-?CON\b|SCHEDA LOGICA|LOGIC BOARD|MAINBOARD|SCHEDA MADRE|ALIMENTATORE|NETZTEIL|POWER SUPPLY|CARICATORE|CHARGER|"
     r"MULTIPRESA|FILM PROTECTEUR|PROTECTOR DE PANTALLA|SCREEN PROTECTOR|DISPLAYSCHUTZ|BEFESTIGUNGS|CLIPS?\b|"
