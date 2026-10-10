@@ -629,7 +629,10 @@
     const b = S.bozza, ret = retailerUsati(), P = b.parametri;
     const coperti = b.asin.filter((a) => ret.some((r) => r.paese === a.paese));
     const coppie = coperti.reduce((n, a) => n + ret.filter((r) => r.paese === a.paese).length, 0);
-    const minuti = Math.max(2, Math.round((coperti.length * 12 + coppie * (P.verifica_url ? 45 : 28)) / 60)) + 2;
+    // misurato: ~12 ASIN per macchina, fino a 8 macchine in parallelo; ~15 s per coppia ASIN×negozio su ogni macchina
+    const parti = Math.max(1, Math.min(8, Math.ceil(coperti.length / 12)));
+    const perParte = Math.ceil(coperti.length / parti), negoziMedi = coppie / Math.max(1, coperti.length);
+    const minuti = Math.max(3, Math.round(3 + perParte * negoziMedi * 0.25));
     const attivi = T.parametriInfo.flatMap((g) => g.voci).filter((v) => P[v.chiave].attivo && (!v.solo || v.solo === P.modalita));
     if (!b.nome) b.nome = `Ricerca ${new Date().toLocaleDateString("it-IT", { month: "long", year: "numeric" })}`;
     box.innerHTML = `
@@ -640,7 +643,7 @@
         <div class="riepilogo">
           <div><strong>${coperti.length}</strong><span class="tenue piccolo">ASIN da confrontare${coperti.length < b.asin.length ? ` (${b.asin.length - coperti.length} senza marketplace)` : ""}</span></div>
           <div><strong>${ret.length}</strong><span class="tenue piccolo">marketplace in ${[...new Set(ret.map((r) => r.paese))].map((c) => paese(c).bandiera).join(" ")}</span></div>
-          <div><strong>~${minuti} min</strong><span class="tenue piccolo">durata stimata</span></div>
+          <div><strong>~${minuti} min</strong><span class="tenue piccolo">durata stimata${parti > 1 ? ` · ${parti} parti in parallelo` : ""}</span></div>
         </div>
         <p class="piccolo tenue">Modalità: <span class="chip info">${nomeModalita(P)}</span></p>
         <p class="piccolo tenue">Criteri attivi: ${attivi.map((v) => `<span class="chip">${v.titolo}${v.chiave === "pollici" && P.pollici.tolleranza ? ` ±${P.pollici.tolleranza}"` : ""}${v.chiave === "anno" ? ` ${P.anno.valore}` : ""}</span>`).join(" ") || "nessuno"}</p>
@@ -1330,7 +1333,7 @@
     { titolo: "Benvenuto in Radar TV", testo: "Parti da una lista di ASIN Amazon e trova, per ogni retailer europeo, il TV più simile con un codice modello diverso.", colore: "var(--giallo)" },
     { titolo: "Incolla gli ASIN", testo: "Copia da Excel, scrivi uno per riga o carica un file. Il paese si legge dalla riga oppure si sceglie per ogni ASIN.", colore: "var(--ciano)" },
     { titolo: "Scegli marketplace e criteri", testo: "Spunta i retailer su cui cercare e decidi quando due TV sono simili: pollici, tecnologia, fascia, anno e altro.", colore: "var(--verde)" },
-    { titolo: "Avvia e chiudi pure", testo: "La ricerca gira su GitHub per 10–30 minuti. Puoi chiudere il browser: la ritrovi nello Storico, con i risultati da scaricare in Excel.", colore: "var(--magenta)" },
+    { titolo: "Avvia e chiudi pure", testo: "La ricerca gira su GitHub: le ricerche grandi si dividono su più macchine in parallelo (100 ASIN in circa 20–30 minuti). Puoi chiudere il browser: la ritrovi nello Storico, con i risultati da scaricare in Excel.", colore: "var(--magenta)" },
   ];
   function tutorial() {
     let i = 0;
@@ -1380,7 +1383,7 @@
             <li><div><h3>Scegli i marketplace</h3><p>Spunta i retailer su cui cercare. Puoi modificare un URL, aggiungerne di nuovi o disattivarli: le modifiche valgono per tutti e restano salvate.</p></div></li>
             <li><div><h3>Imposta la somiglianza</h3><p>Scegli se cerchi un'alternativa della stessa marca o un concorrente equivalente, poi quanto stretto deve essere il confronto: Stretto, Bilanciato (le regole del documento) o Largo. Per regolare i singoli criteri apri "Personalizza i criteri".</p></div></li>
             <li><div><h3>Tieni aggiornato il Catalogo</h3><p>Nel Catalogo trovi marche e serie con tecnologia e fascia. Puoi aggiungere una marca, una serie nuova o correggere una fascia: vale dalla ricerca successiva. Con "Prova un titolo" vedi subito come viene classificato un TV.</p></div></li>
-            <li><div><h3>Avvia e attendi</h3><p>Il motore gira su GitHub. Una ricerca da 10 ASIN su 4 retailer richiede circa 20 minuti. Puoi chiudere la pagina: la pillola verde in alto e lo Storico ti riportano all'avanzamento.</p></div></li>
+            <li><div><h3>Avvia e attendi</h3><p>Il motore gira su GitHub. Una ricerca da 10 ASIN su 4 retailer richiede circa 10–15 minuti; da 100 ASIN circa 20–30 minuti, perché si divide su più macchine in parallelo. Puoi chiudere la pagina: la pillola verde in alto e lo Storico ti riportano all'avanzamento.</p></div></li>
             <li><div><h3>Leggi e scarica</h3><p>Per ogni ASIN vedi i modelli simili per retailer con foto e link. "Anno da verificare" segnala i modelli il cui anno non si ricava dal codice. Scarica l'Excel con un foglio per paese più il foglio Dettaglio con tutti i candidati scartati e il motivo.</p></div></li>
           </ol>
           <aside class="scheda faq">
