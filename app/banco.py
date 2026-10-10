@@ -82,7 +82,7 @@ def cerca_motore(br, dom, testo):
 
 def raccogli(paese, per_marca=5, lotto=""):
     from browser import Browser
-    from regole import catalogo_predefinito, imposta_catalogo, trova_marca, trova_pollici_testo as trova_pollici
+    from regole import catalogo_predefinito, e_accessorio, imposta_catalogo, trova_marca, trova_pollici_testo as trova_pollici
     imposta_catalogo(catalogo_predefinito())
     from web_runner import Pubblicatore, assicura_branch, leggi_json, REPO, TOKEN
     dom = DOMINIO[paese]
@@ -119,7 +119,7 @@ def raccogli(paese, per_marca=5, lotto=""):
                 in_questa = 0
                 for r in righe:
                     t = r["titolo"].strip()
-                    if r["asin"] in visti or not t or ESCLUDI.search(t):
+                    if r["asin"] in visti or not t or ESCLUDI.search(t) or e_accessorio(t):
                         continue
                     pp = trova_pollici(t)
                     if not pp or not 40 <= pp <= 75:

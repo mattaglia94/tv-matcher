@@ -650,6 +650,12 @@
      "descrizione": "C655 QLED"
     },
     {
+     "serie": "C69",
+     "tecnologia": "QLED",
+     "fascia": "ENTRY",
+     "descrizione": "C69B QLED Pro"
+    },
+    {
      "serie": "C6",
      "tecnologia": "MINILED",
      "fascia": "ENTRY",

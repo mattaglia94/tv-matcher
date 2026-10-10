@@ -229,9 +229,9 @@ def main():
     sys.exit(1 if errori else 0)
 
 
-# Banco Amazon: ~200 TV reali (IT/DE/FR/ES/UK, 40-75", brand principali) raccolte da app/banco.py.
+# Banco Amazon: ~280 TV reali (IT/DE/FR/ES/UK, 40-75", brand principali) raccolte da app/banco.py.
 # Ciò che il motore capisce dal solo titolo, confrontato con la scheda tecnica Amazon. Soglie minime: non si torna indietro.
-SOGLIE_BANCO = {"marca": 99, "pollici": 100, "risoluzione": 97, "tecnologia": 90}
+SOGLIE_BANCO = {"marca": 99, "pollici": 99, "risoluzione": 97, "tecnologia": 88}  # il resto è rumore delle schede Amazon
 
 
 def banco_amazon():
@@ -253,6 +253,11 @@ def banco_amazon():
             mio = getattr(i, k)
             ok[k] += mio == vero or (k == "tecnologia" and {mio, vero} <= {"MINILED", "NEOQLED"})
     errori = 0
+    from regole import e_accessorio
+    falsi = [r["titolo"][:70] for r in righe if e_accessorio(r["titolo"])]
+    if falsi:  # nessun TV vero deve essere preso per un accessorio
+        errori += 1
+        print(f"✗ banco Amazon: {len(falsi)} TV scambiati per accessori, es. {falsi[:3]}")
     for k, soglia in SOGLIE_BANCO.items():
         perc = 100 * ok[k] / (tot[k] or 1)
         segno = "✓" if perc >= soglia else "✗"

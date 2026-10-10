@@ -189,7 +189,7 @@ def tecnologia_testo(t: str) -> str:
         return "MINILED"
     if "NEO QLED" in T or "NEOQLED" in T:
         return "NEOQLED"
-    if "QLED" in T or "QNED" in T:
+    if "QLED" in T or "QNED" in T or "QUANTUM DOT" in T:
         return "QLED"
     if "LED" in T or "LCD" in T or "CRYSTAL UHD" in T:
         return "LED"
@@ -592,8 +592,11 @@ _ACCESSORIO = re.compile(
     r"WANDHALTERUNG|HALTERUNG|SUPPORT MURAL|SOPORTE DE PARED|WALL MOUNT|BRACKET|\bBEZEL\b|"
     r"FRIGORIFERO|K[UÜ]HLSCHRANK|R[EÉ]FRIG[EÉ]RATEUR|FRIGOR[IÍ]FICO|FRIDGE|"
     r"LAVATRICE|WASCHMASCHINE|LAVE-LINGE|LAVADORA|WASHING MACHINE|ERSATZ|RICAMBIO|REPLACEMENT|PIÈCE DE RECHANGE|"
-    r"LED STRIP|STRIP LED|BACKLIGHT|RETROILLUMINAZIONE|R[EÉ]TRO[EÉ]CLAIRAGE|TIRA DE LED|SCHUTZFOLIE|PELLICOLA|"
-    r"PROIETTORE|BEAMER|PROJECTOR|VID[EÉ]OPROJECTEUR|PROYECTOR")
+    r"LED STRIP|STRIP LED|STRISCIA LED|STRISCE LED|LED-STREIFEN|BACKLIGHT|RETROILLUMINAZIONE|R[EÉ]TRO[EÉ]CLAIRAGE|TIRA DE LED|SCHUTZFOLIE|PELLICOLA|"
+    r"PROIETTORE|BEAMER|PROJECTOR|VID[EÉ]OPROJECTEUR|PROYECTOR|ST[AÄ]NDER|TV-BEINE|\bBEINE\b|PIEDINI|PIEDS TV|PATAS|"
+    r"T-?CON\b|SCHEDA LOGICA|LOGIC BOARD|MAINBOARD|SCHEDA MADRE|ALIMENTATORE|NETZTEIL|POWER SUPPLY|CARICATORE|CHARGER|"
+    r"MULTIPRESA|FILM PROTECTEUR|PROTECTOR DE PANTALLA|SCREEN PROTECTOR|DISPLAYSCHUTZ|BEFESTIGUNGS|CLIPS?\b|"
+    r"SUPPORT TV|SUPPORTO TV|SOPORTE TV|TV MOUNT|TV STAND|MEUBLE TV|MOBILE TV|TV-SCHRANK|TV-BOARD|LOWBOARD")
 _ACC_DEBOLE = re.compile(r"CORNICE|\bRAHMEN\b|\bMONITOR\b|\bCAVO\b|\bKABEL\b|\bC[AÂ]BLE\b")  # solo se non è un TV
 _ACC_URL = re.compile(r"/(accessori|zubehoer|zubehor|accessoires|accesorios|accessories|elettrodomestici|haushalt|"
                       r"electromenager|electrodomesticos)[/-]", re.I)
@@ -733,12 +736,13 @@ def leggi_scheda(scheda: dict | None) -> dict:
         V = _norm(v).replace(",", ".")
         m = re.search(r"(\d{2,3}(?:\.\d)?)\s*(?:\"|''|ZOLL|POLLICI|INCH|POUCES|PULGADAS)", V)
         if m:
-            out["pollici"] = round(float(m.group(1)))
+            pol = float(m.group(1))
+            out["pollici"] = min(_TAGLIE, key=lambda t: (abs(t - pol), -t)) if abs(pol - round(pol)) > 0.2 else round(pol)
         else:
             m = re.search(r"(\d{2,3}(?:\.\d)?)\s*CM", V)
             if m:  # cm -> pollici, arrotondato alla taglia commerciale più vicina
                 pol = float(m.group(1)) / 2.54
-                out["pollici"] = min(_TAGLIE, key=lambda t: abs(t - pol))
+                out["pollici"] = min(_TAGLIE, key=lambda t: (abs(t - pol), -t))  # 108 cm = 42,5": vale 43
     v = _voce(scheda, "risoluzione")
     if v:
         V = _norm(v)

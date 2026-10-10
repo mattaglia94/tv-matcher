@@ -2652,5 +2652,985 @@
 "tecnologia": "LED",
 "marca": "SHARP"
 }
+},
+{
+"paese": "IT",
+"asin": "B0FMF94X5B",
+"titolo": "Sony K-55XR8 Televisione 55\" 4K Oled Ultra HD Smart TV, HDR, DVB-T2, Hevc Main 10, Wi-Fi Nero [Classe di efficienza energetica C]",
+"prezzo": "1.889,00€",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "OLED",
+"hz": 120,
+"anno": 2022,
+"marca": "SONY"
+}
+},
+{
+"paese": "IT",
+"asin": "B0H2JXW744",
+"titolo": "Sony BRAVIA 7 II True RGB 55 Inch TV, 4K Smart TV (Google TV), RGB LED, XR Processor with AI Technology, 120hz Television with Dolby Vision/Atmos, PS5 compatibility, 55XR75M2, 2026 Model [Classe di efficienza energetica G]",
+"prezzo": "1.899,00€",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 120,
+"anno": 2026,
+"marca": "SONY"
+}
+},
+{
+"paese": "IT",
+"asin": "B0C9YQDDG2",
+"titolo": "SONY FW-50BZ30L affichage de messages Panneau plat de signalisation numérique 127 cm (50\") LCD Wifi 440 cd/m² 4K Ultra",
+"prezzo": "979,78€",
+"scheda": {
+"tecnologia": "LED",
+"marca": "SONY"
+}
+},
+{
+"paese": "IT",
+"asin": "B0D3MVBJ9B",
+"titolo": "Philips Ambilight The Xtra 75PML9009 Smart TV 4K Quantum Dot MiniLED - Schermo da 75\" con processore di immagini P5 Perfect Ultra HD, Titan OS, Dolby Vision e Dolby Atmos Audio - Grigio Antracite [Classe di efficienza energetica F]",
+"prezzo": "2.190,29€",
+"scheda": {
+"pollici": 75,
+"risoluzione": "4K",
+"tecnologia": "MINILED",
+"hz": 120,
+"anno": 2024,
+"marca": "PHILIPS"
+}
+},
+{
+"paese": "IT",
+"asin": "B06XPWKSQV",
+"titolo": "Philips 55POS9002 Smart TV da 55'' OLED, 4K Razor-Slim, Ambilight, Powered by Android",
+"prezzo": "796,77€",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "OLED",
+"anno": 2017,
+"marca": "PHILIPS"
+}
+},
+{
+"paese": "IT",
+"asin": "B0BKWD3RBS",
+"titolo": "Philips 50HFL5214U/12 50\" MEDIASUITE TV UHD ANDROID TV 9 [Classe di efficienza energetica F]",
+"prezzo": "888,23€",
+"scheda": {
+"pollici": 50,
+"risoluzione": "4K",
+"marca": "PHILIPS"
+}
+},
+{
+"paese": "IT",
+"asin": "B0FQNXK9TK",
+"titolo": "TCL 50T6C 50\" QLED TV 4K HDR, FireTV (SmartTV con Dolby Vision e Atmos, HDR10+, Premi e Chiedi ad Alexa)",
+"prezzo": "427,99€",
+"scheda": {
+"pollici": 50,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"marca": "TCL"
+}
+},
+{
+"paese": "IT",
+"asin": "B07DR2JD55",
+"titolo": "TCL | 55DP661 | Android TV Ultra Slim: Risoluzione 4k-Ultra HD PRO, Tecnologia Wide Color Gamut, DTS Premium Sound. Colore: Argento, 55 Pollici (Classe energetica A+)",
+"prezzo": "349,90€",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"marca": "TCL"
+}
+},
+{
+"paese": "IT",
+"asin": "B0F9TDFQ5K",
+"titolo": "TCL Serie C69K Smart TV QD-MiniLED 4K 65\" 65C69K, 144Hz, audio Onkyo 2.1, Dolby Vision IQ & Atmos, Google TV [Classe di efficienza energetica F]",
+"prezzo": "499,99€",
+"scheda": {
+"pollici": 65,
+"risoluzione": "4K",
+"tecnologia": "MINILED",
+"hz": 120,
+"anno": 2021,
+"marca": "TCL"
+}
+},
+{
+"paese": "IT",
+"asin": "B0F94DQTQH",
+"titolo": "TCL 75C6K – Smart TV QD‑Mini LED 4K HDR10+ da 75\", Google TV [Classe di efficienza energetica E]",
+"prezzo": "849,90€",
+"scheda": {
+"risoluzione": "4K",
+"tecnologia": "MINILED",
+"hz": 144,
+"anno": 2025,
+"marca": "TCL"
+}
+},
+{
+"paese": "IT",
+"asin": "B0F9FNQPZP",
+"titolo": "TCL 65C6K – Smart TV QD‑Mini LED 4K HDR10+ da 65\", Google TV [Classe di efficienza energetica F]",
+"prezzo": "429,90€",
+"scheda": {
+"pollici": 65,
+"risoluzione": "4K",
+"tecnologia": "MINILED",
+"hz": 144,
+"anno": 2025,
+"marca": "TCL"
+}
+},
+{
+"paese": "IT",
+"asin": "B0DJT3L51S",
+"titolo": "Hisense 43E79NQ - Smart TV 43 Pollici (108 cm), QLED, 4K, DVB-T2 HEVC [Classe di efficienza energetica E]",
+"prezzo": "549,00€",
+"scheda": {
+"pollici": 43,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 60,
+"anno": 2015,
+"marca": "HISENSE"
+}
+},
+{
+"paese": "IT",
+"asin": "B0CHBCWQZ6",
+"titolo": "Hisense 43A69K - TV Smart 43 Pollici, 4K, DVB-T2, H.265, Nero [Classe di efficienza energetica F]",
+"prezzo": "499,00€",
+"scheda": {
+"pollici": 43,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"anno": 2023,
+"marca": "HISENSE"
+}
+},
+{
+"paese": "IT",
+"asin": "B0C2ZN2TV9",
+"titolo": "Hisense 55\" UHD 4K 2023 55E63KT, Smart TV VIDAA U6, Dolby Vision, HDR 10+, Game Mode Plus, Alexa Built-in, Tuner DVB-T2/S2 HEVC 10, lativù 4K [Classe di efficienza energetica E]",
+"prezzo": "379,00€",
+"scheda": {
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2023,
+"marca": "HISENSE"
+}
+},
+{
+"paese": "IT",
+"asin": "B0CZXP116T",
+"titolo": "Hisense TV 50\" 4K Ultra HD 50E63NT, Smart TV VIDAA U7, Dolby Vision, HDR 10+, DTS Virtual:X, Game Mode Plus, Alexa Built-in, VIDAA Voice, Tuner DVB-T2/S2 HEVC 10, lativù 4K [Classe di efficienza energetica E]",
+"prezzo": "499,79€",
+"scheda": {
+"pollici": 50,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2024,
+"marca": "HISENSE"
+}
+},
+{
+"paese": "IT",
+"asin": "B0F4D9MLMQ",
+"titolo": "Hisense Smart TV 55\" 4K Ultra HD 2025 55A6Q, Smart TV VIDAA U8, Dolby Vision, HDR 10, Game Mode Plus, Alexa Built-in, VIDAA Voice, Tuner DVB-T2/S2 HEVC 10, lativù 4K, 55'', 2025 LED [Classe di efficienza energetica E]",
+"prezzo": "329,00€",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2025,
+"marca": "HISENSE"
+}
+},
+{
+"paese": "IT",
+"asin": "B0D3WVF1DN",
+"titolo": "648mm 16 Pezzi compatibili for Panasonic 65 Pollici 8 luci AWX65166 TH-65AX600C SJ.Hz.D6500402-2835AS-F B-116T06V2C-161014N3-0265-HZ 1.14.FD65001",
+"prezzo": "37,06€",
+"scheda": {
+"marca": "PANASONIC"
+}
+},
+{
+"paese": "IT",
+"asin": "B00JBBKXL0",
+"titolo": "Panasonic TX-65AXW804 65\" 4K Ultra HD Compatibilità 3D Smart TV Wi-Fi Titanio",
+"prezzo": "",
+"scheda": {
+"marca": "PANASONIC"
+}
+},
+{
+"paese": "IT",
+"asin": "B0DJBV1TVR",
+"titolo": "Panasonic TV-65W90AEG, Smart TV da 164 cm / 65\"\", 4K, LED, DVB-T2 [Classe di efficienza energetica G]",
+"prezzo": "399,00€",
+"scheda": {
+"marca": "PANASONIC"
+}
+},
+{
+"paese": "IT",
+"asin": "B0D7QQ1H1P",
+"titolo": "Sharp 50GR8265E 50\" 4K ULTRA HD 144Hz QUANTUM DOT. Google TV™ 4K Ultra High Definition 144Hz Frameless Quantum Dot con eccezionali funzionalità multimediali e di gioco. [Classe di efficienza energetica G]",
+"prezzo": "600,13€",
+"scheda": {
+"pollici": 50,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 144,
+"marca": "SHARP"
+}
+},
+{
+"paese": "IT",
+"asin": "B0C15GJ4YJ",
+"titolo": "Sharp Aquos 55FL1EA, 50\" LED Smart TV 4K UHD Android 11, DVB-T2/S2, 3840 x 2160 Pixels, Wi-Fi, Nero, 3xHDMI 2.1, 2xUSB, Chromecast integrato, Dolby Digital Plus, DolbyAC-4, DTS HD [Classe di efficienza energetica F]",
+"prezzo": "385,34€",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"marca": "SHARP"
+}
+},
+{
+"paese": "IT",
+"asin": "B0GNSMDK4C",
+"titolo": "Sharp 65HP5265E TV 65” QLED 4K UHD, Google TV, Dolby Vision [Classe di efficienza energetica E]",
+"prezzo": "989,29€",
+"scheda": {
+"pollici": 65,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 60,
+"marca": "SHARP"
+}
+},
+{
+"paese": "DE",
+"asin": "B0F62T416G",
+"titolo": "Samsung Crystal UHD U8079F 4K 75 Zoll (189 cm) LED Fernseher, Optimiert für Fussball und Gaming, Crystal Prozessor 4K, SmartThings, AI Upscaling, Knox Security, Kostenlose Inhalte, Smart TV [Energieklasse G]",
+"prezzo": "2519€",
+"scheda": {
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2025,
+"marca": "SAMSUNG"
+}
+},
+{
+"paese": "DE",
+"asin": "B0CZS4X5ZC",
+"titolo": "Samsung Crystal UHD 4K DU8079 Fernseher 75 Zoll, Samsung TV mit Dynamic Crystal Color, 4K Upscaling, AirSlim Design, Smart TV, GU75DU8079UXZG, Deutsches Modell [2024]",
+"prezzo": "62999€",
+"scheda": {
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 120,
+"anno": 2024,
+"marca": "SAMSUNG"
+}
+},
+{
+"paese": "DE",
+"asin": "B09VTGY2LT",
+"titolo": "Samsung QLED 4K Q60B 50 Zoll Fernseher (GQ50Q60BAUXZG, Deutsches Modell), Quantum HDR, Quantum Prozessor Lite 4K, Multi View, Smart TV [2022] [Energieklasse F]",
+"prezzo": "34477€",
+"scheda": {
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 50,
+"anno": 2022,
+"marca": "SAMSUNG"
+}
+},
+{
+"paese": "DE",
+"asin": "B0BXT87RD1",
+"titolo": "Samsung QLED 4K Q60C 50 Zoll Fernseher (GQ50Q60CAUXZG, Deutsches Modell), Quantum-Dot-Technologie, Quantum HDR, AirSlim Design, Smart TV [2023] [Energieklasse E]",
+"prezzo": "2763€",
+"scheda": {
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 120,
+"anno": 2023,
+"marca": "SAMSUNG"
+}
+},
+{
+"paese": "DE",
+"asin": "B0H349Q9XX",
+"titolo": "PHILIPS 75PQS7801/12 75 Zoll Ambilight 4K LED Smart-TV, Pixel Precise Ultra HD, Titan OS, Dolby Atmos Sound",
+"prezzo": "78399€",
+"scheda": {
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2026,
+"marca": "PHILIPS"
+}
+},
+{
+"paese": "DE",
+"asin": "B007FNIM6Y",
+"titolo": "Panasonic TX-L55ETW5 140 cm (55 Zoll) Fernseher (Full HD, Triple Tuner, 3D, Smart TV) [Energieklasse A+]",
+"prezzo": "700,00€",
+"scheda": {
+"risoluzione": "FHD",
+"tecnologia": "LED",
+"anno": 2012,
+"marca": "PANASONIC"
+}
+},
+{
+"paese": "DE",
+"asin": "B007FNIJVM",
+"titolo": "Panasonic TX-P65STW50 165 cm (65 Zoll) Plasma Fernseher (Full HD, Triple Tuner, 3D, Smart TV) [Energieklasse C]",
+"prezzo": "699,00€",
+"scheda": {
+"risoluzione": "FHD",
+"anno": 2012,
+"marca": "PANASONIC"
+}
+},
+{
+"paese": "FR",
+"asin": "B0C27TKR5Z",
+"titolo": "Philips Lightstrip Hue Play Gradient pour TV 65 pouces, synchronisation de la lumière avec l'écran & White and Color lightstrip gradient 2 mètres, compatible Bluetooth",
+"prezzo": "240,69€",
+"scheda": {
+"marca": "PHILIPS"
+}
+},
+{
+"paese": "FR",
+"asin": "B0HHNTKLK5",
+"titolo": "Philips Hue Play Ruban LED à Dégradé pour TV de 65 pouces",
+"prezzo": "83,32€",
+"scheda": {
+"marca": "PHILIPS"
+}
+},
+{
+"paese": "FR",
+"asin": "B0D41MWNBY",
+"titolo": "Philips Lightstrip Hue Play Gradient pour TV 75 pouces, synchronisation & Bridge 2.0 : Hub Central de Contrôle d'Éclairage Intelligent, fonctionne avec Alexa, Google Assistant",
+"prezzo": "188,28€",
+"scheda": {
+"marca": "PHILIPS"
+}
+},
+{
+"paese": "FR",
+"asin": "B0GJ5WRCG2",
+"titolo": "Hisense 40A5S Smart TV 2026 LED 40\" (102 cm) Full HD Noir [Classe énergétique E]",
+"prezzo": "174,99€",
+"scheda": {
+"risoluzione": "FHD",
+"tecnologia": "LED",
+"hz": 60,
+"marca": "HISENSE"
+}
+},
+{
+"paese": "FR",
+"asin": "B0DJBVMGBY",
+"titolo": "Panasonic TV-65Z90AEG Smart TV 164 cm/65\" 4K OLED DVB-T2 [Classe énergétique G]",
+"prezzo": "",
+"scheda": {
+"risoluzione": "4K",
+"tecnologia": "OLED",
+"hz": 144,
+"marca": "PANASONIC"
+}
+},
+{
+"paese": "ES",
+"asin": "B0F22BFWQQ",
+"titolo": "Samsung TV 50 Pulgadas QLED Q8F 4K Smart TV [Clase de eficiencia energética E]",
+"prezzo": "",
+"scheda": {
+"pollici": 50,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 60,
+"marca": "SAMSUNG"
+}
+},
+{
+"paese": "ES",
+"asin": "B0F2293K11",
+"titolo": "Samsung TV 50 Pulgadas QLED Q7F 4K Smart TV con Vision AI, 100% Volumen de Color con Quantum Dot y más de 500 Canales [Clase de eficiencia energética G]",
+"prezzo": "",
+"scheda": {
+"pollici": 50,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 60,
+"marca": "SAMSUNG"
+}
+},
+{
+"paese": "ES",
+"asin": "B0F2B4SG7L",
+"titolo": "Samsung TV 55 Pulgadas QLED Q8F 4K Smart TV [Clase de eficiencia energética E]",
+"prezzo": "",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"hz": 60,
+"marca": "SAMSUNG"
+}
+},
+{
+"paese": "ES",
+"asin": "B0F2249D1G",
+"titolo": "Samsung TV 55 Pulgadas Crystal UHD U8005 4K Smart TV, Colores increíbles con Crystal Processor 4K, Escucha Todos los Altavoces con Q-Symphony, Datos protegidos Knox Security y Gaming Hub [Clase de eficiencia energética G]",
+"prezzo": "2471€",
+"scheda": {
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"marca": "SAMSUNG"
+}
+},
+{
+"paese": "UK",
+"asin": "B0D54N4TR6",
+"titolo": "LG 2024 OLED TV | OLED55B4 | 55'' (139 cm) | OLED| α8 AI 4K Processor | Dolby Vision & Atmos | Alexa",
+"prezzo": "£1,229.59",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "OLED",
+"hz": 120,
+"anno": 2024,
+"marca": "LG"
+}
+},
+{
+"paese": "UK",
+"asin": "B0C2J52CY6",
+"titolo": "LG 2023 OLED TV | OLED55B3 | 55'' (139 cm) | OLED| α7 AI Gen6 4K Processor",
+"prezzo": "£1,926.00",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "OLED",
+"hz": 120,
+"anno": 2023,
+"marca": "LG"
+}
+},
+{
+"paese": "UK",
+"asin": "B0FS7M9C78",
+"titolo": "Smart TV LG 43UA75006LA.AEU 4K Ultra HD 43 Inch LED",
+"prezzo": "£399.79",
+"scheda": {
+"pollici": 42,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 120,
+"anno": 2025,
+"marca": "LG"
+}
+},
+{
+"paese": "UK",
+"asin": "B0CYQ18M44",
+"titolo": "LG 75QNED86T6A TV 75 Inch (190 cm) QNED TV (α8 4K AI Processor, webOS 24, HDR10, up to 120 Hz) [Model Year 2024]",
+"prezzo": "£1,341.59",
+"scheda": {
+"pollici": 75,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 120,
+"anno": 2024,
+"marca": "LG"
+}
+},
+{
+"paese": "UK",
+"asin": "B0F2GFFHXP",
+"titolo": "LG 75QNED84A6C 75\" QNED AI EVO QNED84 4K Ultra HD Smart TV",
+"prezzo": "£1,206.89",
+"scheda": {
+"pollici": 75,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 120,
+"anno": 2025,
+"marca": "LG"
+}
+},
+{
+"paese": "UK",
+"asin": "B0CZTYCDMR",
+"titolo": "Sony BRAVIA 7 QLED (XR l Mini LED), K55XR70, 55 Inch 4K HDR Google Smart TV, Gaming Features for PlayStation 5, IMAX Enhanced, Dolby Vision Atmos, Chromecast, AirPlay, 120Hz, 5 Year Warranty [Energy Class E]",
+"prezzo": "£1,399.00",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "OLED",
+"hz": 120,
+"anno": 2024,
+"marca": "SONY"
+}
+},
+{
+"paese": "UK",
+"asin": "B07C3VGQVJ",
+"titolo": "Sony KD65XF7003​BU 65 Inch 4K HDR Ultra HD Smart TV with Freeview Play, Black (2018 Model)",
+"prezzo": "£927.16",
+"scheda": {
+"pollici": 65,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2018,
+"marca": "SONY"
+}
+},
+{
+"paese": "UK",
+"asin": "B0FWCYHMWZ",
+"titolo": "Sony BRAVIA 8A OLED 55 Inch 4K HDR Smart TV, Gaming Features for PlayStation 5 and IMAX Enhanced, Dolby Vision Atmos, Google Cast, Apple AirPlay, 120Hz 55XR8A [Energy Class F]",
+"prezzo": "£1,499.00",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "OLED",
+"hz": 120,
+"anno": 2025,
+"marca": "SONY"
+}
+},
+{
+"paese": "UK",
+"asin": "B0CZV9MYWG",
+"titolo": "Sony BRAVIA 8 OLED, K65XR80, 65 Inch 4K HDR Google Smart TV, Gaming Features for PlayStation 5 and IMAX Enhanced, Dolby Vision Atmos, Chromecast, Apple AirPlay, 120Hz [Energy Class E]",
+"prezzo": "£1,799.00",
+"scheda": {
+"pollici": 65,
+"risoluzione": "4K",
+"tecnologia": "OLED",
+"hz": 120,
+"anno": 2024,
+"marca": "SONY"
+}
+},
+{
+"paese": "UK",
+"asin": "B0FG465NBM",
+"titolo": "Sony BRAVIA 8 II 55\" QD-OLED, K55XR8M25BP (2025), 4K HDR Smart TV, AI XR Processor, Acoustic Surface Audio+, Dolby Vision/Atmos, IMAX Enhanced, Apple AirPlay 2, Eco Dashboard, 5 year warranty.",
+"prezzo": "£1,999.00",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "OLED",
+"hz": 120,
+"anno": 2025,
+"marca": "SONY"
+}
+},
+{
+"paese": "UK",
+"asin": "B0F2N4L22T",
+"titolo": "Philips Ambilight The One 75PUS9000 4K QLED Smart TV, 75\" Screen with P5 Perfect Picture Engine Ultra HD, Titan OS, Dolby Vision and Dolby Atmos [Energy Class E]",
+"prezzo": "£1,475.79",
+"scheda": {
+"pollici": 75,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 120,
+"anno": 2025,
+"marca": "PHILIPS"
+}
+},
+{
+"paese": "UK",
+"asin": "B0HLLB43R5",
+"titolo": "PHILIPS 50PQS8601/05 50-Inch 4K QLED Ambilight TV",
+"prezzo": "£499.00",
+"scheda": {
+"pollici": 50,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 60,
+"anno": 2026,
+"marca": "PHILIPS"
+}
+},
+{
+"paese": "UK",
+"asin": "B0845ZQF1P",
+"titolo": "PHILIPS 43\" 43HFL3014/12 [Energy Class D]",
+"prezzo": "£554.95",
+"scheda": {
+"risoluzione": "FHD",
+"tecnologia": "LED",
+"hz": 120,
+"anno": 2020,
+"marca": "PHILIPS"
+}
+},
+{
+"paese": "UK",
+"asin": "B0HLLBV52Z",
+"titolo": "PHILIPS 65PQS8601/05 65-Inch 4K QLED Ambilight TV",
+"prezzo": "£699.00",
+"scheda": {
+"pollici": 65,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 60,
+"anno": 2026,
+"marca": "PHILIPS"
+}
+},
+{
+"paese": "UK",
+"asin": "B0FRFYWPC5",
+"titolo": "TV TCL 43P69K - 43 Inch LED UHD 4K Display - 3840x2160 ULTRA-HD - HDR10 - DVB-T2/C - Slot",
+"prezzo": "£315.14",
+"scheda": {
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2025,
+"marca": "TCL"
+}
+},
+{
+"paese": "UK",
+"asin": "B0DPLZF1NK",
+"titolo": "TCL 43V6C-UK 43\" 4K Ultra HD, HDR TV, Smart TV Powered by Google TV (Dolby Audio, Voice Control, compatible with Google assistant, Chromecast built-in, 2025 New Model)",
+"prezzo": "£239.00",
+"scheda": {
+"pollici": 43,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2025,
+"marca": "TCL"
+}
+},
+{
+"paese": "UK",
+"asin": "B0HJYH2SQF",
+"titolo": "TCL P7L 75\" 4K Smart QLED Google AI TV - 75P7L-UK",
+"prezzo": "£799.00",
+"scheda": {
+"pollici": 75,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 60,
+"anno": 2026,
+"marca": "TCL"
+}
+},
+{
+"paese": "UK",
+"asin": "B0DGQ9WKM8",
+"titolo": "TCL 75C69B - Smart TV 190.5 cm (75\") 4K QLED DVB-T2 H.264, H.265 Class F Titanium",
+"prezzo": "£983.49",
+"scheda": {
+"pollici": 75,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"anno": 2024,
+"marca": "TCL"
+}
+},
+{
+"paese": "UK",
+"asin": "B0GY53DBN5",
+"titolo": "TCL 55P8L-UK 55 Inch QD-Mini LED 4K HDR10+ Smart TV, Dolby Vision & Atmos",
+"prezzo": "£599.00",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 144,
+"anno": 2026,
+"marca": "TCL"
+}
+},
+{
+"paese": "UK",
+"asin": "B0GV513VLX",
+"titolo": "Hisense 55\" 55Q8STUK MiniLED 144Hz 4K Ultra HD AI Smart TV with Freely, Netflix, Disney+ and YouTube - Hi-QLED MiniLED, Built-in Subwoofer, Hi-View AI Engine, Hi-QLED Colour, Hands-Free Voice Control",
+"prezzo": "£899.00",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "MINILED",
+"hz": 144,
+"anno": 2026,
+"marca": "HISENSE"
+}
+},
+{
+"paese": "UK",
+"asin": "B0F7WC65BD",
+"titolo": "Hisense 55\" 55U8QTUK MiniLED QLED 165Hz Smart AI TV - Hi-View AI Engine PRO, 165Hz Game Mode Ultra, 4.1.2 Channel, Dolby Atmos, Quantum Dot Colour, Anti-Reflection PRO with Freely, YouTube, Netflix [Energy Class E]",
+"prezzo": "£899.00",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "MINILED",
+"hz": 165,
+"anno": 2025,
+"marca": "HISENSE"
+}
+},
+{
+"paese": "UK",
+"asin": "B0GV4Y5KHR",
+"titolo": "Hisense 40\" 40E4STUK LED Full HD Smart TV with Freely, Netflix, Disney+ and YouTube - Natural Colour Enhancer, Dolby Audio, Share to TV, Noise Reduction, Game Mode, DTS Virtual: X, Smart Home Ready,20240",
+"prezzo": "£229.00",
+"scheda": {
+"pollici": 40,
+"risoluzione": "FHD",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2026,
+"marca": "HISENSE"
+}
+},
+{
+"paese": "UK",
+"asin": "B0F7WDJ22C",
+"titolo": "Hisense 65\" 65E78QTUK PRO 144Hz QLED Smart AI TV - Hi-View AI Engine, 144Hz Game Mode PRO, Dolby Atmos, Quantum Dot Colour with Freely, Disney +, YouTube, Netflix",
+"prezzo": "£569.00",
+"scheda": {
+"pollici": 65,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 144,
+"anno": 2025,
+"marca": "HISENSE"
+}
+},
+{
+"paese": "UK",
+"asin": "B0C4Z57RKM",
+"titolo": "Hisense 75 Inch 144Hz QLED Gaming TV 75E7KQTUK PRO - 144Hz VRR, HDMI 2.1, Freesync Premium, Quantum Dot Colour, VIDAA U7, and Youtube, Freeview Play, Netflix and Disney+ (2023 Model) [Energy Class G]",
+"prezzo": "£649.99",
+"scheda": {
+"pollici": 75,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 144,
+"anno": 2023,
+"marca": "HISENSE"
+}
+},
+{
+"paese": "UK",
+"asin": "B0FSRZF8MJ",
+"titolo": "XIAOMI QLED 50\" A Pro 2026 UltraHD 4K Dolby Audio Google TV",
+"prezzo": "£557.27",
+"scheda": {
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 60,
+"anno": 2026,
+"marca": "XIAOMI"
+}
+},
+{
+"paese": "UK",
+"asin": "B0DJMBJPXN",
+"titolo": "Xiaomi 65\" S Mini TV, Borderless Design, Google TV, QD-Mini LED, 1200 Nits Maximum Brightness, 4K 144H High Refresh Rate, Ultra Smooth Gaming, Dolby Vision IQ & Dolby Atmos [Energy Class G]",
+"prezzo": "£1,360.63",
+"scheda": {
+"pollici": 65,
+"risoluzione": "4K",
+"tecnologia": "MINILED",
+"hz": 144,
+"anno": 2025,
+"marca": "XIAOMI"
+}
+},
+{
+"paese": "UK",
+"asin": "B0GHS3CVFV",
+"titolo": "ST5461D07-1-C-D,Compatible for Logic， Board 55 Inch TV Device Card,Compatible for Xiaomi, Compatible for Konka, ，Compatible for Skyworth",
+"prezzo": "£62.81",
+"scheda": {
+"marca": "XIAOMI"
+}
+},
+{
+"paese": "UK",
+"asin": "B0H5R9XTH7",
+"titolo": "Panasonic TV-40S55AEYC, 40 inch Full HD LED Smart TV, Fire TV",
+"prezzo": "£329.99",
+"scheda": {
+"pollici": 40,
+"risoluzione": "FHD",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2026,
+"marca": "PANASONIC"
+}
+},
+{
+"paese": "UK",
+"asin": "B0DC6SF2CR",
+"titolo": "Panasonic TV-40S55AEY, S55 Series 40 inch Full HD LED Smart TV, 2024, Fire TV, HD Colour Engine, HDR, Alexa Voice Control, Media Player, For An Exceptional Visual Experience [Energy Class E]",
+"prezzo": "£329.00",
+"scheda": {
+"pollici": 40,
+"risoluzione": "FHD",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2024,
+"marca": "PANASONIC"
+}
+},
+{
+"paese": "UK",
+"asin": "B0H5R4W9SN",
+"titolo": "Panasonic TB-40S45AEYC, 40 inch Full HD LED Smart TV, TiVo",
+"prezzo": "£299.99",
+"scheda": {
+"pollici": 40,
+"risoluzione": "FHD",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2026,
+"marca": "PANASONIC"
+}
+},
+{
+"paese": "UK",
+"asin": "B0H5R23S1S",
+"titolo": "Panasonic TB-50W61AEYC, 50 Inch 4K Ultra HD LED Smart TV, TiVo, Freely",
+"prezzo": "£349.00",
+"scheda": {
+"pollici": 50,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2026,
+"marca": "PANASONIC"
+}
+},
+{
+"paese": "UK",
+"asin": "B0GSQN5ZQJ",
+"titolo": "Toshiba 40\" Full HD LCD Smart Fire TV",
+"prezzo": "£199.00",
+"scheda": {
+"risoluzione": "FHD",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2026,
+"marca": "TOSHIBA"
+}
+},
+{
+"paese": "UK",
+"asin": "B0FQNJF6W1",
+"titolo": "Toshiba 50”UV1563DB 4K Smart VIDAA TV, Ultra HD, HDR10, Freely, Disney+, Prime Video, Netflix, Dolby Audio Processing and Vision, Works with Alexa and Google Assistant, VIDAA Voice 2025",
+"prezzo": "£289.00",
+"scheda": {
+"pollici": 50,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2025,
+"marca": "TOSHIBA"
+}
+},
+{
+"paese": "UK",
+"asin": "B0F9F3KPY5",
+"titolo": "Toshiba 43”LV2553DB Full HD Smart VIDAA TV, HDR, Freely, Disney+, Prime Video, Netflix, Dolby Audio, Works with Alexa and Google Assistant, VIDAA Voice 2025 [Energy Class E]",
+"prezzo": "£199.00",
+"scheda": {
+"pollici": 43,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 120,
+"anno": 2025,
+"marca": "TOSHIBA"
+}
+},
+{
+"paese": "UK",
+"asin": "B0GMXWBGJS",
+"titolo": "Toshiba UF26 Fire 43\" 4K Ultra HD LCD Smart Fire TV",
+"prezzo": "£272.09",
+"scheda": {
+"pollici": 43,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2026,
+"marca": "TOSHIBA"
+}
+},
+{
+"paese": "UK",
+"asin": "B0FQNL6YMM",
+"titolo": "Toshiba 55”UV1563DB 4K Smart VIDAA TV, Ultra HD,Dolby Vision, HDR10, Freely, Disney+, Prime Video, Netflix, Dolby Audio Processing, Works with Alexa, Works with Google Assistant, VIDAA Voice 2025",
+"prezzo": "£359.99",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "LED",
+"hz": 60,
+"anno": 2025,
+"marca": "TOSHIBA"
+}
+},
+{
+"paese": "UK",
+"asin": "B0CBBQXJV6",
+"titolo": "SHARP 1904T-C55FN2KL2AB 55\" 4K Ultra HD Smart TV, (Pack Of 1) [Energy Class A]",
+"prezzo": "£600.23",
+"scheda": {
+"marca": "SHARP"
+}
+},
+{
+"paese": "UK",
+"asin": "B0GPR9BMXH",
+"titolo": "Sharp 55 inch QLED 4K Ultra HD Google TV™ Dolby Vision Dolby Atmos 55HP6265E (HP Series) [Energy Class F]",
+"prezzo": "£676.46",
+"scheda": {
+"pollici": 55,
+"risoluzione": "4K",
+"tecnologia": "QLED",
+"hz": 60,
+"anno": 2025,
+"marca": "SHARP"
+}
 }
 ]
