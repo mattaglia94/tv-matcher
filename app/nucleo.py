@@ -277,6 +277,8 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
         else:
             errori.append(stato)
             out["dettaglio"].append({"retailer": r["nome"], "esito": f"ricerca: {stato}", "url": url_s, "ricerca": q})
+            if stato.startswith(("HTTP 403", "HTTP 429")) and not ricerche_ok:
+                break  # sito che blocca: le altre ricerche darebbero lo stesso errore (si passa subito al ponte)
         for l in links:
             if l["url"].split("?")[0] == url_s.split("?")[0]:
                 continue  # filtri della pagina di ricerca (marca, prezzo...), non prodotti

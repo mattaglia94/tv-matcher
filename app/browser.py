@@ -124,6 +124,8 @@ class Browser:
         self._cookie_ok = set()
         self._riscaldati = set()   # domini già visitati dalla home (cookie anti-bot ottenuti)
         self._idealo_azione = {}   # dominio idealo -> URL del modulo di ricerca
+        self._bloccati = {}        # dominio -> volte in cui ha risposto 403/verifica anti-bot
+        self._memo_idealo = {}     # ricerche e offerte idealo già lette in questa esecuzione
 
     def cache_get(self, k):
         return self._cache.get(k)
@@ -342,6 +344,9 @@ class Browser:
         url = url_template.replace("{q}", quote_plus(query))
         if url in self._ricerche:  # stessa ricerca già fatta per un altro ASIN (es. "Xiaomi 65 LED")
             return self._ricerche[url]
+        dominio = re.match(r"(https?://[^/]+)", url).group(1)
+        if self._bloccati.get(dominio, 0) >= 2:  # sito che ci ha già bloccato due volte: inutile riprovare a ogni ASIN
+            return url, [], "HTTP 403 (bloccato)"
         self.riscalda(url)
         r = self._vai(url)
         if r is not None and r.status in (403, 429) or self._in_verifica():
@@ -349,6 +354,8 @@ class Browser:
             self._riscaldati.discard(re.match(r"(https?://[^/]+)", url).group(1))
             self.riscalda(url)
             r = self._vai(url)
+        if r is not None and r.status in (403, 429) or self._in_verifica():
+            self._bloccati[dominio] = self._bloccati.get(dominio, 0) + 1
         if r is None:
             return url, [], "timeout"
         self._pausa(0.5, 1.2)
@@ -384,7 +391,13 @@ class Browser:
 
     # ------------------------------------------------------------ idealo (ponte quando il retailer non è leggibile)
     def idealo_cerca(self, dominio, query):
-        """Cerca su idealo e ritorna i link prodotto [{url, testo}]."""
+        """Cerca su idealo e ritorna i link prodotto [{url, testo}]. Stessa ricerca per più negozi: una volta sola."""
+        chiave = ("cerca", dominio, query)
+        if chiave not in self._memo_idealo:
+            self._memo_idealo[chiave] = self._idealo_cerca(dominio, query)
+        return self._memo_idealo[chiave]
+
+    def _idealo_cerca(self, dominio, query):
         base = f"https://www.{dominio}"
         if dominio not in self._idealo_azione:
             self._vai(base + "/")
@@ -410,7 +423,12 @@ class Browser:
         return out
 
     def idealo_offerte(self, url):
-        """Offerte di una pagina prodotto idealo: [{url, negozio, testo, prezzo, img}]."""
+        """Offerte di una pagina prodotto idealo: [{url, negozio, testo, prezzo, img}] (una lettura per esecuzione)."""
+        if ("offerte", url) not in self._memo_idealo:
+            self._memo_idealo[("offerte", url)] = self._idealo_offerte(url)
+        return self._memo_idealo[("offerte", url)]
+
+    def _idealo_offerte(self, url):
         r = self._vai(url)
         if r is None or r.status >= 400:
             return []
