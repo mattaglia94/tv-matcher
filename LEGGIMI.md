@@ -75,4 +75,4 @@ Serve a verificare il motore su tanti TV veri, senza passare dal sito.
 
 ## Limiti noti
 - I siti cambiano layout e protezioni anti-bot. L'estrazione è generica (legge tutti i link della pagina di ricerca), quindi regge bene, ma se un retailer smette di restituire risultati va controllato il suo URL di ricerca.
-- Dai server di GitHub alcuni negozi bloccano sempre (AO.com e PCComponentes con Cloudflare, Euronics-DE, Argos spesso) o a volte (Darty, Fnac, Joybuy). Se non sono su idealo, risultano "non leggibili". Dal PC di casa (exe) di solito funzionano.
+- Dai server di GitHub alcuni negozi bloccano sempre (AO.com e PCComponentes con Cloudflare, Euronics-DE, Argos spesso) o a volte (Darty, Fnac, Joybuy). Se non sono su idealo, risultano "non leggibili". Dal PC di casa (exe) possono funzionare, perché i blocchi colpiscono soprattutto gli indirizzi dei server.
