@@ -102,7 +102,8 @@ class Pubblicatore:
             with open(os.path.join("output", "stato.json"), "w", encoding="utf-8") as f:
                 json.dump(dati, f, ensure_ascii=False, indent=1)
             return
-        if not forza and time.time() - self.ultimo < 20:
+        # GITHUB_TOKEN: max ~1.000 richieste l'ora per repository, da dividere tra le parti in parallelo
+        if not forza and time.time() - self.ultimo < (20 if PARTI == 1 else 45):
             return
         self.ultimo = time.time()
         contenuto = base64.b64encode(json.dumps(dati, ensure_ascii=False).encode()).decode()
@@ -148,8 +149,9 @@ _ultimo_unito = [0.0]
 
 
 def scrivi_unito(forza=False):
-    """Con più parti, ognuna aggiorna anche runs/<id>/stato.json con la vista complessiva (al massimo ogni 60 s)."""
-    if PARTI == 1 or not REPO or not TOKEN or (not forza and time.time() - _ultimo_unito[0] < 60):
+    """Con più parti si aggiorna anche runs/<id>/stato.json con la vista complessiva."""
+    # durante la ricerca lo aggiorna solo la parte 0 (ogni 3 minuti); alla fine ogni parte lo riscrive una volta
+    if PARTI == 1 or not REPO or not TOKEN or (not forza and (PARTE != 0 or time.time() - _ultimo_unito[0] < 180)):
         return
     _ultimo_unito[0] = time.time()
     st, elenco = _req("GET", f"{API}/repos/{REPO}/contents/runs/{RUN_ID}?ref={BRANCH}")
