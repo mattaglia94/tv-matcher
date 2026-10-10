@@ -236,7 +236,7 @@ def _lg(T: str, info: InfoTV):
         info.chiave = key
         # anno dalla lettera: serie U (UA7 = 2025) o lettera dopo la serie (QNED82A6 = 2025, NANO81T6 = 2024)
         lett = key[1] if re.match(r"U[A-Z]\d", key) else (m.group(3)[:1] if re.match(r"[A-Z]\d", m.group(3)) else "")
-        info.anno = _LG_ANNO.get(lett)
+        info.anno = None if trova_anno_testo(T) else _LG_ANNO.get(lett)  # l'anno scritto nel titolo vince
     for rx, tec, fam in _LG_FAM:
         if re.match(rx, key) or re.search(rx, info.codice):
             info.tecnologia, info.famiglia, info.regola = tec, fam, "LG"
@@ -261,6 +261,9 @@ _HIS_FAM = [  # ordine importante: PRO prima della versione base
 ]
 
 
+_HIS_ANNO = {"H": 2022, "K": 2023, "N": 2024, "Q": 2025, "S": 2026}
+
+
 def _hisense(T: str, info: InfoTV):
     # 55E7Q, 55E79Q, 65E7NQ PRO, 65U7NQ, 100U8NQ, 43A4N
     m = re.search(r"\b(\d{2,3})([AEU])(\d)([A-Z0-9]*)", T)
@@ -272,6 +275,11 @@ def _hisense(T: str, info: InfoTV):
     info.core = m.group(0) + ("PRO" if info.pro else "")
     serie = m.group(2) + m.group(3)
     info.chiave = serie
+    # anno dalla lettera finale: A6K 2023, E7NQ 2024, E7Q 2025, E7S/E7DS 2026
+    for lettera in re.sub(r"[^A-Z]", "", m.group(4))[:3] if not trova_anno_testo(T) else "":  # l'anno scritto vince
+        if lettera in _HIS_ANNO:
+            info.anno = _HIS_ANNO[lettera]
+            break
     for s, pro, tec, fam in _HIS_FAM:
         if s == serie and (pro is None or pro == info.pro):
             info.tecnologia, info.famiglia, info.regola = tec, fam, "HISENSE"

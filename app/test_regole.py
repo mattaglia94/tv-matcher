@@ -58,6 +58,9 @@ RICONOSCIMENTO = [
 
 # (titolo ASIN, titolo candidato, modalità, deve essere simile?)
 SOMIGLIANZA = [
+    # anno dal codice Hisense (Q = 2025) quando il nome non lo dice (es. idealo): non è un modello 2026
+    ("Hisense 65E7DS Smart TV 2026 QLED 65\" 4K", "Hisense 65E7Q QLED 65 pollici 4K", "stessa_marca", False),
+    ("Samsung QE65Q7FAAUXZT QLED 65 2025", "Hisense 65E7S QLED 65 pollici 4K", "concorrente", True),
     # stessa marca
     ("XIAOMI TV F Pro 32 2025, 32 pollici (81 cm), QLED, Smart TV, Fire TV, HD",
      "A-Pro-32-2026 XIA32APRO2 Xiaomi", "stessa_marca", True),
