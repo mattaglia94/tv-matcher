@@ -58,31 +58,31 @@
    "paese": "DE",
    "nome": "Euronics-DE",
    "url": "https://www.euronics.de/search?sSearch={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "MediaMarkt",
    "url": "https://www.mediamarkt.de/de/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Saturn",
    "url": "https://www.saturn.de/de/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Otto",
    "url": "https://www.otto.de/suche/{q}/",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Joybuy-DE",
    "url": "https://www.joybuy.de/search?keyword={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
@@ -124,57 +124,57 @@
    "paese": "FR",
    "nome": "Boulanger",
    "url": "https://www.boulanger.com/resultats?tr={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Conforama",
    "url": "https://www.conforama.fr/recherche-conforama/{q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Carrefour-FR",
    "url": "https://www.carrefour.fr/s?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "E.Leclerc",
    "url": "https://www.e.leclerc/recherche?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Auchan",
    "url": "https://www.auchan.fr/recherche?text={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Darty",
    "url": "https://www.darty.com/nav/recherche?text={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Cdiscount",
    "url": "https://www.cdiscount.com/search/10/{q}.html",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Fnac",
    "url": "https://www.fnac.com/SearchResult/ResultList.aspx?Search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Joybuy-FR",
    "url": "https://www.joybuy.fr/search?keyword={q}",
-   "attivo": true
+   "attivo": false
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-12T08:28:49.298Z"
+ "aggiornato": "2026-10-12T09:24:05.682Z"
 }
