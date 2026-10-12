@@ -129,12 +129,13 @@ def ponte_idealo(br, info, r, P, paese, out, max_m, log=print):
     cerca = (lambda q: br.pricerunner_cerca(q)) if pr else (lambda q: br.idealo_cerca(dom, q))
     offerte_di = (lambda u: br.pricerunner_offerte(u)) if pr else (lambda u: br.idealo_offerte(u))
     concorrente = P["modalita"] == "concorrente"
-    candidati = {}
+    candidati, letti = {}, 0
     for q in query_ricerca(info, P):
         try:
             prodotti = cerca(q)
         except Exception:
             prodotti = []
+        letti += len(prodotti)
         for l in prodotti:
             c = analizza(l["testo"])
             if not c.marca or not c.pollici or (c.marca != info.marca) != concorrente:
@@ -152,6 +153,9 @@ def ponte_idealo(br, info, r, P, paese, out, max_m, log=print):
                 candidati[l["url"]] = (score, c, motivo)
         if len(candidati) >= 3:
             break
+    if letti and not candidati:  # il comparatore risponde ma non ha nessun modello simile: non c'è nemmeno nel negozio
+        out["dettaglio"].append({"retailer": r["nome"], "ricerca": dom,
+                                 "esito": f"via {dom}: nessun modello simile tra {letti} prodotti"})
     scelti, codici = [], set()
     for url, (score, c, motivo) in sorted(candidati.items(), key=lambda x: x[1][0])[:5]:
         if len(scelti) >= max_m:
@@ -472,9 +476,9 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
             scelti = via
             out["match"][r["nome"]] = scelti
             esito = "trovato"
-        elif any(d.get("retailer") == r["nome"] and str(d.get("esito", "")).startswith(f"via {COMPARATORE.get(paese)}: nessuna offerta")
+        elif any(d.get("retailer") == r["nome"] and str(d.get("esito", "")).startswith(f"via {COMPARATORE.get(paese)}: nessun")
                  for d in out["dettaglio"]):
-            # sito bloccato, ma il comparatore elenca i modelli simili e quel negozio non li vende: non presente
+            # sito bloccato, ma il comparatore mostra che quel negozio non vende modelli simili (o che non ne esistono)
             esito = "non_presente"
     out["esito"][r["nome"]] = esito
     testo = ", ".join(s["modello"] + (f" (via {s['via']})" if s.get("via") else "") for s in scelti) or ESITI[esito]
