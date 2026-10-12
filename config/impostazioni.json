@@ -4,55 +4,55 @@
    "paese": "IT",
    "nome": "MediaWorld",
    "url": "https://www.mediaworld.it/it/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Euronics",
    "url": "https://www.euronics.it/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Unieuro",
    "url": "https://www.unieuro.it/online/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Expert",
    "url": "https://www.expert.it/it/it/exp/shop/search?terms={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
    "nome": "MediaMarkt-ES",
    "url": "https://www.mediamarkt.es/es/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
    "nome": "El Corte Inglés",
    "url": "https://www.elcorteingles.es/search-nwx/1/?s={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
    "nome": "Carrefour",
    "url": "https://www.carrefour.es/?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
    "nome": "PcComponentes",
    "url": "https://www.pccomponentes.com/search/?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
    "nome": "Alcampo",
    "url": "https://www.compraonline.alcampo.es/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-12T12:10:07.932Z"
+ "aggiornato": "2026-10-12T12:41:45.128Z"
 }
