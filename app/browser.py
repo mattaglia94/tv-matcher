@@ -437,6 +437,60 @@ class Browser:
         except Exception:
             return []
 
+    # ------------------------------------------------------------ PriceRunner (ponte nel Regno Unito, dove idealo non c'è)
+    def pricerunner_cerca(self, query):
+        """Prodotti trovati su PriceRunner UK: [{url, testo}] (pagine /pl/<categoria>-<id>/...)."""
+        chiave = ("pr-cerca", query)
+        if chiave in self._memo_idealo:
+            return self._memo_idealo[chiave]
+        out = []
+        r = self._vai(f"https://www.pricerunner.com/results?q={quote_plus(query)}")
+        if r is not None and r.status < 400:
+            try:
+                links = self.page.evaluate(JS_LINKS)
+            except Exception:
+                links = []
+            visti = set()
+            for l in links:
+                h = l["href"].split("?")[0]
+                if "/pl/" in h and h not in visti:
+                    visti.add(h)
+                    out.append({"url": h, "testo": l["testo"]})
+        self._memo_idealo[chiave] = out
+        return out
+
+    def pricerunner_offerte(self, url):
+        """Offerte di un prodotto PriceRunner: [{url, negozio, testo, prezzo}]. I link alle offerte passano da
+        clk.klarna.com/.../gotostore; il nome del negozio è all'inizio del testo dell'offerta."""
+        chiave = ("pr-offerte", url)
+        if chiave in self._memo_idealo:
+            return self._memo_idealo[chiave]
+        out = []
+        r = self._vai(url)
+        if r is not None and r.status < 400:
+            try:
+                righe = self.page.evaluate("""() => {
+                  const m = new Map();
+                  document.querySelectorAll('a[href*="gotostore"]').forEach(a => {
+                    if (/clickarea=sponsored/.test(a.href)) return;   // annunci sponsorizzati: non sono offerte del confronto
+                    const k = a.href.split('?')[0];
+                    const t = (a.innerText || '').replace(/\\s+/g, ' ').trim();
+                    const alt = [...a.querySelectorAll('img')].map(i => i.alt || '').join(' ');
+                    const v = m.get(k) || {url: a.href, testi: []};
+                    if (t || alt) v.testi.push((alt + ' ' + t).trim());
+                    m.set(k, v);
+                  });
+                  return [...m.values()].map(v => ({url: v.url, testo: v.testi.join(' | ').slice(0, 400)}));
+                }""")
+            except Exception:
+                righe = []
+            for o in righe:
+                prezzo = re.search(r"£\s?[\d.,]+", o["testo"])
+                out.append({"url": o["url"], "negozio": o["testo"][:60], "testo": o["testo"],
+                            "prezzo": prezzo.group(0) if prezzo else "", "img": ""})
+        self._memo_idealo[chiave] = out
+        return out
+
     def verifica(self, url):
         """Apre la pagina prodotto: ritorna (vivo, titolo+h1, testo pagina, immagine, scheda tecnica).
         Le pagine lette negli ultimi 30 giorni vengono riusate senza riaprirle."""

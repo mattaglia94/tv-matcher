@@ -230,7 +230,38 @@ def main():
     print(f"{tot - errori}/{tot} casi corretti")
     errori += banco_amazon()
     errori += invarianza_modello()
+    errori += ponte_uk()
     sys.exit(1 if errori else 0)
+
+
+def ponte_uk():
+    """Regno Unito: sito del negozio bloccato -> si passa da PriceRunner (idealo nel Regno Unito non c'è)."""
+    from nucleo import confronta_retailer
+
+    class B:
+        visti = []
+
+        def cerca(self, url, q):
+            return url, [], "HTTP 403"
+
+        def idealo_cerca(self, dom, q):
+            B.visti.append(dom)
+            return []
+
+        def pricerunner_cerca(self, q):
+            B.visti.append("pricerunner")
+            return [{"url": "https://www.pricerunner.com/pl/2-1/TVs/Hisense-65E7S", "testo": "Hisense 65E7S PRO 65\" QLED 4K 2026 £599"}]
+
+        def pricerunner_offerte(self, url):
+            return [{"url": "https://clk.klarna.com/uk/gotostore/v1/x", "negozio": "Currys 4.5 (120 ratings)",
+                     "testo": "Currys 4.5 Hisense 65E7S £599.00", "prezzo": "£599.00", "img": ""}]
+
+    info = analizza("Samsung QE65Q7FAAUXXU QLED 65 inch 4K 2026")
+    P = unisci_parametri({"modalita": "concorrente"})
+    r = confronta_retailer(B(), info, {"nome": "Currys", "url": "https://www.currys.co.uk/search?q={q}"}, P, "UK", log=lambda m: None)
+    ok = r["esito"].get("Currys") == "trovato" and "pricerunner" in B.visti and not any("idealo" in v for v in B.visti)
+    print(("✓" if ok else "✗") + " Regno Unito: ponte PriceRunner" + ("" if ok else f" {r['esito']} {B.visti} {r['dettaglio'][-2:]}"))
+    return 0 if ok else 1
 
 
 def invarianza_modello():

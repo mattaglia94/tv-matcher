@@ -576,7 +576,7 @@
           </div>
           <div class="param" style="grid-template-columns:auto 1fr;padding:12px">
             <label class="switch"><input type="checkbox" data-bool="ponte_idealo" ${P.ponte_idealo ? "checked" : ""} aria-label="Usa idealo come ponte"><span></span></label>
-            <div><h4>Se un sito blocca la ricerca, usa idealo</h4><p>Cerca il modello simile sul comparatore idealo e tiene solo le offerte di quel retailer. Il risultato è segnalato come trovato tramite servizio terzo.</p></div>
+            <div><h4>Se un sito blocca la ricerca, usa un comparatore</h4><p>Cerca il modello simile su idealo (nel Regno Unito su PriceRunner) e tiene solo le offerte di quel retailer. Il risultato è segnalato come trovato tramite servizio terzo.</p></div>
           </div>
         </div>
       </section>

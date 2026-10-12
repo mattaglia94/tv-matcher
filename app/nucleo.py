@@ -23,7 +23,9 @@ URL_CORRETTI = {  # indirizzi di ricerca cambiati dai negozi (vale anche per le 
 PID_MARCHE = {"SAM": "SAMSUNG", "XIA": "XIAOMI", "LGE": "LG", "HIS": "HISENSE", "TCL": "TCL", "PHI": "PHILIPS",
               "SON": "SONY", "PAN": "PANASONIC", "SHA": "SHARP", "TOS": "TOSHIBA", "HAI": "HAIER", "SAB": "SABA"}
 
-IDEALO = {"IT": "idealo.it", "DE": "idealo.de", "FR": "idealo.fr", "ES": "idealo.es", "UK": "idealo.co.uk"}
+IDEALO = {"IT": "idealo.it", "DE": "idealo.de", "FR": "idealo.fr", "ES": "idealo.es"}
+# comparatore usato come ponte quando il sito del negozio non si legge: idealo, nel Regno Unito PriceRunner
+COMPARATORE = {**IDEALO, "UK": "pricerunner.com"}
 
 AMAZON_DOMINIO = {"IT": "amazon.it", "DE": "amazon.de", "FR": "amazon.fr",
                   "ES": "amazon.es", "UK": "amazon.co.uk"}
@@ -119,15 +121,18 @@ def anno_da_idealo(br, c, paese, log=print):
 def ponte_idealo(br, info, r, P, paese, out, max_m, log=print):
     """Il sito del retailer non è leggibile: cerca su idealo i modelli simili e tiene solo
     le offerte di quel retailer. Ogni match riporta 'via' = dominio idealo usato."""
-    dom = IDEALO.get(paese)
+    dom = COMPARATORE.get(paese)
     chiave = chiave_negozio(r["nome"])
-    if not dom or len(chiave) < 3:
+    if not dom or len(chiave) < 2:
         return []
+    pr = dom == "pricerunner.com"
+    cerca = (lambda q: br.pricerunner_cerca(q)) if pr else (lambda q: br.idealo_cerca(dom, q))
+    offerte_di = (lambda u: br.pricerunner_offerte(u)) if pr else (lambda u: br.idealo_offerte(u))
     concorrente = P["modalita"] == "concorrente"
     candidati = {}
     for q in query_ricerca(info, P):
         try:
-            prodotti = br.idealo_cerca(dom, q)
+            prodotti = cerca(q)
         except Exception:
             prodotti = []
         for l in prodotti:
@@ -146,10 +151,12 @@ def ponte_idealo(br, info, r, P, paese, out, max_m, log=print):
         if c.codice in codici:
             continue
         try:
-            offerte = br.idealo_offerte(url)
+            offerte = offerte_di(url)
         except Exception:
             offerte = []
-        off = next((o for o in offerte if chiave in re.sub(r"[^a-z0-9]", "", o["negozio"].lower())), None)
+        # PriceRunner: il nome del negozio apre il testo dell'offerta ("Currys 4.5 ...", "AO ..."): deve iniziare così
+        off = next((o for o in offerte if (re.sub(r"[^a-z0-9]", "", o["negozio"].lower()).startswith(chiave) if pr
+                                           else chiave in re.sub(r"[^a-z0-9]", "", o["negozio"].lower()))), None)
         out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "famiglia": c.famiglia, "pollici": c.pollici,
                                  "anno": c.anno, "url": url, "ricerca": f"{dom}",
                                  "esito": (f"VALIDO via {dom}: offerta {r['nome']} {off.get('prezzo', '')}".strip() if off
@@ -440,9 +447,9 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
     else:
         esito = "errore"
     if esito in ("errore", "illeggibile") and P.get("ponte_idealo", True) and not stop():
-        log(f"   {r['nome']}: sito non leggibile, provo tramite {IDEALO.get(paese, 'comparatore')}")
+        log(f"   {r['nome']}: sito non leggibile, provo tramite {COMPARATORE.get(paese, 'comparatore')}")
         via = ponte_idealo(br, info, r, P, paese, out, max_m, log)
-        out["ponte"][r["nome"]] = IDEALO.get(paese, "")
+        out["ponte"][r["nome"]] = COMPARATORE.get(paese, "")
         if via:
             scelti = via
             out["match"][r["nome"]] = scelti
