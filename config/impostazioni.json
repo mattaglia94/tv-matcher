@@ -4,25 +4,25 @@
    "paese": "IT",
    "nome": "MediaWorld",
    "url": "https://www.mediaworld.it/it/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Euronics",
    "url": "https://www.euronics.it/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Unieuro",
    "url": "https://www.unieuro.it/online/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Expert",
    "url": "https://www.expert.it/it/it/exp/shop/search?terms={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -124,57 +124,57 @@
    "paese": "FR",
    "nome": "Boulanger",
    "url": "https://www.boulanger.com/resultats?tr={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Conforama",
    "url": "https://www.conforama.fr/recherche-conforama/{q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Carrefour-FR",
    "url": "https://www.carrefour.fr/s?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "E.Leclerc",
    "url": "https://www.e.leclerc/recherche?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Auchan",
    "url": "https://www.auchan.fr/recherche?text={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Darty",
    "url": "https://www.darty.com/nav/recherche?text={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Cdiscount",
    "url": "https://www.cdiscount.com/search/10/{q}.html",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Fnac",
    "url": "https://www.fnac.com/SearchResult/ResultList.aspx?Search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Joybuy-FR",
    "url": "https://www.joybuy.fr/search?keyword={q}",
-   "attivo": true
+   "attivo": false
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-12T14:41:59.133Z"
+ "aggiornato": "2026-10-12T16:11:21.703Z"
 }
