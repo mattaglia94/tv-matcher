@@ -261,6 +261,23 @@ _HIS_FAM = [  # ordine importante: PRO prima della versione base
 ]
 
 
+# Metz (Skyworth): 40MQH7000Y, 32MQF7030Z, 60MNH7000Z, 43MUD7000Z -> pollici, M, tecnologia (Q/N/U/T), lettera anno
+_METZ_ANNO = {"H": 2026, "F": 2025, "E": 2024, "D": 2023, "C": 2022}
+
+
+def _metz(T: str, info: InfoTV):
+    m = re.search(r"\b(\d{2,3})M([A-Z])([A-Z])(\d{4})([A-Z]?)\b", T)
+    if not m:
+        return False
+    info.codice = m.group(0)
+    info.pollici = int(m.group(1))
+    info.core = m.group(0)
+    info.chiave = "M" + m.group(2)
+    if not trova_anno_testo(T):
+        info.anno = _METZ_ANNO.get(m.group(3))
+    return False  # il resto (tecnologia, fascia) lo completano catalogo e regole generiche
+
+
 _HIS_ANNO = {"H": 2022, "K": 2023, "N": 2024, "Q": 2025, "S": 2026}
 
 
@@ -659,6 +676,8 @@ def analizza(testo: str, codice_noto: str = "", marca_nota: str = "", prezzo: fl
         ok = _samsung(T, info)
     elif info.marca == "XIAOMI":
         ok = _xiaomi(T, info)
+    elif info.marca == "METZ":
+        _metz(T, info)  # solo codice e anno; tecnologia e fascia dal catalogo/caratteristiche
     if not ok:
         _generica(T, info)
     applica_catalogo(info, T)
@@ -824,7 +843,8 @@ PARAMETRI_DEFAULT = {
     "tecnologia": {"attivo": True, "equivalenze": [["MINILED", "NEOQLED"]]},
     "risoluzione": {"attivo": True},
     "refresh": {"attivo": True},
-    "anno": {"attivo": True, "valore": 2026, "accetta_ignoto": True},
+    # modo "asin": stesso anno del TV Amazon (se non si ricava, vale "valore"); modo "fisso": sempre "valore"
+    "anno": {"attivo": True, "modo": "asin", "valore": 2026, "accetta_ignoto": True},
     "pro": {"attivo": True},
     "dolby_vision": {"attivo": False},
     "hdr10plus": {"attivo": False},
@@ -856,6 +876,14 @@ def _tec_equivalenti(a: str, b: str, gruppi) -> bool:
     if a == b:
         return True
     return any(a in g and b in g for g in (gruppi or []))
+
+
+def anno_obiettivo(P: dict, amz: InfoTV) -> int:
+    """Anno richiesto ai modelli trovati: quello del TV Amazon (predefinito) oppure un anno fisso scelto sul sito."""
+    a = P.get("anno") or {}
+    if a.get("modo", "asin") == "asin" and amz is not None and amz.anno:
+        return int(amz.anno)
+    return int(a.get("valore") or 2026)
 
 
 def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
@@ -903,7 +931,7 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
         return False, f"refresh {cand.hz}Hz", 0
     # Dolby Vision / HDR10+ / HDMI 2.1 si controllano sulla pagina prodotto (nucleo.elabora_asin)
     if P["anno"]["attivo"]:
-        target = int(P["anno"].get("valore") or 2026)
+        target = anno_obiettivo(P, amz)
         if cand.anno is not None and cand.anno != target:
             return False, f"anno {cand.anno}", 0
         if cand.anno is None:

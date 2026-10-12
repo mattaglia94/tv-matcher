@@ -2,11 +2,11 @@
 Usato sia dall'exe/CLI (motore.py) sia dal runner del sito (web_runner.py)."""
 import re
 
-from regole import _tec_equivalenti, analizza, e_accessorio, arricchisci, classe_hz, hz_diverse, confronta_param, leggi_prezzo, leggi_scheda, stesso_modello, unisci_parametri
+from regole import _tec_equivalenti, analizza, anno_obiettivo, e_accessorio, arricchisci, classe_hz, hz_diverse, confronta_param, leggi_prezzo, leggi_scheda, stesso_modello, unisci_parametri
 
 ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
          "nessun_simile": "Nessun modello simile", "errore": "Ricerca non riuscita",
-         "illeggibile": "Risultati non leggibili",
+         "illeggibile": "Sito non consultabile",
          "saltato": "Saltato: modello Amazon mancante"}
 
 # indirizzi di ricerca vecchi o sbagliati salvati nelle impostazioni -> indirizzo corretto
@@ -140,6 +140,14 @@ def ponte_idealo(br, info, r, P, paese, out, max_m, log=print):
             if not c.marca or not c.pollici or (c.marca != info.marca) != concorrente:
                 continue
             ok, motivo, score = confronta_param(info, c, P)
+            if ok and c.anno is None and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True):
+                # tramite comparatore non c'è la pagina del negozio da verificare: senza anno certo non si propone
+                c.anno = anno_da_idealo(br, c, paese, log) if not pr else None
+                if c.anno != anno_obiettivo(P, info):
+                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": l["url"], "ricerca": dom,
+                                             "esito": f"scartato: anno {c.anno or 'non determinabile'} (tramite {dom})"})
+                    continue
+                motivo = ", ".join(x for x in motivo.split(", ") if x and x != "anno da verificare") or "ok"
             if ok and l["url"] not in candidati:
                 candidati[l["url"]] = (score, c, motivo)
         if len(candidati) >= 3:
@@ -420,7 +428,7 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
                                              "esito": f"anno {anno_pag} letto su {IDEALO.get(paese, 'idealo')}"})
                     motivo = ", ".join(x for x in motivo.split(", ") if x and x != "ok") + (", " if motivo not in ("", "ok") else "") + f"anno da {IDEALO.get(paese, 'idealo')}"
-            if anno_pag and P["anno"]["attivo"] and anno_pag != int(P["anno"]["valore"]):
+            if anno_pag and P["anno"]["attivo"] and anno_pag != anno_obiettivo(P, info):
                 out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
                                          "esito": f"scartato: anno {anno_pag} (da pagina)"})
                 continue
@@ -436,6 +444,11 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
             # il codice sulla pagina prodotto è il più affidabile: se c'è, vince
             if cp.codice and cp.marca == c.marca and cp.pollici == c.pollici and not stesso_modello(info, cp):
                 c.codice = cp.codice
+            # codice letto altrove nella pagina (es. "vedi anche 40MQF7000Z") ma la scheda dice un'altra diagonale:
+            # si mostra il modello della scheda, o marca + caratteristiche, non un codice sbagliato
+            m_pol = re.match(r"\D{0,4}(\d{2,3})", c.codice or "")
+            if sp.get("pollici") and m_pol and int(m_pol.group(1)) != sp["pollici"] and int(m_pol.group(1)) in (24, 32, 40, 42, 43, 48, 50, 55, 58, 60, 65, 70, 75, 77, 83, 85, 98, 100):
+                c.codice = sp.get("modello") or f"{c.marca.title()} {sp['pollici']}\" {c.tecnologia}".strip()
         codici.add(c.codice)
         scelti.append({"modello": c.codice, "url": url, "img": im, "nota": "" if motivo == "ok" else motivo,
                        "titolo": (nome_pag or c.testo)[:160], **info_dict(c)})
@@ -459,6 +472,10 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
             scelti = via
             out["match"][r["nome"]] = scelti
             esito = "trovato"
+        elif any(d.get("retailer") == r["nome"] and str(d.get("esito", "")).startswith(f"via {COMPARATORE.get(paese)}: nessuna offerta")
+                 for d in out["dettaglio"]):
+            # sito bloccato, ma il comparatore elenca i modelli simili e quel negozio non li vende: non presente
+            esito = "non_presente"
     out["esito"][r["nome"]] = esito
     testo = ", ".join(s["modello"] + (f" (via {s['via']})" if s.get("via") else "") for s in scelti) or ESITI[esito]
     if esito == "errore" and errori:

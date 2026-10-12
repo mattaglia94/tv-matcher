@@ -57,6 +57,15 @@ RICONOSCIMENTO = [
 ]
 
 # (titolo ASIN, titolo candidato, modalità, deve essere simile?)
+# questi casi usano l'anno FISSO 2026 (es. Xiaomi F Pro 2025 -> sostituto A Pro 2026); STESSO_ANNO usa il predefinito
+FISSO = {"attivo": True, "modo": "fisso", "valore": 2026, "accetta_ignoto": True}
+STESSO_ANNO = [  # predefinito: stesso anno del TV Amazon
+    ("Metz 40 Pouces Smart TV FHD QLED 40MQH7000Y", "Metz 40MQF7000Z QLED 40\" Full HD", "stessa_marca", False),  # F = 2025
+    ("Metz 40 Pouces Smart TV FHD QLED 40MQH7000Y", "TV QLED 40\" Metz 40MQH7030Z Full HD Smart TV", "stessa_marca", True),
+    ("XIAOMI TV F Pro 32 2025, 32 pollici (81 cm), QLED, Smart TV, Fire TV, HD", "Xiaomi TV A Pro 32 2026 TV nero", "stessa_marca", False),
+    ("Samsung QE65Q7FAAUXZT QLED 65", "Hisense 65E7Q QLED 65 pollici 4K", "concorrente", True),   # 2025 e 2025
+    ("Samsung QE65Q7FAAUXZT QLED 65", "Hisense 65E7S QLED 65 pollici 4K", "concorrente", False),  # 2025 e 2026
+]
 SOMIGLIANZA = [
     # anno dal codice Hisense (Q = 2025) quando il nome non lo dice (es. idealo): non è un modello 2026
     ("Hisense 65E7DS Smart TV 2026 QLED 65\" 4K", "Hisense 65E7Q QLED 65 pollici 4K", "stessa_marca", False),
@@ -200,7 +209,7 @@ def main():
                   + (f"; amazon {campo[0]}={r['amazon'].get(campo[0])}" if campo else ""))
     for riga, ana, titolo in CASI_ASIN:
         r = elabora_asin(_BrowserFinto(titolo, ["Xiaomi TV A Pro 32 2026 TV nero"], "Xiaomi - TV A PRO 32 2026 TV, Nero"),
-                         dict(riga), [{"nome": "N", "url": "{q}"}], {"modalita": "stessa_marca", "verifica_url": True},
+                         dict(riga), [{"nome": "N", "url": "{q}"}], {"modalita": "stessa_marca", "verifica_url": True, "anno": FISSO},
                          log=lambda m: None, anagrafica=ana)
         if r["errore"] or "A PRO 32" not in [m["modello"] for m in r["match"].get("N", [])]:
             errori += 1
@@ -208,7 +217,7 @@ def main():
                   f"amazon {r['amazon'].get('marca')} {r['amazon'].get('pollici')}")
     for amz, ris, tp, modo, atteso in PAGINE:
         r = elabora_asin(_BrowserFinto(amz, ris, tp), {"asin": "B0TEST0000", "paese": "IT"}, [{"nome": "N", "url": "{q}"}],
-                         {"modalita": modo, "verifica_url": True}, log=lambda m: None)
+                         {"modalita": modo, "verifica_url": True, "anno": FISSO}, log=lambda m: None)
         trovati = [m["modello"] for m in r["match"].get("N", [])]
         if (atteso is None and trovati) or (atteso is not None and atteso not in trovati):
             errori += 1
@@ -221,12 +230,17 @@ def main():
             errori += 1
             print(f"✗ riconoscimento: {titolo}\n    atteso {atteso}, ottenuto {ottenuto} (chiave {i.chiave!r}, {i.regola})")
     for amz_t, cand_t, modo, atteso in SOMIGLIANZA:
-        P = unisci_parametri({"modalita": modo})
+        P = unisci_parametri({"modalita": modo, "anno": FISSO})
         ok, motivo, _ = confronta_param(analizza(amz_t), analizza(cand_t, prezzo=leggi_prezzo(cand_t)), P)  # come nel motore
         if ok != atteso:
             errori += 1
             print(f"✗ somiglianza ({modo}): {amz_t[:45]} ↔ {cand_t[:45]}\n    atteso {'simile' if atteso else 'scartato'}, motivo: {motivo}")
-    tot = len(RICONOSCIMENTO) + len(SOMIGLIANZA) + len(PAGINE) + len(CASI_ASIN) + len(SCHEDE)
+    for amz_t, cand_t, modo, atteso in STESSO_ANNO:
+        ok, motivo, _ = confronta_param(analizza(amz_t), analizza(cand_t), unisci_parametri({"modalita": modo}))
+        if ok != atteso:
+            errori += 1
+            print(f"✗ stesso anno ({modo}): {amz_t[:45]} ↔ {cand_t[:45]}: atteso {atteso}, motivo {motivo}")
+    tot = len(RICONOSCIMENTO) + len(SOMIGLIANZA) + len(PAGINE) + len(CASI_ASIN) + len(SCHEDE) + len(STESSO_ANNO)
     print(f"{tot - errori}/{tot} casi corretti")
     errori += banco_amazon()
     errori += invarianza_modello()
@@ -256,7 +270,7 @@ def ponte_uk():
             return [{"url": "https://clk.klarna.com/uk/gotostore/v1/x", "negozio": "Currys 4.5 (120 ratings)",
                      "testo": "Currys 4.5 Hisense 65E7S £599.00", "prezzo": "£599.00", "img": ""}]
 
-    info = analizza("Samsung QE65Q7FAAUXXU QLED 65 inch 4K 2026")
+    info = analizza("Samsung QE65Q7HAAUXXU QLED 65 inch 4K 2026")
     P = unisci_parametri({"modalita": "concorrente"})
     r = confronta_retailer(B(), info, {"nome": "Currys", "url": "https://www.currys.co.uk/search?q={q}"}, P, "UK", log=lambda m: None)
     ok = r["esito"].get("Currys") == "trovato" and "pricerunner" in B.visti and not any("idealo" in v for v in B.visti)

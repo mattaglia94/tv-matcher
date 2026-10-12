@@ -45,7 +45,7 @@
     play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
     tv: '<svg viewBox="0 0 64 48" fill="none"><rect x="2" y="2" width="60" height="38" rx="7" stroke="#A9A3D6" stroke-width="3"/><path d="M22 46h20" stroke="#A9A3D6" stroke-width="3" stroke-linecap="round"/><g opacity=".8"><rect x="10" y="10" width="8.8" height="22" fill="#FFD23F"/><rect x="18.8" y="10" width="8.8" height="22" fill="#2EE6F0"/><rect x="27.6" y="10" width="8.8" height="22" fill="#4BE38E"/><rect x="36.4" y="10" width="8.8" height="22" fill="#FF4FA3"/><rect x="45.2" y="10" width="8.8" height="22" fill="#7B61FF"/></g></svg>',
   };
-  const ESITI = { saltato: "Saltato", trovato: "Trovato", non_presente: "Prodotto non presente", nessun_simile: "Nessun modello simile", errore: "Ricerca non riuscita", illeggibile: "Risultati non leggibili" };
+  const ESITI = { saltato: "Saltato", trovato: "Trovato", non_presente: "Prodotto non presente", nessun_simile: "Nessun modello simile", errore: "Ricerca non riuscita", illeggibile: "Sito non consultabile" };
   const ESITI_NOTA = {
     non_presente: "Nessun TV con la marca e la diagonale cercate nel catalogo del retailer.",
     nessun_simile: "Ci sono TV con la marca e la diagonale cercate, ma nessuno rispetta i criteri.",
@@ -502,7 +502,7 @@
     if (P.famiglia.attivo) parti.push(conc ? "<strong>fascia</strong> uguale o vicina" : "stessa <strong>famiglia</strong>");
     if (P.risoluzione.attivo) parti.push("stessa risoluzione");
     if (P.refresh.attivo) parti.push("stessa frequenza");
-    if (P.anno.attivo) parti.push(`anno <strong>${P.anno.valore}</strong>${P.anno.accetta_ignoto ? " (o non indicato)" : ""}`);
+    if (P.anno.attivo) parti.push(`${P.anno.modo === "fisso" ? `anno <strong>${P.anno.valore}</strong>` : "<strong>stesso anno</strong> del TV Amazon"}${P.anno.accetta_ignoto ? " (o non indicato)" : ""}`);
     if (!conc && P.pro.attivo) parti.push("PRO solo con PRO");
     return "Cerco " + parti.join(", ") + ".";
   }
@@ -513,7 +513,8 @@
     const controllo = (v) => {
       const p = P[v.chiave];
       if (v.controllo === "tolleranza") return `<div class="controlli"><label class="campo" style="grid-auto-flow:column;align-items:center">Tolleranza ±<input type="number" min="0" max="20" step="1" data-num="pollici.tolleranza" value="${p.tolleranza}"> pollici</label><span class="tenue piccolo">0 = stessa diagonale</span></div>`;
-      if (v.controllo === "anno") return `<div class="controlli"><label class="campo" style="grid-auto-flow:column;align-items:center">Anno<input type="number" min="2020" max="2035" data-num="anno.valore" value="${p.valore}"></label>
+      if (v.controllo === "anno") return `<div class="controlli"><label class="campo" style="grid-auto-flow:column;align-items:center">Anno<select data-anno-modo><option value="asin" ${p.modo !== "fisso" ? "selected" : ""}>Stesso del TV Amazon</option><option value="fisso" ${p.modo === "fisso" ? "selected" : ""}>Anno fisso</option></select></label>
+        <label class="campo" style="grid-auto-flow:column;align-items:center">${p.modo === "fisso" ? "Anno fisso" : "Se l'anno Amazon non si ricava"}<input type="number" min="2020" max="2035" data-num="anno.valore" value="${p.valore}"></label>
         <label class="check"><input type="checkbox" data-bool="anno.accetta_ignoto" ${p.accetta_ignoto ? "checked" : ""}> Accetta i modelli con anno non ricavabile (segnalati "da verificare")</label></div>`;
       if (v.controllo === "equivalenze") return `<div class="controlli"><span class="tenue piccolo">Considera equivalenti:</span>
         ${(p.equivalenze || []).map((g, gi) => `<span class="chip info">${g.map((t) => T.nomeTecnologia[t] || t).join(" = ")} <button type="button" class="btn fantasma piccolo" data-togli-eq="${gi}" aria-label="Rimuovi equivalenza" style="padding:0 4px">✕</button></span>`).join("") || '<span class="chip">nessuna</span>'}
@@ -589,6 +590,7 @@
     box.querySelectorAll("[data-on]").forEach((x) => (x.onchange = () => { P[x.dataset.on].attivo = x.checked; cambia(); }));
     box.querySelectorAll("[data-num]").forEach((x) => (x.onchange = () => { imposta(x.dataset.num, Number(x.value)); cambia(); }));
     box.querySelectorAll("[data-bool]").forEach((x) => (x.onchange = () => { imposta(x.dataset.bool, x.checked); cambia(); }));
+    box.querySelectorAll("[data-anno-modo]").forEach((x) => (x.onchange = () => { P.anno.modo = x.value; cambia(); }));
     box.querySelectorAll("[data-togli-eq]").forEach((x) => (x.onclick = () => { P.tecnologia.equivalenze.splice(Number(x.dataset.togliEq), 1); cambia(); }));
     const eq = document.getElementById("eqAgg");
     if (eq) eq.onclick = () => {
@@ -646,7 +648,7 @@
           <div><strong>~${minuti} min</strong><span class="tenue piccolo">durata stimata${parti > 1 ? ` · ${parti} parti in parallelo` : ""}</span></div>
         </div>
         <p class="piccolo tenue">Modalità: <span class="chip info">${nomeModalita(P)}</span></p>
-        <p class="piccolo tenue">Criteri attivi: ${attivi.map((v) => `<span class="chip">${v.titolo}${v.chiave === "pollici" && P.pollici.tolleranza ? ` ±${P.pollici.tolleranza}"` : ""}${v.chiave === "anno" ? ` ${P.anno.valore}` : ""}</span>`).join(" ") || "nessuno"}</p>
+        <p class="piccolo tenue">Criteri attivi: ${attivi.map((v) => `<span class="chip">${v.titolo}${v.chiave === "pollici" && P.pollici.tolleranza ? ` ±${P.pollici.tolleranza}"` : ""}${v.chiave === "anno" ? (P.anno.modo === "fisso" ? ` ${P.anno.valore}` : " = Amazon") : ""}</span>`).join(" ") || "nessuno"}</p>
         <div style="margin-top:26px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
           <button class="btn primario grande" type="button" id="btnAvvia" ${coperti.length ? "" : "disabled"}>${ICONE.play} Avvia la ricerca</button>
           <span class="tenue piccolo" id="msgAvvio"></span>

@@ -1281,16 +1281,28 @@
    "tecnologia_predefinita": "LED",
    "serie": [
     {
-     "serie": "MQF",
+     "serie": "MQ",
      "tecnologia": "QLED",
      "fascia": "ENTRY",
-     "descrizione": "QLED"
+     "descrizione": "MQ… QLED (es. 40MQH7000Y; la lettera dopo MQ è l'anno: F 2025, H 2026)"
     },
     {
-     "serie": "MOC",
+     "serie": "MN",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "MN… Mini LED (es. 60MNH7000Z)"
+    },
+    {
+     "serie": "MU",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "MU… LED 4K/Full HD"
+    },
+    {
+     "serie": "MO",
      "tecnologia": "OLED",
      "fascia": "PREMIUM",
-     "descrizione": "OLED"
+     "descrizione": "MO… OLED"
     }
    ]
   },
