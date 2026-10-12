@@ -124,57 +124,57 @@
    "paese": "FR",
    "nome": "Boulanger",
    "url": "https://www.boulanger.com/resultats?tr={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Conforama",
    "url": "https://www.conforama.fr/recherche-conforama/{q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Carrefour-FR",
    "url": "https://www.carrefour.fr/s?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "E.Leclerc",
    "url": "https://www.e.leclerc/recherche?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Auchan",
    "url": "https://www.auchan.fr/recherche?text={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Darty",
    "url": "https://www.darty.com/nav/recherche?text={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Cdiscount",
    "url": "https://www.cdiscount.com/search/10/{q}.html",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Fnac",
    "url": "https://www.fnac.com/SearchResult/ResultList.aspx?Search={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Joybuy-FR",
    "url": "https://www.joybuy.fr/search?keyword={q}",
-   "attivo": false
+   "attivo": true
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-09T19:00:32.316Z"
+ "aggiornato": "2026-10-12T08:28:42.123Z"
 }
