@@ -48,7 +48,7 @@ window.TVM = {
     tecnologia: { attivo: true, equivalenze: [["MINILED", "NEOQLED"]] },
     risoluzione: { attivo: true },
     refresh: { attivo: true },
-    anno: { attivo: true, modo: "asin", valore: 2026, accetta_ignoto: true },
+    anno: { attivo: true, modo: "asin", valore: new Date().getFullYear(), accetta_ignoto: true },
     pro: { attivo: true },
     dolby_vision: { attivo: false },
     hdr10plus: { attivo: false },

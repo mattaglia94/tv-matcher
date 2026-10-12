@@ -844,7 +844,7 @@ PARAMETRI_DEFAULT = {
     "risoluzione": {"attivo": True},
     "refresh": {"attivo": True},
     # modo "asin": stesso anno del TV Amazon (se non si ricava, vale "valore"); modo "fisso": sempre "valore"
-    "anno": {"attivo": True, "modo": "asin", "valore": 2026, "accetta_ignoto": True},
+    "anno": {"attivo": True, "modo": "asin", "valore": __import__("datetime").date.today().year, "accetta_ignoto": True},
     "pro": {"attivo": True},
     "dolby_vision": {"attivo": False},
     "hdr10plus": {"attivo": False},
@@ -883,7 +883,7 @@ def anno_obiettivo(P: dict, amz: InfoTV) -> int:
     a = P.get("anno") or {}
     if a.get("modo", "asin") == "asin" and amz is not None and amz.anno:
         return int(amz.anno)
-    return int(a.get("valore") or 2026)
+    return int(a.get("valore") or __import__("datetime").date.today().year)
 
 
 def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
