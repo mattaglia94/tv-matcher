@@ -28,61 +28,61 @@
    "paese": "ES",
    "nome": "MediaMarkt-ES",
    "url": "https://www.mediamarkt.es/es/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
    "nome": "El Corte Inglés",
    "url": "https://www.elcorteingles.es/search-nwx/1/?s={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
    "nome": "Carrefour",
    "url": "https://www.carrefour.es/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
    "nome": "PcComponentes",
    "url": "https://www.pccomponentes.com/search/?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
    "nome": "Alcampo",
    "url": "https://www.compraonline.alcampo.es/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Euronics-DE",
    "url": "https://www.euronics.de/search?sSearch={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "MediaMarkt",
    "url": "https://www.mediamarkt.de/de/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Saturn",
    "url": "https://www.saturn.de/de/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Otto",
    "url": "https://www.otto.de/suche/{q}/",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Joybuy-DE",
    "url": "https://www.joybuy.de/search?keyword={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-12T13:50:25.414Z"
+ "aggiornato": "2026-10-12T13:53:38.677Z"
 }
