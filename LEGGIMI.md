@@ -66,7 +66,7 @@ Anno dal codice:
 - **Opzione B**: carica la cartella su GitHub. Il workflow `.github/workflows/build.yml` crea l'exe in automatico (scheda Actions → artifact *Radar_TV*).
 
 ## Banco di prova (`app/banco.py`, workflow "Banco di prova")
-Serve a verificare il motore su tanti TV vere, senza passare dal sito.
+Serve a verificare il motore su tante TV vere, senza passare dal sito.
 - **raccogli**: pesca da Amazon (5 paesi, brand principali, 40–75") TV con la loro scheda tecnica → `banco/asin_<paese>.json` nel branch `dati`.
 - **confronta**: lancia il motore completo su un campione di quegli ASIN in tutti i negozi del paese → `runs/banco-…/stato.json`.
 - **sonda**: apre pagine di negozi problematici e salva cosa vede il browser.
