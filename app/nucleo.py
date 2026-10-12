@@ -155,8 +155,13 @@ def ponte_idealo(br, info, r, P, paese, out, max_m, log=print):
         except Exception:
             offerte = []
         # PriceRunner: il nome del negozio apre il testo dell'offerta ("Currys 4.5 ...", "AO ..."): deve iniziare così
-        off = next((o for o in offerte if (re.sub(r"[^a-z0-9]", "", o["negozio"].lower()).startswith(chiave) if pr
-                                           else chiave in re.sub(r"[^a-z0-9]", "", o["negozio"].lower()))), None)
+        def del_negozio(o):
+            n = re.sub(r"[^a-z0-9]", "", o["negozio"].lower())
+            if not pr:
+                return chiave in n
+            # nomi corti (AO) devono aprire il testo; gli altri possono stare poco dopo (logo, "Valid until...")
+            return n.startswith(chiave) or (len(chiave) >= 4 and chiave in n[:40])
+        off = next((o for o in offerte if del_negozio(o)), None)
         out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "famiglia": c.famiglia, "pollici": c.pollici,
                                  "anno": c.anno, "url": url, "ricerca": f"{dom}",
                                  "esito": (f"VALIDO via {dom}: offerta {r['nome']} {off.get('prezzo', '')}".strip() if off
