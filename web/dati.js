@@ -72,7 +72,7 @@ window.TVM = {
                  concorrente: "Il concorrente deve essere della stessa fascia (base, entry, media, premium, top). Una fascia di distanza è ammessa ma segnalata, e vince sempre la fascia identica." },
         controllo: "regole" },
       { chiave: "pro", titolo: "Separazione PRO", testo: "Un modello PRO si confronta solo con un altro PRO.", solo: "stessa_marca" },
-      { chiave: "anno", titolo: "Anno di lancio", testo: "Solo modelli dello stesso anno del TV Amazon (oppure di un anno fisso a scelta). L'anno si ricava dal codice (Samsung/Metz: H = 2026, Hisense: S = 2026, LG OLED: C6 = 2026) o dal titolo.", controllo: "anno" },
+      { chiave: "anno", titolo: "Anno di lancio", testo: "Solo modelli dello stesso anno della TV Amazon (oppure di un anno fisso a scelta). L'anno si ricava dal codice (Samsung/Metz: H = 2026, Hisense: S = 2026, LG OLED: C6 = 2026) o dal titolo.", controllo: "anno" },
     ]},
     { gruppo: "Caratteristiche", nota: "Si leggono dalla pagina prodotto: servono la verifica pagina accesa e qualche secondo in più per prodotto.", voci: [
       { chiave: "dolby_vision", titolo: "Dolby Vision", testo: "Se l'ASIN Amazon lo supporta, anche il modello simile deve supportarlo." },

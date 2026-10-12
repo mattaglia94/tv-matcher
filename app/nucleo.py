@@ -276,9 +276,9 @@ def prepara_asin(br, riga, retailer, P, log=print, anagrafica=None):
     # per cercare un concorrente servono tecnologia e fascia dell'ASIN, altrimenti il confronto è casuale
     non_classificato = P["modalita"] == "concorrente" and not (info.tecnologia and info.fascia)
     if e_accessorio(nome):
-        out["errore"] = "non sembra un TV (accessorio o ricambio): controlla l'ASIN"
+        out["errore"] = "non sembra una TV (accessorio o ricambio): controlla l'ASIN"
         out["esito"] = {r["nome"]: "saltato" for r in retailer}
-        log("   ⚠ l'ASIN non sembra un TV")
+        log("   ⚠ l'ASIN non sembra una TV")
         return out, None
     if not info.marca or not info.pollici or non_classificato:
         out["errore"] = nota or ("fascia del modello Amazon non riconosciuta" if non_classificato else "modello Amazon non riconosciuto")

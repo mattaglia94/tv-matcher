@@ -47,7 +47,7 @@
   };
   const ESITI = { saltato: "Saltato", trovato: "Trovato", non_presente: "Prodotto non presente", nessun_simile: "Nessun modello simile", errore: "Ricerca non riuscita", illeggibile: "Sito non consultabile" };
   const ESITI_NOTA = {
-    non_presente: "Nessun TV con la marca e la diagonale cercate nel catalogo del retailer.",
+    non_presente: "Nessuna TV con la marca e la diagonale cercate nel catalogo del retailer.",
     nessun_simile: "Ci sono TV con la marca e la diagonale cercate, ma nessuno rispetta i criteri.",
     errore: "Il sito non ha risposto o ha bloccato la ricerca: riprova più tardi.",
     illeggibile: "La pagina si è aperta ma non mostrava TV leggibili (probabile blocco): verifica a mano.",
@@ -139,7 +139,7 @@
       <section class="login vista">
         <div class="login-box">
           <img src="logo.svg" alt="" width="84" height="84">
-          <div><h1>Radar TV</h1><p class="tenue" style="margin-top:10px">Trova i modelli simili ai TV Amazon sui retailer europei.</p></div>
+          <div><h1>Radar TV</h1><p class="tenue" style="margin-top:10px">Trova i modelli simili alle TV Amazon sui retailer europei.</p></div>
           ${barre}
           <form id="fLogin">
             <label class="campo">Password<input type="password" id="pwd" autocomplete="current-password" required autofocus></label>
@@ -179,7 +179,7 @@
         <div class="intestazione">
           <div>
             <h1>Nuova ricerca</h1>
-            <p class="tenue">Parti da una lista di ASIN Amazon: il motore trova, per ogni retailer, il TV più simile con un codice modello diverso.</p>
+            <p class="tenue">Parti da una lista di ASIN Amazon: il motore trova, per ogni retailer, la TV più simile con un codice modello diverso.</p>
           </div>
         </div>
         <div class="wizard">
@@ -502,7 +502,7 @@
     if (P.famiglia.attivo) parti.push(conc ? "<strong>fascia</strong> uguale o vicina" : "stessa <strong>famiglia</strong>");
     if (P.risoluzione.attivo) parti.push("stessa risoluzione");
     if (P.refresh.attivo) parti.push("stessa frequenza");
-    if (P.anno.attivo) parti.push(`${P.anno.modo === "fisso" ? `anno <strong>${P.anno.valore}</strong>` : "<strong>stesso anno</strong> del TV Amazon"}${P.anno.accetta_ignoto ? " (o non indicato)" : ""}`);
+    if (P.anno.attivo) parti.push(`${P.anno.modo === "fisso" ? `anno <strong>${P.anno.valore}</strong>` : "<strong>stesso anno</strong> della TV Amazon"}${P.anno.accetta_ignoto ? " (o non indicato)" : ""}`);
     if (!conc && P.pro.attivo) parti.push("PRO solo con PRO");
     return "Cerco " + parti.join(", ") + ".";
   }
@@ -513,7 +513,7 @@
     const controllo = (v) => {
       const p = P[v.chiave];
       if (v.controllo === "tolleranza") return `<div class="controlli"><label class="campo" style="grid-auto-flow:column;align-items:center">Tolleranza ±<input type="number" min="0" max="20" step="1" data-num="pollici.tolleranza" value="${p.tolleranza}"> pollici</label><span class="tenue piccolo">0 = stessa diagonale</span></div>`;
-      if (v.controllo === "anno") return `<div class="controlli"><label class="campo" style="grid-auto-flow:column;align-items:center">Anno<select data-anno-modo><option value="asin" ${p.modo !== "fisso" ? "selected" : ""}>Stesso del TV Amazon</option><option value="fisso" ${p.modo === "fisso" ? "selected" : ""}>Anno fisso</option></select></label>
+      if (v.controllo === "anno") return `<div class="controlli"><label class="campo" style="grid-auto-flow:column;align-items:center">Anno<select data-anno-modo><option value="asin" ${p.modo !== "fisso" ? "selected" : ""}>Stesso della TV Amazon</option><option value="fisso" ${p.modo === "fisso" ? "selected" : ""}>Anno fisso</option></select></label>
         <label class="campo" style="grid-auto-flow:column;align-items:center">${p.modo === "fisso" ? "Anno fisso" : "Se l'anno Amazon non si ricava"}<input type="number" min="2020" max="2035" data-num="anno.valore" value="${p.valore}"></label>
         <label class="check"><input type="checkbox" data-bool="anno.accetta_ignoto" ${p.accetta_ignoto ? "checked" : ""}> Accetta i modelli con anno non ricavabile (segnalati "da verificare")</label></div>`;
       if (v.controllo === "equivalenze") return `<div class="controlli"><span class="tenue piccolo">Considera equivalenti:</span>
@@ -1194,12 +1194,12 @@
       <div class="vista">
         <div class="intestazione">
           <div><h1>Marche e serie</h1>
-          <p class="tenue">Il motore riconosce un TV da marca e serie: qui decidi tecnologia e fascia di ogni serie. Le fasce (Base, Entry, Media, Premium, Top) servono a confrontare marche diverse. Le modifiche valgono per tutte le ricerche successive.</p></div>
+          <p class="tenue">Il motore riconosce una TV da marca e serie: qui decidi tecnologia e fascia di ogni serie. Le fasce (Base, Entry, Media, Premium, Top) servono a confrontare marche diverse. Le modifiche valgono per tutte le ricerche successive.</p></div>
           <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="button" id="catNuova">+ Nuova marca</button><button class="btn primario" type="button" id="catSalva" disabled>Salva modifiche</button></div>
         </div>
         <section class="scheda prova-titolo">
           <h3>Prova un titolo</h3>
-          <p class="tenue piccolo">Incolla il nome di un TV come appare su Amazon o su un retailer: vedi subito come viene classificato (anteprima indicativa).</p>
+          <p class="tenue piccolo">Incolla il nome di una TV come appare su Amazon o su un retailer: vedi subito come viene classificato (anteprima indicativa).</p>
           <input type="text" id="catProva" placeholder="es. TCL 65C7L SQD-Mini LED 4K 144Hz" value="${esc(S.provaCat || "")}" aria-label="Titolo da provare">
           <div id="catEsito" class="prova-esito" aria-live="polite"></div>
         </section>
@@ -1295,7 +1295,7 @@
         const rip = d.querySelector("[data-ripristina]");
         if (rip) rip.onclick = () => { C.marche[C.marche.indexOf(m)] = clona(C.base.get(m.marca.toUpperCase())); segnaSporco(); disegna(); disegnaProva(); };
         d.querySelector("[data-elimina-marca]").onclick = () => {
-          if (!confirm(`Eliminare ${m.marca} dal catalogo? I suoi TV non verranno più riconosciuti per serie.`)) return;
+          if (!confirm(`Eliminare ${m.marca} dal catalogo? Le sue TV non verranno più riconosciute per serie.`)) return;
           C.marche.splice(C.marche.indexOf(m), 1);
           if (C.base.has(m.marca.toUpperCase())) C.rimosse.add(m.marca.toUpperCase());
           segnaSporco(); disegna(); disegnaProva();
@@ -1332,7 +1332,7 @@
 
   // ------------------------------------------------------------------ guida e tutorial
   const SLIDE = [
-    { titolo: "Benvenuto in Radar TV", testo: "Parti da una lista di ASIN Amazon e trova, per ogni retailer europeo, il TV più simile con un codice modello diverso.", colore: "var(--giallo)" },
+    { titolo: "Benvenuto in Radar TV", testo: "Parti da una lista di ASIN Amazon e trova, per ogni retailer europeo, la TV più simile con un codice modello diverso.", colore: "var(--giallo)" },
     { titolo: "Incolla gli ASIN", testo: "Copia da Excel, scrivi uno per riga o carica un file. Il paese si legge dalla riga oppure si sceglie per ogni ASIN.", colore: "var(--ciano)" },
     { titolo: "Scegli marketplace e criteri", testo: "Spunta i retailer su cui cercare e decidi quando due TV sono simili: pollici, tecnologia, fascia, anno e altro.", colore: "var(--verde)" },
     { titolo: "Avvia e chiudi pure", testo: "La ricerca gira su GitHub: le ricerche grandi si dividono su più macchine in parallelo (100 ASIN in circa 20–30 minuti). Puoi chiudere il browser: la ritrovi nello Storico, con i risultati da scaricare in Excel.", colore: "var(--magenta)" },
@@ -1384,7 +1384,7 @@
             <li><div><h3>Inserisci gli ASIN</h3><p>Incolla la lista o carica un CSV/Excel. Ogni ASIN ha un paese: lo leggo dalla riga (es. <code>B0F457MQCQ;IT</code>) o uso il paese predefinito. Se Amazon non risponde, scrivi a mano il modello nella colonna facoltativa.</p></div></li>
             <li><div><h3>Scegli i marketplace</h3><p>Spunta i retailer su cui cercare. Puoi modificare un URL, aggiungerne di nuovi o disattivarli: le modifiche valgono per tutti e restano salvate.</p></div></li>
             <li><div><h3>Imposta la somiglianza</h3><p>Scegli se cerchi un'alternativa della stessa marca o un concorrente equivalente, poi quanto stretto deve essere il confronto: Stretto, Bilanciato (le regole del documento) o Largo. Per regolare i singoli criteri apri "Personalizza i criteri".</p></div></li>
-            <li><div><h3>Tieni aggiornato il Catalogo</h3><p>Nel Catalogo trovi marche e serie con tecnologia e fascia. Puoi aggiungere una marca, una serie nuova o correggere una fascia: vale dalla ricerca successiva. Con "Prova un titolo" vedi subito come viene classificato un TV.</p></div></li>
+            <li><div><h3>Tieni aggiornato il Catalogo</h3><p>Nel Catalogo trovi marche e serie con tecnologia e fascia. Puoi aggiungere una marca, una serie nuova o correggere una fascia: vale dalla ricerca successiva. Con "Prova un titolo" vedi subito come viene classificata una TV.</p></div></li>
             <li><div><h3>Avvia e attendi</h3><p>Il motore gira su GitHub. Una ricerca da 10 ASIN su 4 retailer richiede circa 10–15 minuti; da 100 ASIN circa 20–30 minuti, perché si divide su più macchine in parallelo. Puoi chiudere la pagina: la pillola verde in alto e lo Storico ti riportano all'avanzamento.</p></div></li>
             <li><div><h3>Leggi e scarica</h3><p>Per ogni ASIN vedi i modelli simili per retailer con foto e link. "Anno da verificare" segnala i modelli il cui anno non si ricava dal codice. Scarica l'Excel con un foglio per paese più il foglio Dettaglio con tutti i candidati scartati e il motivo.</p></div></li>
           </ol>
@@ -1394,9 +1394,9 @@
             <details><summary>Amazon ha bloccato la lettura (captcha): cosa faccio?</summary><p>Amazon a volte blocca le visite automatiche. Il motore riprova con indirizzi diversi e poi cerca l'ASIN sul web. Se non basta, apri la ricerca, premi "Completa i modelli mancanti", scrivi il modello accanto all'ASIN (basta il codice, es. 85U8075F) e avvia. Il modello resta salvato per le ricerche successive.</p></details>
                         <details><summary>Cosa vuol dire "anno da verificare"?</summary><p>Il codice non dichiara l'anno e il titolo non lo riporta. Il modello rispetta gli altri criteri: verifica l'anno sulla pagina prodotto o spegni "Accetta anno non ricavabile".</p></details>
             <details><summary>Posso lanciare più ricerche insieme?</summary><p>Sì, girano in parallelo su GitHub. Ognuna compare nello Storico con il suo stato.</p></details>
-            <details><summary>Il prezzo viene letto?</summary><p>Solo per i TV che non sono nel Catalogo: se marca o serie sono sconosciute, la fascia viene stimata dal prezzo al pollice e il risultato lo segnala. Per tutti gli altri il confronto si basa su codice modello, pollici e caratteristiche tecniche.</p></details>
+            <details><summary>Il prezzo viene letto?</summary><p>Solo per le TV che non sono nel Catalogo: se marca o serie sono sconosciute, la fascia viene stimata dal prezzo al pollice e il risultato lo segnala. Per tutti gli altri il confronto si basa su codice modello, pollici e caratteristiche tecniche.</p></details>
             <details><summary>Usa l'intelligenza artificiale?</summary><p>No. Il motore segue regole fisse: legge le pagine dei siti con un browser automatico, riconosce i modelli con il Catalogo (marche, serie, fasce) e confronta le caratteristiche. Nessun servizio di AI viene chiamato.</p></details>
-            <details><summary>Un TV di una marca nuova?</summary><p>Funziona anche senza fare nulla: la marca viene presa da Amazon e la fascia stimata dal prezzo. Per risultati più precisi aggiungi la marca e le sue serie nel <a href="#/catalogo">Catalogo</a>.</p></details>
+            <details><summary>Una TV di una marca nuova?</summary><p>Funziona anche senza fare nulla: la marca viene presa da Amazon e la fascia stimata dal prezzo. Per risultati più precisi aggiungi la marca e le sue serie nel <a href="#/catalogo">Catalogo</a>.</p></details>
           </aside>
         </div>
       </div>`;

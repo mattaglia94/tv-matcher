@@ -1,6 +1,6 @@
 # Radar TV
 
-Confronta i TV venduti su Amazon (per ASIN) con modelli **simili ma non identici** sui retailer del paese scelto. Il tool non usa AI: si basa solo su regole fisse.
+Confronta le TV vendute su Amazon (per ASIN) con modelli **simili ma non identici** sui retailer del paese scelto. Il tool non usa AI: si basa solo su regole fisse.
 
 ## Requisiti sul PC
 - Windows con **Microsoft Edge** (già presente) oppure Google Chrome.
@@ -54,7 +54,7 @@ Due modalità, scelte per ogni ricerca.
 - stessa risoluzione, classe di refresh e anno, come sopra.
 
 Tra i candidati validi vince quello col punteggio più basso (diagonale e fascia identiche prima di tutto).
-Il sistema operativo del TV viene ignorato. Le marche senza tabella (Sharp, Grundig…) usano la serie letterale del codice.
+Il sistema operativo della TV viene ignorato. Le marche senza tabella (Sharp, Grundig…) usano la serie letterale del codice.
 
 Anno dal codice:
 - Samsung: lettera finale (H = 2026, F = 2025);
@@ -71,7 +71,7 @@ Serve a verificare il motore su tanti TV veri, senza passare dal sito.
 - **confronta**: lancia il motore completo su un campione di quegli ASIN in tutti i negozi del paese → `runs/banco-…/stato.json`.
 - **sonda**: apre pagine di negozi problematici e salva cosa vede il browser.
 - In locale: `python app/banco.py valuta <file>` (titolo vs scheda Amazon) e `python app/banco.py esiti <stato.json>` (statistiche per negozio e motivi di scarto).
-- `app/banco_campioni.json` (~270 TV reali) è usato da `test_regole.py`: soglie minime di marca, pollici, risoluzione e tecnologia, e nessun TV vero scambiato per un accessorio.
+- `app/banco_campioni.json` (~270 TV reali) è usato da `test_regole.py`: soglie minime di marca, pollici, risoluzione e tecnologia, e nessuna TV vera scambiata per un accessorio.
 
 ## Limiti noti
 - I siti cambiano layout e protezioni anti-bot. L'estrazione è generica (legge tutti i link della pagina di ricerca), quindi regge bene, ma se un retailer smette di restituire risultati va controllato il suo URL di ricerca.
