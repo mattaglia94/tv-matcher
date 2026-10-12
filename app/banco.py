@@ -248,9 +248,16 @@ def sonda(urls):
                 html = br.page.content()
             except Exception:
                 corpo, html = "", ""
-            prod = [l for l in links if re.search(r"\d{2}", l.get("testo", "")) and len(l.get("testo", "")) > 25]
+            prod = [l for l in links if re.search(r"\d{2}", l.get("testo", "")) and len(l.get("testo", "")) > 25][:40]
+            try:  # link con immagini (loghi dei negozi) e attributi utili per capire la struttura delle offerte
+                extra = br.page.evaluate("""() => [...document.querySelectorAll('a[href]')].filter(a => /£|€|store|shop|go/i.test(a.innerText + a.href))
+                    .slice(0, 40).map(a => ({href: a.href, testo: a.innerText.replace(/\\s+/g,' ').slice(0,200),
+                    alt: [...a.querySelectorAll('img')].map(i => i.alt).join('/'), aria: a.getAttribute('aria-label') || '',
+                    padre: (a.closest('li,article,[class*=offer i],[data-testid]') || {}).className || ''}))""")
+            except Exception as e:
+                extra = [str(e)]
             out.append({"url": u, "finale": br.page.url, "stato": getattr(r, "status", None), "titolo": br.page.title(),
-                        "n_link": len(links), "link_prodotto": prod[:15], "corpo": corpo,
+                        "n_link": len(links), "link_prodotto": prod, "extra": extra, "corpo": corpo,
                         "html_len": len(html), "html_prodotti": [m.group(0)[:300] for m in re.finditer(r"<[^>]+(product|tile|card)[^>]*>", html, re.I)][:10]})
             print(u, out[-1]["stato"], out[-1]["titolo"][:60], len(links), len(prod), flush=True)
     finally:
