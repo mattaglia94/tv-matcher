@@ -88,13 +88,13 @@
    "paese": "UK",
    "nome": "AO.com",
    "url": "https://ao.com/search?search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Currys",
    "url": "https://www.currys.co.uk/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-13T08:30:18.985Z"
+ "aggiornato": "2026-10-13T08:30:22.240Z"
 }
