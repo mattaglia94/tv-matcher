@@ -1,4 +1,4 @@
-/* Radar TV — logica del sito (JavaScript puro, nessun framework). */
+/* TV Finder — logica del sito (JavaScript puro, nessun framework). */
 (() => {
   "use strict";
   const T = window.TVM;
@@ -45,6 +45,7 @@
     play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
     tv: '<svg viewBox="0 0 64 48" fill="none"><rect x="2" y="2" width="60" height="38" rx="7" stroke="#A9A3D6" stroke-width="3"/><path d="M22 46h20" stroke="#A9A3D6" stroke-width="3" stroke-linecap="round"/><g opacity=".8"><rect x="10" y="10" width="8.8" height="22" fill="#FFD23F"/><rect x="18.8" y="10" width="8.8" height="22" fill="#2EE6F0"/><rect x="27.6" y="10" width="8.8" height="22" fill="#4BE38E"/><rect x="36.4" y="10" width="8.8" height="22" fill="#FF4FA3"/><rect x="45.2" y="10" width="8.8" height="22" fill="#7B61FF"/></g></svg>',
   };
+  const testoEsito = (e) => (S.ricercaIdentica && e === "nessun_simile" ? "Stesso modello non presente" : ESITI[e]);
   const ESITI = { saltato: "Saltato", trovato: "Trovato", non_presente: "Prodotto non presente", nessun_simile: "Nessun modello simile", errore: "Ricerca non riuscita", illeggibile: "Sito non consultabile" };
   const ESITI_NOTA = {
     non_presente: "Nessuna TV con la marca e la diagonale cercate nel catalogo del retailer.",
@@ -139,7 +140,7 @@
       <section class="login vista">
         <div class="login-box">
           <img src="logo.svg" alt="" width="84" height="84">
-          <div><h1>Radar TV</h1><p class="tenue" style="margin-top:10px">Trova i modelli simili alle TV Amazon sui retailer europei.</p></div>
+          <div><h1>TV Finder</h1><p class="tenue" style="margin-top:10px">Trova lo stesso modello o i modelli simili alle TV Amazon sui retailer europei.</p></div>
           ${barre}
           <form id="fLogin">
             <label class="campo">Password<input type="password" id="pwd" autocomplete="current-password" required autofocus></label>
@@ -179,7 +180,7 @@
         <div class="intestazione">
           <div>
             <h1>Nuova ricerca</h1>
-            <p class="tenue">Parti da una lista di ASIN Amazon: il motore trova, per ogni retailer, la TV più simile con un codice modello diverso.</p>
+            <p class="tenue">Parti da una lista di ASIN Amazon: il motore trova, per ogni retailer, lo stesso modello oppure la TV più simile.</p>
           </div>
         </div>
         <div class="wizard">
@@ -495,6 +496,7 @@
     return "personalizzato";
   }
   function frase(P) {
+    if (P.ricerca === "identico") return "Cerca <strong>lo stesso modello</strong> della TV Amazon: stesso codice, anche con le varianti di paese o di canale (es. QE55Q7FAAUXZT = QE55Q7FAATXZT), stessa diagonale e stesso anno.";
     const conc = P.modalita === "concorrente";
     const parti = [conc ? "TV di <strong>altre marche</strong>" : "TV della <strong>stessa marca</strong> con codice diverso"];
     if (P.pollici.attivo) parti.push(P.pollici.tolleranza ? `diagonale entro <strong>±${P.pollici.tolleranza}"</strong>` : "<strong>stessa diagonale</strong>");
@@ -526,7 +528,17 @@
     const liv = livelloDi(P);
     box.innerHTML = `
       <section class="scheda">
-        <h2>Cosa cerchi?</h2>
+        <h2>Tipo di ricerca</h2>
+        <div class="modalita" role="radiogroup" aria-label="Tipo di ricerca">
+          ${[["identico", "=", "Stesso modello", "Cerca nei negozi esattamente il modello Amazon, con il suo codice"], ["simile", "≈", "Modello simile", "Cerca un modello simile per caratteristiche, con le regole qui sotto"]].map(([v, ic, t, d]) => `
+            <label class="modalita-opz ${(P.ricerca || "simile") === v ? "scelta" : ""}">
+              <input type="radio" name="ricerca" value="${v}" ${(P.ricerca || "simile") === v ? "checked" : ""}>
+              <span class="modalita-icona" aria-hidden="true">${ic}</span>
+              <strong>${t}</strong><span>${d}</span>
+            </label>`).join("")}
+        </div>
+        ${P.ricerca === "identico" ? `<p class="frase-criteri" id="fraseCriteri">${frase(P)}</p>` : `
+        <h3 style="margin-top:26px">Cosa cerchi?</h3>
         <div class="modalita" role="radiogroup" aria-label="Modalità di ricerca">
           ${T.modalita.map((m) => `
             <label class="modalita-opz ${P.modalita === m.valore ? "scelta" : ""}">
@@ -543,7 +555,7 @@
               <strong>${l.titolo}</strong><span class="tenue piccolo">${l.testo}</span>
             </button>`).join("")}
         </div>
-        <p class="frase-criteri" id="fraseCriteri">${frase(P)}${liv === "personalizzato" ? ' <span class="chip attenzione">personalizzato</span>' : ""}</p>
+        <p class="frase-criteri" id="fraseCriteri">${frase(P)}${liv === "personalizzato" ? ' <span class="chip attenzione">personalizzato</span>' : ""}</p>`}
       </section>
       <details class="scheda avanzate" ${liv === "personalizzato" || S.avanzateAperte ? "open" : ""} id="avanzate">
         <summary><h3 style="display:inline">Personalizza i criteri</h3> <span class="tenue piccolo">interruttori singoli, preset salvati, opzioni dei risultati</span></summary>
@@ -556,7 +568,7 @@
           <button class="btn piccolo" type="button" id="salvaPreset">Salva come preset</button>
           ${S.bozza.preset !== "" && S.bozza.preset !== "__std" && preset[S.bozza.preset] ? '<button class="btn fantasma piccolo pericolo" type="button" id="eliminaPreset">Elimina preset</button>' : ""}
         </div>
-      ${T.parametriInfo.map((g) => `
+      ${P.ricerca === "identico" ? "" : T.parametriInfo.map((g) => `
         <section class="gruppo-param">
           <h3>${g.gruppo}</h3>${g.nota ? `<p class="tenue piccolo">${g.nota}</p>` : ""}
           ${g.voci.filter((v) => !v.solo || v.solo === P.modalita).map((v) => `
@@ -587,6 +599,7 @@
     const cambia = () => { S.bozza.preset = ""; salvaBozza(); passoParametri(box); };
     const imposta = (path, val) => { const [a, b] = path.split("."); if (b) P[a][b] = val; else P[a] = val; };
     box.querySelectorAll('input[name="modalita"]').forEach((x) => (x.onchange = () => { P.modalita = x.value; cambia(); }));
+    box.querySelectorAll('input[name="ricerca"]').forEach((x) => (x.onchange = () => { P.ricerca = x.value; cambia(); }));
     box.querySelectorAll("[data-on]").forEach((x) => (x.onchange = () => { P[x.dataset.on].attivo = x.checked; cambia(); }));
     box.querySelectorAll("[data-num]").forEach((x) => (x.onchange = () => { imposta(x.dataset.num, Number(x.value)); cambia(); }));
     box.querySelectorAll("[data-bool]").forEach((x) => (x.onchange = () => { imposta(x.dataset.bool, x.checked); cambia(); }));
@@ -770,6 +783,7 @@
   function disegnaRun(id, dati, st, primo) {
     const s = dati.stato || {}, gh = dati.github || {};
     S.statoRun = s; // i pulsanti leggono sempre l'ultimo stato ricevuto
+    S.ricercaIdentica = (s.config?.parametri?.ricerca === "identico");
     const av = s.avanzamento || { fatti: 0, totale: 1, corrente: st.testo };
     const perc = st.cod === "completato" ? 100 : Math.min(99, Math.round((av.fatti / Math.max(1, av.totale)) * 100));
     const inCorso = st.cod === "corso" || st.cod === "coda";
@@ -978,7 +992,7 @@
               if (c.paese !== r.paese) return '<td class="tenue">·</td>';
               const m = (r.match || {})[c.nome] || [];
               const e = (r.esito || {})[c.nome];
-              return `<td>${m.length ? m.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.modello)}</a>${x.nota ? ` <span class="chip attenzione">${esc(x.nota)}</span>` : ""}`).join("<br>") : `<span class="${e === "errore" ? "chip errore" : "tenue"}">${e ? ESITI[e] : "—"}</span>`}</td>`;
+              return `<td>${m.length ? m.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.modello)}</a>${x.nota ? ` <span class="chip attenzione">${esc(x.nota)}</span>` : ""}`).join("<br>") : `<span class="${e === "errore" ? "chip errore" : "tenue"}">${e ? testoEsito(e) : "—"}</span>`}</td>`;
             }).join("")}
           </tr>`).join("")}</tbody>
         </table></div>`;
@@ -1007,7 +1021,7 @@
               if (m === undefined) return `<div class="match-tile nessuno"><div class="retailer">${esc(ret.nome)}</div><span>In attesa</span></div>`;
               if (!m.length) {
                 const e = (r.esito || {})[ret.nome] || "nessun_simile";
-                return `<div class="match-tile nessuno ${e}"><div class="retailer">${esc(ret.nome)}<span class="chip ${e === "errore" || e === "illeggibile" ? "errore" : ""}">${ESITI[e]}</span></div><span class="piccolo">${ESITI_NOTA[e] || ""}${(r.ponte || {})[ret.nome] ? ` Cercato anche su ${esc(r.ponte[ret.nome])}: nessuna offerta di ${esc(ret.nome)} per un modello simile.` : ""}</span></div>`;
+                return `<div class="match-tile nessuno ${e}"><div class="retailer">${esc(ret.nome)}<span class="chip ${e === "errore" || e === "illeggibile" ? "errore" : ""}">${testoEsito(e)}</span></div><span class="piccolo">${ESITI_NOTA[e] || ""}${(r.ponte || {})[ret.nome] ? ` Cercato anche su ${esc(r.ponte[ret.nome])}: nessuna offerta di ${esc(ret.nome)} per un modello simile.` : ""}</span></div>`;
               }
               const [x, ...altri] = m;
               return `
@@ -1043,7 +1057,7 @@
           const m = (r.match || {})[x.nome] || [];
           const e = (r.esito || {})[x.nome];
           if (m.length) return [m.map((y) => y.modello).join(" / "), m.map((y) => y.url).join(" ")];
-          return [e && e !== "trovato" ? ESITI[e] : "", ""];
+          return [e && e !== "trovato" ? testoEsito(e) : "", ""];
         })]);
       });
       const ws = XLSX.utils.aoa_to_sheet(righe);
@@ -1332,7 +1346,7 @@
 
   // ------------------------------------------------------------------ guida e tutorial
   const SLIDE = [
-    { titolo: "Benvenuto in Radar TV", testo: "Parti da una lista di ASIN Amazon e trova, per ogni retailer europeo, la TV più simile con un codice modello diverso.", colore: "var(--giallo)" },
+    { titolo: "Benvenuto in TV Finder", testo: "Parti da una lista di ASIN Amazon e trova, per ogni retailer europeo, lo stesso modello oppure la TV più simile.", colore: "var(--giallo)" },
     { titolo: "Incolla gli ASIN", testo: "Copia da Excel, scrivi uno per riga o carica un file. Il paese si legge dalla riga oppure si sceglie per ogni ASIN.", colore: "var(--ciano)" },
     { titolo: "Scegli marketplace e criteri", testo: "Spunta i retailer su cui cercare e decidi quando due TV sono simili: pollici, tecnologia, fascia, anno e altro.", colore: "var(--verde)" },
     { titolo: "Avvia e chiudi pure", testo: "La ricerca gira su GitHub: le ricerche grandi si dividono su più macchine in parallelo (100 ASIN in circa 20–30 minuti). Puoi chiudere il browser: la ritrovi nello Storico, con i risultati da scaricare in Excel.", colore: "var(--magenta)" },

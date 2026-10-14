@@ -843,6 +843,8 @@ PARAMETRI_DEFAULT = {
     "tecnologia": {"attivo": True, "equivalenze": [["MINILED", "NEOQLED"]]},
     "risoluzione": {"attivo": True},
     "refresh": {"attivo": True},
+    # ricerca "simile" (regole di somiglianza) oppure "identico" (lo stesso modello dell'ASIN, anche con varianti di codice)
+    "ricerca": "simile",
     # modo "asin": stesso anno del TV Amazon (se non si ricava, vale "valore"); modo "fisso": sempre "valore"
     "anno": {"attivo": True, "modo": "asin", "valore": __import__("datetime").date.today().year, "accetta_ignoto": True},
     "pro": {"attivo": True},
@@ -980,6 +982,45 @@ def stesso_modello(a: InfoTV, b: InfoTV) -> bool:
         return False
     x, y = a.core, b.core
     return x == y or x in b.codice or y in a.codice
+
+
+def _cod_norm(c: str) -> str:
+    return re.sub(r"[^A-Z0-9]", "", (c or "").upper())
+
+
+def stesso_modello_esatto(a: InfoTV, b: InfoTV) -> bool:
+    """Modalità "Stesso modello": la stessa TV dell'ASIN, anche con varianti di codice per paese o canale
+    (QE55Q7FAAUXZT = QE55Q7FAATXZT = GQ55Q7FAAT; 55UA73006LA = 55UA73006LA.AEU). Diagonale e anno, se noti, uguali."""
+    if not a.codice or not b.codice or not a.marca or a.marca != b.marca:
+        return False
+    if "caratteristiche" in a.note or "caratteristiche" in b.note:
+        return False  # "Metz 32\" QLED" non è un codice modello
+    if a.pollici and b.pollici and a.pollici != b.pollici:
+        return False
+    if a.anno and b.anno and a.anno != b.anno:
+        return False  # stesso nome commerciale, anno diverso (es. Xiaomi A Pro 75 2025 / 2026)
+    if a.marca in ("SAMSUNG", "HISENSE") and a.core and b.core:
+        return a.core == b.core  # il "core" toglie prefisso del paese e suffissi di distribuzione
+    # senza il prefisso di paese/canale prima dei pollici (K-55XR80 = 55XR80, TX-55… = 55…)
+    x, y = (re.sub(r"^[A-Z]+(?=\d)", "", _cod_norm(c)) for c in (a.codice, b.codice))
+    if x == y:
+        return True
+    corto, lungo = sorted((x, y), key=len)
+    if not lungo.startswith(corto):
+        return False
+    resto = lungo[len(corto):]
+    return len(corto) >= 6 or (len(corto) >= 5 and len(resto) <= 2 and resto.isalpha())
+
+
+def confronta_identico(amz: InfoTV, cand: InfoTV, P: dict | None = None):
+    """Come confronta_param, ma per la modalità "Stesso modello"."""
+    if not cand.codice:
+        return False, "codice modello non leggibile", 0
+    if cand.marca != amz.marca:
+        return False, "marca diversa", 0
+    if stesso_modello_esatto(amz, cand):
+        return True, "ok", 0
+    return False, f"modello diverso ({cand.codice})", 0
 
 
 def confronta(amz: InfoTV, cand: InfoTV, anno_target: int, accetta_anno_ignoto: bool):

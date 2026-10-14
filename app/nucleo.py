@@ -2,7 +2,7 @@
 Usato sia dall'exe/CLI (motore.py) sia dal runner del sito (web_runner.py)."""
 import re
 
-from regole import _tec_equivalenti, analizza, anno_obiettivo, e_accessorio, arricchisci, classe_hz, hz_diverse, confronta_param, leggi_prezzo, leggi_scheda, stesso_modello, unisci_parametri
+from regole import _tec_equivalenti, analizza, anno_obiettivo, confronta_identico, stesso_modello_esatto, e_accessorio, arricchisci, classe_hz, hz_diverse, confronta_param, leggi_prezzo, leggi_scheda, stesso_modello, unisci_parametri
 
 ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
          "nessun_simile": "Nessun modello simile", "errore": "Ricerca non riuscita",
@@ -39,6 +39,20 @@ def query_ricerca(info, P):
     """Testi di ricerca da provare sul retailer (dal più specifico al più largo)."""
     m, p, f = info.marca.title(), info.pollici, info.famiglia
     tec = NOMI_TEC.get(info.tecnologia, "")
+    if P.get("ricerca") == "identico":
+        # stesso modello: si cerca il codice (intero e senza suffissi di paese/canale), poi marca + codice
+        cod = re.sub(r"\.[A-Z]{2,4}$", "", (info.codice or "").upper()).strip()
+        q = [cod] if cod else []
+        n = cod.replace("-", "").replace(" ", "")
+        if info.core and info.core in n:
+            corto = n[:n.index(info.core) + len(info.core)]
+            if corto != n:
+                q.append(corto)
+        if cod and m and m.upper() not in cod:
+            q.append(f"{m} {cod}")
+        if not q and m and p:
+            q.append(f"{m} {p}")
+        return list(dict.fromkeys(q))
     if P.get("modalita") == "concorrente":
         q = [f"TV {p} {tec}".strip(), f"TV {p} pollici"]
         # poi le marche concorrenti più diffuse, finché non si trova un match
@@ -128,7 +142,9 @@ def ponte_idealo(br, info, r, P, paese, out, max_m, log=print):
     pr = dom == "pricerunner.com"
     cerca = (lambda q: br.pricerunner_cerca(q)) if pr else (lambda q: br.idealo_cerca(dom, q))
     offerte_di = (lambda u: br.pricerunner_offerte(u)) if pr else (lambda u: br.idealo_offerte(u))
-    concorrente = P["modalita"] == "concorrente"
+    identico = P.get("ricerca") == "identico"
+    concorrente = P["modalita"] == "concorrente" and not identico
+    valuta = confronta_identico if identico else confronta_param
     candidati, letti = {}, 0
     for q in query_ricerca(info, P):
         try:
@@ -140,8 +156,8 @@ def ponte_idealo(br, info, r, P, paese, out, max_m, log=print):
             c = analizza(l["testo"])
             if not c.marca or not c.pollici or (c.marca != info.marca) != concorrente:
                 continue
-            ok, motivo, score = confronta_param(info, c, P)
-            if ok and c.anno is None and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True):
+            ok, motivo, score = valuta(info, c, P)
+            if ok and not identico and c.anno is None and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True):
                 # tramite comparatore non c'è la pagina del negozio da verificare: senza anno certo non si propone
                 c.anno = anno_da_idealo(br, c, paese, log) if not pr else None
                 if c.anno != anno_obiettivo(P, info):
@@ -274,7 +290,13 @@ def prepara_asin(br, riga, retailer, P, log=print, anagrafica=None):
                      **info_dict(info)}
     log(f"   Amazon ({fonte or 'non riconosciuto'}): {info.marca} {info.codice} {info.pollici}\" {info.famiglia}")
     # per cercare un concorrente servono tecnologia e fascia dell'ASIN, altrimenti il confronto è casuale
-    non_classificato = P["modalita"] == "concorrente" and not (info.tecnologia and info.fascia)
+    identico = P.get("ricerca") == "identico"
+    non_classificato = P["modalita"] == "concorrente" and not identico and not (info.tecnologia and info.fascia)
+    if identico and info.marca and info.pollici and (not info.codice or "caratteristiche" in info.note):
+        out["errore"] = "codice modello non ricavabile da Amazon: per cercare lo stesso modello scrivilo a mano"
+        out["esito"] = {r["nome"]: "saltato" for r in retailer}
+        log("   ⚠ stesso modello: codice Amazon mancante")
+        return out, None
     if e_accessorio(nome):
         out["errore"] = "non sembra una TV (accessorio o ricambio): controlla l'ASIN"
         out["esito"] = {r["nome"]: "saltato" for r in retailer}
@@ -292,7 +314,9 @@ def prepara_asin(br, riga, retailer, P, log=print, anagrafica=None):
 def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
     """Fase 2 (un negozio): cerca i modelli simili all'ASIN su un retailer.
     Ritorna {match, esito, dettaglio, ponte} per quel retailer (indipendente dagli altri: si può parallelizzare)."""
-    concorrente = P["modalita"] == "concorrente"
+    identico = P.get("ricerca") == "identico"
+    concorrente = P["modalita"] == "concorrente" and not identico
+    valuta = confronta_identico if identico else confronta_param
     max_m = max(1, int(P.get("max_match") or 1))
     out = {"match": {}, "esito": {}, "dettaglio": [], "ponte": {}}
     r = {**r, "url": URL_CORRETTI.get(r["url"], r["url"])}
@@ -331,7 +355,7 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
                     pertinenti += 1
             else:
                 continue  # stessa marca in modalità concorrente, o altra marca in modalità stessa marca
-            ok, motivo, score = confronta_param(info, c, P)
+            ok, motivo, score = valuta(info, c, P)
             if not ok and motivo.startswith("codice modello non leggibile") and P.get("verifica_url", True) and \
                     abs(c.pollici - info.pollici) <= int(P["pollici"].get("tolleranza") or 0) and l["url"] not in da_leggere:
                 da_leggere[l["url"]] = l  # titolo senza modello: si legge la scheda dell'inserzione (dopo, se serve)
@@ -358,7 +382,7 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
             c.pollici = sp["pollici"]
         if not c.marca or not c.pollici or (c.marca != info.marca) != concorrente:
             continue
-        ok, motivo, score = confronta_param(info, c, P)
+        ok, motivo, score = valuta(info, c, P)
         out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "famiglia": c.famiglia,
                                  "pollici": c.pollici, "anno": c.anno, "url": url,
                                  "esito": ("VALIDO " if ok else "scartato: ") + motivo + " (modello letto nella scheda dell'inserzione)"})
@@ -397,56 +421,71 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
                 out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
                                          "esito": f"pagina prodotto non coerente ({pol_pag}\")"})
                 continue
-            # caratteristiche: scheda tecnica, poi titolo; il testo libero della pagina solo per le funzioni HDR/HDMI
-            full = arricchisci(analizza(f"{titolo_pag} {corpo[:20000]}", c.codice), sp)
-            mancanti = [n for k, n in (("dolby_vision", "Dolby Vision"), ("hdr10plus", "HDR10+"),
-                                       ("hdmi21", "HDMI 2.1"))
-                        if P[k]["attivo"] and getattr(info, k) and not getattr(full, k)]
-            # anno e risoluzione: scheda tecnica, altrimenti SOLO il titolo del prodotto (il resto della pagina
-            # contiene menu, banner, copyright ed etichette energetiche con altri anni e risoluzioni)
-            ris_pag = sp.get("risoluzione") or cp.risoluzione
-            if P["risoluzione"]["attivo"] and info.risoluzione and ris_pag and ris_pag != info.risoluzione and \
-                    not (P["modalita"] == "concorrente" and {ris_pag, info.risoluzione} <= {"HD", "FHD"}):
-                mancanti.append(f"risoluzione {info.risoluzione} (pagina: {ris_pag})")
-            hz_pag = sp.get("hz")
-            if P["refresh"]["attivo"] and info.hz and hz_pag and hz_diverse(hz_pag, info.hz):
-                mancanti.append(f"frequenza {info.hz} Hz (pagina: {hz_pag} Hz)")
-            # la voce "tecnologia" delle schede è spesso generica o sbagliata (un QLED è anche "LED", un LED a volte
-            # "Mini LED"): si scarta solo se una è OLED e l'altra no, oppure se anche il titolo della pagina la contraddice
-            tec_pag = sp.get("tecnologia")
-            if tec_pag and cp.tecnologia and cp.tecnologia != tec_pag and "OLED" not in (tec_pag, cp.tecnologia):
-                tec_pag = cp.tecnologia
-            if P["tecnologia"]["attivo"] and tec_pag and c.fascia_fonte != "catalogo" and info.tecnologia and \
-                    tec_pag != info.tecnologia and not _tec_equivalenti(info.tecnologia, tec_pag, P["tecnologia"].get("equivalenze")) and \
-                    ("OLED" in (tec_pag, info.tecnologia) or (cp.tecnologia and cp.tecnologia != info.tecnologia)):
-                mancanti.append(f"tecnologia {info.tecnologia} (pagina: {tec_pag})")
-            if mancanti:
-                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                         "esito": "scartato: " + ", ".join(mancanti)})
-                continue
-            anno_pag = cp.anno or sp.get("anno") or c.anno  # l'anno scritto nel titolo è più affidabile della scheda
-            # anno su idealo solo se serve davvero (Stretto: un anno sconosciuto escluderebbe il modello)
-            if not anno_pag and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True) and c.codice:
-                anno_pag = anno_da_idealo(br, c, paese, log)
-                if anno_pag:
+            if identico:
+                # stesso modello: la pagina deve mostrare lo stesso codice (se ne mostra uno) e lo stesso anno
+                cpag = analizza(f"{sp.get('modello', '')} {titolo_pag}")
+                if cpag.codice and cpag.marca == info.marca and "caratteristiche" not in cpag.note \
+                        and not stesso_modello_esatto(info, cpag):
+                    out["dettaglio"].append({"retailer": r["nome"], "modello": cpag.codice, "url": url,
+                                             "esito": f"scartato: la pagina mostra un altro modello ({cpag.codice})"})
+                    continue
+                anno_pag = cp.anno or sp.get("anno")
+                if anno_pag and info.anno and anno_pag != info.anno:
                     out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                             "esito": f"anno {anno_pag} letto su {IDEALO.get(paese, 'idealo')}"})
-                    motivo = ", ".join(x for x in motivo.split(", ") if x and x != "ok") + (", " if motivo not in ("", "ok") else "") + f"anno da {IDEALO.get(paese, 'idealo')}"
-            if anno_pag and P["anno"]["attivo"] and anno_pag != anno_obiettivo(P, info):
-                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                         "esito": f"scartato: anno {anno_pag} (da pagina)"})
-                continue
-            if not anno_pag and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True):
-                out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                         "esito": "scartato: anno non indicato nemmeno nella scheda tecnica"})
-                continue
-            if anno_pag:  # anno letto in scheda, nel titolo o su idealo: non è più "da verificare"
-                c.anno = anno_pag
-                motivo = ", ".join(x for x in motivo.split(", ") if x and x != "anno da verificare") or "ok"
+                                             "esito": f"scartato: stesso nome ma anno {anno_pag}"})
+                    continue
+            else:
+                # caratteristiche: scheda tecnica, poi titolo; il testo libero della pagina solo per le funzioni HDR/HDMI
+                full = arricchisci(analizza(f"{titolo_pag} {corpo[:20000]}", c.codice), sp)
+                mancanti = [n for k, n in (("dolby_vision", "Dolby Vision"), ("hdr10plus", "HDR10+"),
+                                           ("hdmi21", "HDMI 2.1"))
+                            if P[k]["attivo"] and getattr(info, k) and not getattr(full, k)]
+                # anno e risoluzione: scheda tecnica, altrimenti SOLO il titolo del prodotto (il resto della pagina
+                # contiene menu, banner, copyright ed etichette energetiche con altri anni e risoluzioni)
+                ris_pag = sp.get("risoluzione") or cp.risoluzione
+                if P["risoluzione"]["attivo"] and info.risoluzione and ris_pag and ris_pag != info.risoluzione and \
+                        not (P["modalita"] == "concorrente" and {ris_pag, info.risoluzione} <= {"HD", "FHD"}):
+                    mancanti.append(f"risoluzione {info.risoluzione} (pagina: {ris_pag})")
+                hz_pag = sp.get("hz")
+                if P["refresh"]["attivo"] and info.hz and hz_pag and hz_diverse(hz_pag, info.hz):
+                    mancanti.append(f"frequenza {info.hz} Hz (pagina: {hz_pag} Hz)")
+                # la voce "tecnologia" delle schede è spesso generica o sbagliata (un QLED è anche "LED", un LED a volte
+                # "Mini LED"): si scarta solo se una è OLED e l'altra no, oppure se anche il titolo della pagina la contraddice
+                tec_pag = sp.get("tecnologia")
+                if tec_pag and cp.tecnologia and cp.tecnologia != tec_pag and "OLED" not in (tec_pag, cp.tecnologia):
+                    tec_pag = cp.tecnologia
+                if P["tecnologia"]["attivo"] and tec_pag and c.fascia_fonte != "catalogo" and info.tecnologia and \
+                        tec_pag != info.tecnologia and not _tec_equivalenti(info.tecnologia, tec_pag, P["tecnologia"].get("equivalenze")) and \
+                        ("OLED" in (tec_pag, info.tecnologia) or (cp.tecnologia and cp.tecnologia != info.tecnologia)):
+                    mancanti.append(f"tecnologia {info.tecnologia} (pagina: {tec_pag})")
+                if mancanti:
+                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                             "esito": "scartato: " + ", ".join(mancanti)})
+                    continue
+                anno_pag = cp.anno or sp.get("anno") or c.anno  # l'anno scritto nel titolo è più affidabile della scheda
+                # anno su idealo solo se serve davvero (Stretto: un anno sconosciuto escluderebbe il modello)
+                if not anno_pag and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True) and c.codice:
+                    anno_pag = anno_da_idealo(br, c, paese, log)
+                    if anno_pag:
+                        out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                                 "esito": f"anno {anno_pag} letto su {IDEALO.get(paese, 'idealo')}"})
+                        motivo = ", ".join(x for x in motivo.split(", ") if x and x != "ok") + (", " if motivo not in ("", "ok") else "") + f"anno da {IDEALO.get(paese, 'idealo')}"
+                if anno_pag and P["anno"]["attivo"] and anno_pag != anno_obiettivo(P, info):
+                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                             "esito": f"scartato: anno {anno_pag} (da pagina)"})
+                    continue
+                if not anno_pag and P["anno"]["attivo"] and not P["anno"].get("accetta_ignoto", True):
+                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
+                                             "esito": "scartato: anno non indicato nemmeno nella scheda tecnica"})
+                    continue
+                if anno_pag:  # anno letto in scheda, nel titolo o su idealo: non è più "da verificare"
+                    c.anno = anno_pag
+                    motivo = ", ".join(x for x in motivo.split(", ") if x and x != "anno da verificare") or "ok"
             im = og or im
             nome_pag = titolo_pag.strip()
             # il codice sulla pagina prodotto è il più affidabile: se c'è, vince
-            if cp.codice and cp.marca == c.marca and cp.pollici == c.pollici and not stesso_modello(info, cp):
+            if cp.codice and cp.marca == c.marca and cp.pollici == c.pollici and \
+                    (stesso_modello_esatto(info, cp) if identico else not stesso_modello(info, cp)):
                 c.codice = cp.codice
             # codice letto altrove nella pagina (es. "vedi anche 40MQF7000Z") ma la scheda dice un'altra diagonale:
             # si mostra il modello della scheda, o marca + caratteristiche, non un codice sbagliato

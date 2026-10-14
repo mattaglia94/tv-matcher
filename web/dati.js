@@ -42,6 +42,7 @@ window.TVM = {
 
   // Parametri di somiglianza: stessa struttura letta dal motore (app/regole.py)
   parametriDefault: {
+    ricerca: "simile",
     modalita: "stessa_marca",
     pollici: { attivo: true, tolleranza: 0 },
     famiglia: { attivo: true },

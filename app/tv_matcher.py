@@ -1,4 +1,4 @@
-"""Radar TV – interfaccia grafica (doppio click) e riga di comando.
+"""TV Finder – interfaccia grafica (doppio click) e riga di comando.
 
 Uso da riga di comando:
     python tv_matcher.py --input input.xlsx --paese IT [--visibile]
@@ -22,7 +22,7 @@ def gui():
     from motore import esegui, crea_modello_input
 
     root = tk.Tk()
-    root.title("Radar TV – confronto Amazon vs retailer")
+    root.title("TV Finder – confronto Amazon vs retailer")
     root.geometry("760x520")
     q = queue.Queue()
     stato = {"stop": False, "thread": None}
@@ -117,7 +117,7 @@ def gui():
 
 def cli():
     from motore import esegui
-    p = argparse.ArgumentParser(description="Radar TV")
+    p = argparse.ArgumentParser(description="TV Finder")
     p.add_argument("--input", required=True)
     p.add_argument("--paese", default="IT", choices=PAESI)
     p.add_argument("--output", default=os.path.join(cartella_base(), "Output"))

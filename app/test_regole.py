@@ -245,7 +245,32 @@ def main():
     errori += banco_amazon()
     errori += invarianza_modello()
     errori += ponte_uk()
+    errori += stesso_modello_test()
     sys.exit(1 if errori else 0)
+
+
+IDENTICO = [  # modalità "Stesso modello": (titolo Amazon, risultati del negozio, titolo pagina, trovato?)
+    ("Samsung QE55Q7FAAUXZT QLED 4K 55 pollici 2025", [("SAMSUNG TV QLED 55\" QE55Q7FAATXZT Smart TV", "https://n.it/p1"),
+     ("SAMSUNG TV QLED 55\" QE55Q8FAATXZT", "https://n.it/p2")], "Samsung QE55Q7FAATXZT TV QLED 55", True),
+    ("Samsung QE55Q7FAAUXZT QLED 4K 55 pollici 2025", [("SAMSUNG TV QLED 55\" QE55Q8FAATXZT", "https://n.it/p2")], "Samsung QE55Q8FAATXZT", False),
+    ("LG 55UA73006LA 55 pollici 4K", [("LG UHD 55UA73006LA.AEU Smart TV 55", "https://n.it/x")], "LG 55UA73006LA", True),
+    ("Xiaomi TV A Pro 75 2026 QLED", [("Xiaomi TV A Pro 75 2025 QLED", "https://n.it/y")], "Xiaomi TV A Pro 75 2025", False),
+    ("Metz 40 Pouces Smart TV FHD QLED 40MQH7000Y", [("Metz 40MQH7030Z QLED 40", "https://n.it/z")], "Metz 40MQH7030Z", False),
+]
+
+
+def stesso_modello_test():
+    from nucleo import elabora_asin
+    errori = 0
+    for amz, ris, tp, atteso in IDENTICO:
+        r = elabora_asin(_BrowserFinto(amz, ris, tp), {"asin": "B0TEST0000", "paese": "IT"}, [{"nome": "N", "url": "{q}"}],
+                         {"ricerca": "identico", "verifica_url": True}, log=lambda m: None)
+        trovati = [m["modello"] for m in r["match"].get("N", [])]
+        if bool(trovati) != atteso:
+            errori += 1
+            print(f"✗ stesso modello: {amz[:40]} -> trovati {trovati}, atteso {'sì' if atteso else 'no'}")
+    print(("✓" if not errori else "✗") + f" stesso modello: {len(IDENTICO) - errori}/{len(IDENTICO)}")
+    return errori
 
 
 def ponte_uk():

@@ -1,15 +1,15 @@
-# Radar TV
+# TV Finder
 
 Confronta le TV vendute su Amazon (per ASIN) con modelli **simili ma non identici** sui retailer del paese scelto. Il tool non usa AI: si basa solo su regole fisse.
 
 ## Requisiti sul PC
 - Windows con **Microsoft Edge** (già presente) oppure Google Chrome.
-- Nient'altro, se usi `Radar_TV.exe`.
+- Nient'altro, se usi `TV_Finder.exe`.
 
 ## Uso mensile
 1. Apri `input_tv_matcher.xlsx` e compila il foglio **ASIN** (colonna ASIN e colonna Paese).
    - *Amazon product name* e *Amazon Model* sono facoltativi. Se li compili, il tool non apre Amazon (utile quando Amazon mostra un captcha).
-2. Fai doppio click su `Radar_TV.exe`, scegli il file, il paese e premi **▶ Avvia**.
+2. Fai doppio click su `TV_Finder.exe`, scegli il file, il paese e premi **▶ Avvia**.
 3. L'output viene salvato nella cartella `Output` con il nome `Matching_TV_<PAESE>_<data>.xlsx`:
    - foglio **Matching**: ASIN, nome e modello Amazon, poi *Model Name* e *Product URL* per ogni retailer. Se non c'è un match valido, le celle restano vuote.
    - foglio **Dettaglio**: tutti i candidati trovati, con il motivo dello scarto oppure "VALIDO". Serve per i controlli di qualità.
@@ -63,7 +63,7 @@ Anno dal codice:
 
 ## Creare l'exe (una volta sola)
 - **Opzione A**: su un PC Windows con Python installato, doppio click su `build_exe.bat`.
-- **Opzione B**: carica la cartella su GitHub. Il workflow `.github/workflows/build.yml` crea l'exe in automatico (scheda Actions → artifact *Radar_TV*).
+- **Opzione B**: carica la cartella su GitHub. Il workflow `.github/workflows/build.yml` crea l'exe in automatico (scheda Actions → artifact *TV_Finder*).
 
 ## Banco di prova (`app/banco.py`, workflow "Banco di prova")
 Serve a verificare il motore su tante TV vere, senza passare dal sito.
