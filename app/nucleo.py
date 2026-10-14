@@ -50,6 +50,8 @@ def query_ricerca(info, P):
                 q.append(corto)
         if cod and m and m.upper() not in cod:
             q.append(f"{m} {cod}")
+        if info.marca == "XIAOMI" and info.chiave and p:  # i negozi scrivono "Xiaomi TV F Pro 43", non L43MB-FPEU
+            q.insert(0, f"Xiaomi {info.chiave.split('-')[0]}{' Pro' if info.pro else ''} {p}")
         if not q and m and p:
             q.append(f"{m} {p}")
         return list(dict.fromkeys(q))
@@ -429,11 +431,9 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
                     out["dettaglio"].append({"retailer": r["nome"], "modello": cpag.codice, "url": url,
                                              "esito": f"scartato: la pagina mostra un altro modello ({cpag.codice})"})
                     continue
-                anno_pag = cp.anno or sp.get("anno")
-                if anno_pag and info.anno and anno_pag != info.anno:
-                    out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "url": url,
-                                             "esito": f"scartato: stesso nome ma anno {anno_pag}"})
-                    continue
+                anno_pag = cp.anno or sp.get("anno") or c.anno
+                if anno_pag and info.anno and anno_pag != info.anno:  # stesso modello, anno diverso nel titolo: lo si dice
+                    motivo = ", ".join(x for x in [motivo if motivo != "ok" else "", f"anno nel negozio {anno_pag}, su Amazon {info.anno}"] if x)
             else:
                 # caratteristiche: scheda tecnica, poi titolo; il testo libero della pagina solo per le funzioni HDR/HDMI
                 full = arricchisci(analizza(f"{titolo_pag} {corpo[:20000]}", c.codice), sp)

@@ -254,7 +254,12 @@ IDENTICO = [  # modalità "Stesso modello": (titolo Amazon, risultati del negozi
      ("SAMSUNG TV QLED 55\" QE55Q8FAATXZT", "https://n.it/p2")], "Samsung QE55Q7FAATXZT TV QLED 55", True),
     ("Samsung QE55Q7FAAUXZT QLED 4K 55 pollici 2025", [("SAMSUNG TV QLED 55\" QE55Q8FAATXZT", "https://n.it/p2")], "Samsung QE55Q8FAATXZT", False),
     ("LG 55UA73006LA 55 pollici 4K", [("LG UHD 55UA73006LA.AEU Smart TV 55", "https://n.it/x")], "LG 55UA73006LA", True),
-    ("Xiaomi TV A Pro 75 2026 QLED", [("Xiaomi TV A Pro 75 2025 QLED", "https://n.it/y")], "Xiaomi TV A Pro 75 2025", False),
+    ("Xiaomi TV A Pro 75 2026 QLED", [("Xiaomi TV A Pro 75 2025 QLED", "https://n.it/y")], "Xiaomi TV A Pro 75 2025", True),  # stesso nome, anno diverso: vale (segnalato)
+    # caso reale: Amazon "F Pro 43 2025, L43MB-FPEU" = MediaWorld "Xiaomi 43 F PRO 2026" / MediaMarkt "TV F Pro 43 2026"
+    ("Xiaomi TV F Pro 43 Pulgadas 2025, 4K UHD QLED Smart Fire TV, L43MB-FPEU", [("TV QLED 43 Xiaomi TV F Pro 43 2026 UHD 4K", "https://n.es/a"),
+     ("TV QLED 43 Xiaomi A Pro 2025 43 QLED 4K", "https://n.es/b")], "Xiaomi TV F Pro 43 2026", True),
+    ("Xiaomi TV F Pro 43 2025,43 pollici (101 cm), 4K UHD QLED", [("Xiaomi 43 F PRO 2026 Smart TV 43 QLED", "https://n.it/c"),
+     ("Xiaomi 32 F PRO 2026 Smart TV 32 QLED HD", "https://n.it/d")], "Xiaomi 43 F PRO 2026", True),
     ("Metz 40 Pouces Smart TV FHD QLED 40MQH7000Y", [("Metz 40MQH7030Z QLED 40", "https://n.it/z")], "Metz 40MQH7030Z", False),
 ]
 

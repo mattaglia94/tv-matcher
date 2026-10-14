@@ -385,6 +385,7 @@ def _xiaomi(T: str, info: InfoTV):
         T = T[:j.start()] + f"{j.group(1)}{' PRO' if j.group(3) else ''} {j.group(2)}" + T[j.end():]
     m = (re.search(r"\bXIA(\d{2,3})(A|F|S|MAX|Q)(PRO)?\d?\b", T)
          or re.search(r"\b(\d{2,3})(A|F|S|Q)(PRO)?\d?\b", T)           # codici tipo 50APRO2, 32A2 (titoli Unieuro)
+         or re.search(r"\b(\d{2,3})\s+(A|F|S|MAX)(\s+PRO)?\b(?!\s*(?:CM|POLLICI|ZOLL|POUCES|PULGADAS|INCH))", T)  # "XIAOMI 43 F PRO 2026" (MediaWorld)
          or re.search(r"\b(?:TV\s+)?(A|F|S|MAX|Q\d?)(\s+PRO)?\s*(MINI\s?LED)?\b[^0-9]{0,20}?(\d{2,3})\b", T))
     if not m:
         return _xiaomi_codice(T, info) or _xiaomi_caratteristiche(T, info)
@@ -989,17 +990,17 @@ def _cod_norm(c: str) -> str:
 
 
 def stesso_modello_esatto(a: InfoTV, b: InfoTV) -> bool:
-    """Modalità "Stesso modello": la stessa TV dell'ASIN, anche con varianti di codice per paese o canale
-    (QE55Q7FAAUXZT = QE55Q7FAATXZT = GQ55Q7FAAT; 55UA73006LA = 55UA73006LA.AEU). Diagonale e anno, se noti, uguali."""
+    """Modalità "Stesso modello": lo stesso nome/codice dell'ASIN, anche con varianti per paese o canale
+    (QE55Q7FAAUXZT = QE55Q7FAATXZT = GQ55Q7FAAT; 55UA73006LA = 55UA73006LA.AEU; Xiaomi L43MB-FPEU = F Pro 43).
+    Diagonale uguale. L'anno NON conta: lo stesso modello è spesso venduto con anni diversi nel titolo
+    (il motore lo segnala nel risultato)."""
     if not a.codice or not b.codice or not a.marca or a.marca != b.marca:
         return False
     if "caratteristiche" in a.note or "caratteristiche" in b.note:
         return False  # "Metz 32\" QLED" non è un codice modello
     if a.pollici and b.pollici and a.pollici != b.pollici:
         return False
-    if a.anno and b.anno and a.anno != b.anno:
-        return False  # stesso nome commerciale, anno diverso (es. Xiaomi A Pro 75 2025 / 2026)
-    if a.marca in ("SAMSUNG", "HISENSE") and a.core and b.core:
+    if a.marca in ("SAMSUNG", "HISENSE", "XIAOMI") and a.core and b.core:
         return a.core == b.core  # il "core" toglie prefisso del paese e suffissi di distribuzione
     # senza il prefisso di paese/canale prima dei pollici (K-55XR80 = 55XR80, TX-55… = 55…)
     x, y = (re.sub(r"^[A-Z]+(?=\d)", "", _cod_norm(c)) for c in (a.codice, b.codice))

@@ -496,7 +496,7 @@
     return "personalizzato";
   }
   function frase(P) {
-    if (P.ricerca === "identico") return "Cerca <strong>lo stesso modello</strong> della TV Amazon: stesso codice, anche con le varianti di paese o di canale (es. QE55Q7FAAUXZT = QE55Q7FAATXZT), stessa diagonale e stesso anno.";
+    if (P.ricerca === "identico") return "Cerca <strong>lo stesso modello</strong> della TV Amazon: stesso codice, anche con le varianti di paese o di canale (es. QE55Q7FAAUXZT = QE55Q7FAATXZT), stessa diagonale. Se il negozio indica un anno diverso da Amazon, il risultato lo segnala.";
     const conc = P.modalita === "concorrente";
     const parti = [conc ? "TV di <strong>altre marche</strong>" : "TV della <strong>stessa marca</strong> con codice diverso"];
     if (P.pollici.attivo) parti.push(P.pollici.tolleranza ? `diagonale entro <strong>±${P.pollici.tolleranza}"</strong>` : "<strong>stessa diagonale</strong>");
