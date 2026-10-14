@@ -28,31 +28,31 @@
    "paese": "ES",
    "nome": "MediaMarkt-ES",
    "url": "https://www.mediamarkt.es/es/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
    "nome": "El Corte Inglés",
    "url": "https://www.elcorteingles.es/search-nwx/1/?s={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
    "nome": "Carrefour",
    "url": "https://www.carrefour.es/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
    "nome": "PcComponentes",
    "url": "https://www.pccomponentes.com/search/?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
    "nome": "Alcampo",
    "url": "https://www.compraonline.alcampo.es/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-13T16:26:40.772Z"
+ "aggiornato": "2026-10-14T09:45:11.477Z"
 }
