@@ -118,7 +118,7 @@
    "paese": "UK",
    "nome": "Joybuy-UK",
    "url": "https://www.joybuy.co.uk/search?keyword={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-15T12:49:16.445Z"
+ "aggiornato": "2026-10-16T08:54:41.679Z"
 }
