@@ -61,7 +61,8 @@ RICONOSCIMENTO = [
 FISSO = {"attivo": True, "modo": "fisso", "valore": 2026, "accetta_ignoto": True}
 STESSO_ANNO = [  # predefinito: stesso anno del TV Amazon
     ("Metz 40 Pouces Smart TV FHD QLED 40MQH7000Y", "Metz 40MQF7000Z QLED 40\" Full HD", "stessa_marca", False),  # F = 2025
-    ("Metz 40 Pouces Smart TV FHD QLED 40MQH7000Y", "TV QLED 40\" Metz 40MQH7030Z Full HD Smart TV", "stessa_marca", True),
+    # 7000 e 7030 sono modelli diversi (feedback ottobre 2026: "Different model, new model / 2026 energy class")
+    ("Metz 40 Pouces Smart TV FHD QLED 40MQH7000Y", "TV QLED 40\" Metz 40MQH7030Z Full HD Smart TV", "stessa_marca", False),
     ("XIAOMI TV F Pro 32 2025, 32 pollici (81 cm), QLED, Smart TV, Fire TV, HD", "Xiaomi TV A Pro 32 2026 TV nero", "stessa_marca", False),
     ("Samsung QE65Q7FAAUXZT QLED 65", "Hisense 65E7Q QLED 65 pollici 4K", "concorrente", True),   # 2025 e 2025
     ("Samsung QE65Q7FAAUXZT QLED 65", "Hisense 65E7S QLED 65 pollici 4K", "concorrente", False),  # 2025 e 2026
@@ -81,7 +82,25 @@ SOMIGLIANZA = [
     ("XIAOMI TV F 50, 50 pollici (127 cm), 4K UHD, Smart TV, Fire TV", "Xiaomi 50APRO2 TV 127 cm (50\") 4K Ultra HD", "stessa_marca", False),
     ("XIAOMI TV F Pro 50 2025, 50 pollici, 4K UHD QLED", "Xiaomi 50APRO2 TV 127 cm (50\") 4K Ultra HD", "stessa_marca", True),
     ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED", "XIAOMI TV F Pro 75 QLED", "stessa_marca", False),  # stesso modello
-    ("Hisense 55E7Q 4K QLED 2026", "Hisense 55A7Q QLED 4K 2026", "stessa_marca", True),
+    ("Hisense 55E7Q 4K QLED 2026", "Hisense 55A7Q QLED 4K 2026", "stessa_marca", False),  # E7 ≠ A7 (feedback)
+    # --- mapping segnalati come errati (feedback ottobre 2026) ---
+    ("Hisense 50E7DS PRO Fernseher 50 Zoll, 4K UHD QLED, 144Hz", "Hisense 50Q7S QLED 4K", "stessa_marca", False),  # PRO vs entry
+    ("Hisense 65E7DS PRO Fernseher 65 Zoll, 4K UHD QLED, 144Hz", "Hisense 65E7S QLED 4K", "stessa_marca", False),
+    ("Hisense Smart TV QLED 144Hz 55\" 4K 55E7S PRO", "Hisense 55E79S QLED 4K", "stessa_marca", False),
+    ("Hisense Smart TV MiniLED 165Hz 65\" 4K 65U79S PRO", "Hisense 65Q8S Mini LED 4K", "stessa_marca", False),
+    ("Hisense Smart TV 58\" UHD 4K 58E6ST", "Hisense 58A6S 4K UHD", "stessa_marca", False),
+    ("Hisense Smart TV QLED 50\" 4K 50A7S", "Hisense 50E7S QLED 4K", "stessa_marca", False),
+    ("Hisense 32\" 32A5STUK Hi-QLED Full HD Smart TV", "Hisense 32E5STUK Full HD Smart TV", "stessa_marca", False),
+    ("Hisense 50\" 50Q8STUK MiniLED 144Hz 4K", "Hisense 50U7STUK Mini LED 4K", "stessa_marca", False),
+    ("TCL 65T8D 65 Pouces QLED avec QD-Mini LED 4K 144 Hz", "TCL 65C79LX1 Mini LED 4K", "stessa_marca", False),  # super entry vs mid
+    ("TCL 65T8D 65 Pouces QLED avec QD-Mini LED 4K 144 Hz", "TCL 65C7L SQD Mini LED", "stessa_marca", False),
+    ("TCL 65Q7D Pro 65\" SQD-Mini LED TV 4K 144Hz", "TCL 65C6K Pro QD-Mini LED", "stessa_marca", False),
+    ("TCL 75Q7D Pro 75\" SQD-Mini LED TV 4K 144Hz", "TCL 75Q7C QD-Mini LED", "stessa_marca", False),       # serie vecchia
+    ("Metz QLED TV 55 Zoll 4K 55MQF7500Z", "Metz 55MQF8001Z 4K", "stessa_marca", False),
+    ("Metz TV 40 Pulgadas QLED 40MQH7000Y", "Metz 40MTF3001Z LED", "stessa_marca", False),
+    ("Samsung Smart TV M1EH 43-Inch, 4K Mini LED [2026] UE43M1EHAU", "Samsung QE43QN70H Neo QLED", "stessa_marca", False),
+    ("Samsung Smart TV M1EH 55-Inch, 4K Mini LED [2026] UE55M1EHAU", "Samsung UE55M70H Mini LED", "stessa_marca", False),
+    ("Samsung Smart TV M1EH 65-Inch, 4K Mini LED [2026] UE65M1EHAU", "Samsung QE65QN1EH Neo QLED", "stessa_marca", False),
     ("Xiaomi TV F 65 Zoll 2026, 4K UHD, Smart TV, Fire OS8, L65MC-FAEU", "Xiaomi L65MC-AUEU 165 cm (65 Zoll) 4K Ultra HD", "stessa_marca", True),
     ("Xiaomi TV F 65 Zoll 2025, 4K UHD, Smart TV, Fire OS8, L65MB-FAEU", "Xiaomi L65MB-SEU 165 cm (65 Zoll) 4K Mini LED", "stessa_marca", False),
     ("Hisense 55E7Q 4K QLED 2026", "Hisense 55U7Q Mini LED 2026", "stessa_marca", False),  # altra tecnologia

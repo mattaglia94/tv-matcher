@@ -250,12 +250,13 @@ _HIS_FAM = [  # ordine importante: PRO prima della versione base
     ("E7", True, "QLED", "HISENSE-QLED-PREMIUM"),
     ("U7", True, "MINILED", "HISENSE-MINILED-MID"),
     ("U8", None, "MINILED", "HISENSE-MINILED-PREMIUM"),
+    ("Q8", None, "MINILED", "HISENSE-MINILED-ENTRY-Q8"),
     ("U7", False, "MINILED", "HISENSE-MINILED-ENTRY"),
     ("E8", None, "MINILED", "HISENSE-MINILED-SUPERENTRY"),
     ("E7", False, "QLED", "HISENSE-QLED-ENTRY-1"),
     ("A7", None, "QLED", "HISENSE-QLED-ENTRY-2"),
-    ("E6", None, "LED", "HISENSE-LED-4K-ENTRY"),
-    ("A6", None, "LED", "HISENSE-LED-4K-ENTRY"),
+    ("E6", None, "LED", "HISENSE-LED-4K-ENTRY-1"),
+    ("A6", None, "LED", "HISENSE-LED-4K-ENTRY-2"),
     ("A5", None, "QLED", "HISENSE-QLED-HD"),
     ("A4", None, "LED", "HISENSE-LED-HD"),
 ]
@@ -283,12 +284,12 @@ _HIS_ANNO = {"H": 2022, "K": 2023, "N": 2024, "Q": 2025, "S": 2026}
 
 def _hisense(T: str, info: InfoTV):
     # 55E7Q, 55E79Q, 65E7NQ PRO, 65U7NQ, 100U8NQ, 43A4N
-    m = re.search(r"\b(\d{2,3})([AEU])(\d)([A-Z0-9]*)", T)
+    m = re.search(r"\b(\d{2,3})([AEUQ])(\d)([A-Z0-9]*)", T)
     if not m:
         return False
     info.codice = m.group(0)
     info.pollici = int(m.group(1))
-    info.pro = bool(re.search(r"PRO\b", T[m.start():m.end() + 6]))
+    info.pro = bool(re.search(rf"\b{re.escape(m.group(0))}[\s-]*PRO\b", T))
     info.core = m.group(0) + ("PRO" if info.pro else "")
     serie = m.group(2) + m.group(3)
     info.chiave = serie
@@ -344,6 +345,8 @@ def _samsung(T: str, info: InfoTV):
             anno_l = "D"  # DU7179 = gamma 2024
     info.codice = m.group(0)
     info.core = f"{pol}{lett}{num}{anno_l}"
+    if anno_l not in SAMSUNG_ANNO and m.lastindex >= 6 and (m.group(6) or "")[:1] in SAMSUNG_ANNO:
+        anno_l = m.group(6)[0]  # M1EH: la lettera dell'anno è la seconda (E = variante)
     info.anno = SAMSUNG_ANNO.get(anno_l)
     n = int(num)
     tre = len(num) == 3
@@ -351,12 +354,10 @@ def _samsung(T: str, info: InfoTV):
     if lett in ("LS", "R"):
         info.tecnologia = "QLED" if lett == "LS" else "MINILED"
         info.famiglia = "SAMSUNG-" + ("LIFESTYLE" if lett == "LS" else "MICRO-RGB")
-    elif lett == "QN":
-        info.tecnologia = "NEOQLED"
-        info.famiglia = "SAMSUNG-NEOQLED-" + _samsung_fascia(n, tre)
-    elif lett == "M":
-        info.tecnologia = "MINILED"
-        info.famiglia = "SAMSUNG-MINILED-" + _samsung_fascia(n, tre)
+    elif lett in ("QN", "M"):
+        info.tecnologia = "NEOQLED" if lett == "QN" else "MINILED"
+        # serie a una cifra (M1EH, QN1EH, 2026) = linea nuova a sé, non confrontabile con M70/QN70
+        info.famiglia = f"SAMSUNG-{info.tecnologia}-" + (f"SERIE{n}" if len(num) == 1 else _samsung_fascia(n, tre))
     elif lett == "S":
         info.tecnologia = "OLED"
         f = "SUPERPREMIUM" if n > 98 else "PREMIUM" if n >= 94 else "MID" if n >= 90 else "ENTRY"
@@ -507,7 +508,7 @@ def _generica(T: str, info: InfoTV):
     info.codice = m.group(0)
     info.pollici = info.pollici or int(m.group(1))
     info.core = m.group(1) + m.group(2) + m.group(3)
-    info.chiave = m.group(2) + m.group(3)
+    info.chiave = m.group(2) + m.group(3) + re.sub(r"\d.*", "", m.group(4))
     info.tecnologia = tec_titolo
     info.famiglia = f"{info.marca}-{m.group(2)}{m.group(3)[0]}"
     return True
@@ -547,6 +548,8 @@ def applica_catalogo(info: InfoTV, T: str):
         info.famiglia = f"{info.marca}-{v.get('famiglia') or (info.tecnologia + '-' + info.fascia)}"
         info.fascia_fonte = "catalogo"
         info.regola = f"catalogo: {m['marca']} {v['serie']}"
+        if m.get("ignora_pro"):
+            info.pro = False  # es. TCL "Q7D Pro": PRO è parte del nome, non una variante
         if not info.codice and info.pollici:  # nessun codice (es. Beovision): serie + pollici
             info.codice = f"{v['serie']} {info.pollici}"
             info.core = f"{info.pollici}{v['serie'].replace(' ', '')}"
@@ -682,6 +685,9 @@ def analizza(testo: str, codice_noto: str = "", marca_nota: str = "", prezzo: fl
     if not ok:
         _generica(T, info)
     applica_catalogo(info, T)
+    mz = info.marca == "METZ" and re.search(r"\b\d{2,3}M([A-Z])[A-Z](\d{4})", info.codice or "")
+    if mz:  # Metz: 7000, 7030, 7500, 8001 sono modelli diversi anche nella stessa tecnologia
+        info.famiglia = f"METZ-M{mz.group(1)}{mz.group(2)}"
     if pollici_testo and info.pollici != pollici_testo:
         info.note.append(f"pollici codice {info.pollici} ≠ titolo {pollici_testo}")
         info.pollici = pollici_testo
@@ -950,6 +956,9 @@ def confronta_param(amz: InfoTV, cand: InfoTV, P: dict):
             # Così una piccola differenza di classificazione non fa perdere un modello ovviamente simile.
             if cand.famiglia and cand.famiglia == amz.famiglia:
                 pass
+            elif amz.fascia_fonte in ("catalogo", "regole"):
+                # serie censita (catalogo o regole di marca): un'altra serie non è un modello simile
+                return False, f"altra serie ({cand.famiglia.split('-', 1)[-1] or '?'}, ASIN {amz.famiglia.split('-', 1)[-1]})", 0
             elif amz.fascia and cand.fascia == amz.fascia:
                 note.append(f"altra serie, stessa fascia {cand.fascia.lower()}")
                 score += 30

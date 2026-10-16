@@ -1,6 +1,6 @@
 {
  "versione": 1,
- "aggiornato": "2026-10-09",
+ "aggiornato": "2026-10-16",
  "fasce": {
   "BASE": "Base",
   "ENTRY": "Entry",
@@ -400,7 +400,7 @@
    "alias": [
     "HISENSE"
    ],
-   "note": "Famiglie del documento di matching (E7 = QLED Entry 1, A7 = QLED Entry 2, PRO separati).",
+   "note": "Famiglie del documento di matching (E = Entry 1, A = Entry 2, PRO separati). Con Stessa marca si accetta solo la stessa famiglia.",
    "fascia_predefinita": "",
    "tecnologia_predefinita": "",
    "serie": [
@@ -423,14 +423,14 @@
      "tecnologia": "LED",
      "fascia": "ENTRY",
      "descrizione": "A6 4K",
-     "famiglia": "LED-4K-ENTRY"
+     "famiglia": "LED-4K-ENTRY-2"
     },
     {
      "serie": "E6",
      "tecnologia": "LED",
      "fascia": "ENTRY",
      "descrizione": "E6 4K",
-     "famiglia": "LED-4K-ENTRY"
+     "famiglia": "LED-4K-ENTRY-1"
     },
     {
      "serie": "A7",
@@ -502,7 +502,7 @@
      "tecnologia": "MINILED",
      "fascia": "MID",
      "descrizione": "Q8 Mini LED",
-     "famiglia": "MINILED-ENTRY"
+     "famiglia": "MINILED-ENTRY-Q8"
     },
     {
      "serie": "U7",
@@ -561,7 +561,7 @@
    "alias": [
     "TCL"
    ],
-   "note": "",
+   "note": "PRO fa parte del nome della serie (Q7D Pro, C6K Pro): non distingue una variante.",
    "fascia_predefinita": "",
    "tecnologia_predefinita": "",
    "serie": [
@@ -620,16 +620,32 @@
      "descrizione": "T8 QLED"
     },
     {
+     "serie": "T8D",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "T8D QD-Mini LED (super entry, 2026)",
+     "famiglia": "MINILED-SUPERENTRY"
+    },
+    {
      "serie": "Q6C",
      "tecnologia": "MINILED",
      "fascia": "ENTRY",
-     "descrizione": "Q6C QD-Mini LED (2025)"
+     "descrizione": "Q6C QD-Mini LED (2025)",
+     "famiglia": "MINILED-ENTRY-Q"
     },
     {
      "serie": "Q7C",
      "tecnologia": "MINILED",
      "fascia": "MID",
-     "descrizione": "Q7C QD-Mini LED (2025)"
+     "descrizione": "Q7C QD-Mini LED (2025)",
+     "famiglia": "MINILED-MID-Q"
+    },
+    {
+     "serie": "Q7D",
+     "tecnologia": "MINILED",
+     "fascia": "ENTRY",
+     "descrizione": "Q7D Pro SQD/RGB-Mini LED (2026), paragonabile a Q6C",
+     "famiglia": "MINILED-ENTRY-Q"
     },
     {
      "serie": "Q6",
@@ -733,7 +749,8 @@
      "fascia": "ENTRY",
      "descrizione": "PF650 Fire TV 4K"
     }
-   ]
+   ],
+   "ignora_pro": true
   },
   {
    "marca": "Xiaomi",
@@ -1276,7 +1293,7 @@
    "alias": [
     "METZ"
    ],
-   "note": "",
+   "note": "La famiglia è il numero di modello (7000, 7030, 7500...): numeri diversi = modelli non confrontabili. La lettera dopo MQ/MN/MU è l'anno (F 2025, H 2026).",
    "fascia_predefinita": "ENTRY",
    "tecnologia_predefinita": "LED",
    "serie": [
@@ -1303,6 +1320,12 @@
      "tecnologia": "OLED",
      "fascia": "PREMIUM",
      "descrizione": "MO… OLED"
+    },
+    {
+     "serie": "MT",
+     "tecnologia": "LED",
+     "fascia": "ENTRY",
+     "descrizione": "MT… LED (es. 40MTF3001Z)"
     }
    ]
   },
