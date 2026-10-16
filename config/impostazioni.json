@@ -172,9 +172,9 @@
    "paese": "FR",
    "nome": "Joybuy-FR",
    "url": "https://www.joybuy.fr/search?keyword={q}",
-   "attivo": false
+   "attivo": true
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-16T08:54:45.549Z"
+ "aggiornato": "2026-10-16T08:54:48.156Z"
 }
