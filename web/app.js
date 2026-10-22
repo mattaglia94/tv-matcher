@@ -1442,7 +1442,7 @@
           <form class="scheda fb-form" id="fFb">
             <h3>Nuovo feedback</h3>
             <div class="griglia-2">
-              <label class="campo">Il tuo nome <span class="tenue piccolo">facoltativo</span><input type="text" name="nome" maxlength="80" value="${esc(nome)}" autocomplete="name"></label>
+              <label class="campo"><span>Il tuo nome <span class="tenue piccolo">(facoltativo)</span></span><input type="text" name="nome" maxlength="80" value="${esc(nome)}" autocomplete="name"></label>
               <label class="campo">Tipo<select name="tipo">${TIPI_FB.map((t) => `<option ${t === (b.tipo || "") ? "selected" : ""}>${t}</option>`).join("")}</select></label>
             </div>
             <label class="campo">Feedback<textarea name="messaggio" required maxlength="4000" placeholder="Cosa non va, o cosa miglioreresti?">${esc(b.messaggio || "")}</textarea></label>

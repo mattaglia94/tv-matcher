@@ -580,3 +580,7 @@ label.btn { display: inline-flex; align-items: center; gap: 8px; }
 @media (max-width: 900px) {
   .fb-griglia, .fb-form .griglia-2 { grid-template-columns: 1fr; }
 }
+@media (max-width: 600px) {
+  .nav { flex-wrap: wrap; row-gap: 2px; }
+  .nav a { padding: 7px 9px; font-size: .9rem; }
+}
