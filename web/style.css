@@ -554,3 +554,29 @@ label.btn { display: inline-flex; align-items: center; gap: 8px; }
 .match-tile .retailer { flex-wrap: wrap; }
 .match-tile .retailer .chip { white-space: normal; text-align: left; max-width: 100%; }
 .match-tile .foto { overflow: hidden; }
+
+/* ---------------------------------------------------------------- feedback */
+.fb-griglia { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 22px; align-items: start; }
+.fb-griglia .scheda + .scheda { margin-top: 0; }
+.fb-form { display: grid; gap: 16px; }
+.fb-form .griglia-2 { grid-template-columns: 1fr 1fr; gap: 14px; }
+.fb-form textarea { font-family: var(--corpo); font-size: 1rem; min-height: 140px; }
+.fb-rif { border: 1px solid var(--linea); border-radius: var(--r-m); padding: 12px 14px; }
+.fb-rif summary { cursor: pointer; font-weight: 600; }
+.fb-rif[open] summary { margin-bottom: 14px; }
+.fb-rif .griglia-2 { margin-bottom: 14px; }
+.fb-lista .lista-testa { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.fb-lista .filtri { display: flex; flex-wrap: wrap; gap: 8px; }
+.fb-voce { border: 1px solid var(--linea); border-left: 4px solid var(--viola); border-radius: var(--r-m); padding: 14px 16px; background: var(--notte-2); }
+.fb-voce + .fb-voce { margin-top: 12px; }
+.fb-voce.stato-in-valutazione { border-left-color: var(--giallo); }
+.fb-voce.stato-applicato { border-left-color: var(--verde); }
+.fb-voce.stato-scartato { border-left-color: var(--linea); opacity: .7; }
+.fb-testa { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.fb-testa select { margin-left: auto; width: auto; padding: 4px 8px; font-size: .85rem; }
+.fb-testo { margin: 10px 0 6px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.match-tile .segnala { background: none; border: 0; padding: 0; color: var(--tenue); font-size: .8rem; text-decoration: underline; cursor: pointer; justify-self: start; text-align: left; }
+.match-tile .segnala:hover { color: var(--testo); }
+@media (max-width: 900px) {
+  .fb-griglia, .fb-form .griglia-2 { grid-template-columns: 1fr; }
+}

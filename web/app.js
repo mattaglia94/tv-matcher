@@ -110,6 +110,7 @@
     if (vista === "esecuzioni") return vistaStorico();
     if (vista === "guida") return vistaGuida();
     if (vista === "catalogo") return vistaCatalogo();
+    if (vista === "feedback") return vistaFeedback();
     if (arg) S.passo = Math.min(4, Math.max(1, Number(arg) || 1));
     vistaNuova();
   }
@@ -756,6 +757,7 @@
   }
 
   async function vistaRun(id) {
+    S.runAttuale = id;
     app.innerHTML = `<div class="attesa vista"><span class="caricamento"></span><p class="tenue">Carico la ricerca…</p></div>`;
     let primo = true;
     const ciclo = async () => {
@@ -1033,12 +1035,19 @@
                   ${x.titolo ? `<p class="titolo-ret" title="${esc(x.titolo)}">${esc(x.titolo)}</p>` : ""}
                   <div class="etichette">${etichetteInfo(x)}</div>
                   <a class="vai" href="${esc(x.url)}" target="_blank" rel="noopener">Apri la pagina prodotto</a>
+                  <button type="button" class="segnala" data-segnala="${esc(JSON.stringify({ asin: r.asin, paese: r.paese, negozio: ret.nome, modello: x.modello, link: x.url, amazon: a.modello || "" }))}">Segnala questo abbinamento</button>
                   ${altri.length ? `<div class="altri">Anche: ${altri.map((y) => `<a href="${esc(y.url)}" target="_blank" rel="noopener">${esc(y.modello)}</a>`).join(", ")}</div>` : ""}
                 </div>`;
             }).join("") || '<p class="tenue">Nessun marketplace per questo paese.</p>'}
           </div>
         </article>`;
     }).join("");
+    box.querySelectorAll("[data-segnala]").forEach((b) => (b.onclick = () => {
+      const d = JSON.parse(b.dataset.segnala);
+      S.fbBozza = { tipo: "Abbinamento errato", asin: d.asin, paese: d.paese, negozio: d.negozio, modello: d.modello, link: d.link,
+        ricerca: S.runAttuale || "", messaggio: `Amazon ${d.amazon || d.asin} → ${d.negozio} ${d.modello}: ` };
+      location.hash = "#/feedback";
+    }));
   }
 
   // ------------------------------------------------------------------ export xlsx
@@ -1415,6 +1424,106 @@
         </div>
       </div>`;
     document.getElementById("rivedi").onclick = tutorial;
+  }
+
+  // ------------------------------------------------------------------ feedback (solo raccolta: non cambia il motore)
+  const TIPI_FB = ["Abbinamento errato", "Modello mancante", "Suggerimento", "Problema del sito", "Altro"];
+  const STATI_FB = ["nuovo", "in valutazione", "applicato", "scartato"];
+  const filtroFb = { stato: "", tipo: "" };
+
+  async function vistaFeedback() {
+    const b = S.fbBozza || {};
+    S.fbBozza = null;
+    const nome = memoria.leggi("fbNome", "");
+    app.innerHTML = `
+      <div class="vista">
+        <div class="intestazione"><div><h1>Feedback</h1><p class="tenue">Segnala un abbinamento sbagliato, un modello mancante o un'idea. I feedback vengono solo raccolti: il tool non cambia finché non vengono valutati.</p></div></div>
+        <div class="fb-griglia">
+          <form class="scheda fb-form" id="fFb">
+            <h3>Nuovo feedback</h3>
+            <div class="griglia-2">
+              <label class="campo">Il tuo nome <span class="tenue piccolo">facoltativo</span><input type="text" name="nome" maxlength="80" value="${esc(nome)}" autocomplete="name"></label>
+              <label class="campo">Tipo<select name="tipo">${TIPI_FB.map((t) => `<option ${t === (b.tipo || "") ? "selected" : ""}>${t}</option>`).join("")}</select></label>
+            </div>
+            <label class="campo">Feedback<textarea name="messaggio" required maxlength="4000" placeholder="Cosa non va, o cosa miglioreresti?">${esc(b.messaggio || "")}</textarea></label>
+            <details class="fb-rif" ${b.asin ? "open" : ""}><summary>Riferimento a una TV <span class="tenue piccolo">facoltativo</span></summary>
+              <div class="griglia-2">
+                <label class="campo">ASIN<input type="text" name="asin" maxlength="20" value="${esc(b.asin || "")}"></label>
+                <label class="campo">Paese<select name="paese"><option value="">—</option>${["IT", "DE", "FR", "ES", "UK"].map((p) => `<option ${p === b.paese ? "selected" : ""}>${p}</option>`).join("")}</select></label>
+                <label class="campo">Negozio<input type="text" name="negozio" maxlength="60" value="${esc(b.negozio || "")}"></label>
+                <label class="campo">Modello trovato<input type="text" name="modello" maxlength="80" value="${esc(b.modello || "")}"></label>
+              </div>
+              <label class="campo">Link<input type="url" name="link" maxlength="600" value="${esc(b.link || "")}" placeholder="https://"></label>
+            </details>
+            <input type="hidden" name="ricerca" value="${esc(b.ricerca || "")}">
+            <div><button class="btn primario" type="submit">Invia feedback</button></div>
+            <p class="piccolo tenue">Il testo viene salvato nell'archivio del tool su GitHub, che è pubblico: non scrivere dati personali o riservati.</p>
+          </form>
+          <section class="scheda fb-lista">
+            <div class="lista-testa"><h3>Feedback ricevuti <span class="tenue" id="fbConta"></span></h3>
+              <div class="filtri">
+                <select id="fbStato"><option value="">Tutti gli stati</option>${STATI_FB.map((x) => `<option ${x === filtroFb.stato ? "selected" : ""}>${x}</option>`).join("")}</select>
+                <select id="fbTipo"><option value="">Tutti i tipi</option>${TIPI_FB.map((x) => `<option ${x === filtroFb.tipo ? "selected" : ""}>${x}</option>`).join("")}</select>
+                <button class="btn piccolo" type="button" id="fbXlsx">Scarica Excel</button>
+              </div>
+            </div>
+            <div id="fbElenco"><div class="caricamento">${barre}</div></div>
+          </section>
+        </div>
+      </div>`;
+    let tutti = [];
+    const disegna = () => {
+      const lista = tutti.filter((f) => (!filtroFb.stato || f.stato === filtroFb.stato) && (!filtroFb.tipo || f.tipo === filtroFb.tipo));
+      document.getElementById("fbConta").textContent = tutti.length ? `(${lista.length}${lista.length !== tutti.length ? ` di ${tutti.length}` : ""})` : "";
+      const el = document.getElementById("fbElenco");
+      if (!lista.length) { el.innerHTML = `<div class="vuoto"><p class="tenue">${tutti.length ? "Nessun feedback con questi filtri." : "Ancora nessun feedback."}</p></div>`; return; }
+      el.innerHTML = lista.map((f) => `
+        <article class="fb-voce stato-${esc(f.stato.replace(/ /g, "-"))}">
+          <div class="fb-testa"><span class="chip">${esc(f.tipo)}</span><span class="piccolo tenue">${esc(f.nome || "Anonimo")} · ${dataBreve(f.data)}</span>
+            <select data-stato="${esc(f.id)}" aria-label="Stato">${STATI_FB.map((x) => `<option ${x === f.stato ? "selected" : ""}>${x}</option>`).join("")}</select></div>
+          <p class="fb-testo">${esc(f.messaggio)}</p>
+          ${f.asin || f.negozio || f.modello || f.link ? `<p class="piccolo tenue">${[f.paese && f.asin ? `${f.paese} ${f.asin}` : f.asin, f.negozio, f.modello].filter(Boolean).map(esc).join(" · ")}${f.link ? ` · <a href="${esc(f.link)}" target="_blank" rel="noopener">link</a>` : ""}${f.ricerca ? ` · <a href="#/run/${esc(f.ricerca)}">ricerca</a>` : ""}</p>` : ""}
+        </article>`).join("");
+      el.querySelectorAll("[data-stato]").forEach((s) => (s.onchange = async () => {
+        s.disabled = true;
+        try {
+          await api("feedback", { metodo: "PATCH", corpo: { id: s.dataset.stato, stato: s.value } });
+          const f = tutti.find((x) => x.id === s.dataset.stato); if (f) f.stato = s.value;
+          toast("Stato aggiornato", "ok"); disegna();
+        } catch (e) { toast(e.message, "errore"); s.disabled = false; }
+      }));
+    };
+    const carica = async () => {
+      try { tutti = (await api("feedback")).feedback || []; disegna(); }
+      catch (e) { document.getElementById("fbElenco").innerHTML = `<p class="errore-testo">${esc(e.message)}</p>`; }
+    };
+    document.getElementById("fbStato").onchange = (e) => { filtroFb.stato = e.target.value; disegna(); };
+    document.getElementById("fbTipo").onchange = (e) => { filtroFb.tipo = e.target.value; disegna(); };
+    document.getElementById("fbXlsx").onclick = () => {
+      if (!window.XLSX) return toast("Generatore Excel non ancora caricato, riprova", "errore");
+      const righe = [["Data", "Nome", "Tipo", "Stato", "Feedback", "Paese", "ASIN", "Negozio", "Modello", "Link", "Ricerca"],
+        ...tutti.map((f) => [f.data.slice(0, 16).replace("T", " "), f.nome, f.tipo, f.stato, f.messaggio, f.paese, f.asin, f.negozio, f.modello, f.link, f.ricerca])];
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(righe);
+      ws["!cols"] = [16, 16, 18, 14, 70, 6, 12, 16, 18, 40, 22].map((w) => ({ wch: w }));
+      XLSX.utils.book_append_sheet(wb, ws, "Feedback");
+      XLSX.writeFile(wb, `TV_Finder_feedback_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    };
+    document.getElementById("fFb").onsubmit = async (e) => {
+      e.preventDefault();
+      const form = e.target, btn = form.querySelector("button[type=submit]");
+      const corpo = Object.fromEntries(new FormData(form));
+      memoria.scrivi("fbNome", corpo.nome || "");
+      btn.disabled = true;
+      try {
+        const { feedback } = await api("feedback", { metodo: "POST", corpo });
+        tutti.unshift(feedback); disegna();
+        form.messaggio.value = ""; ["asin", "negozio", "modello", "link", "ricerca"].forEach((k) => (form[k].value = "")); form.paese.value = "";
+        toast("Grazie! Feedback inviato", "ok");
+      } catch (err) { toast("Feedback non inviato: " + err.message, "errore"); }
+      btn.disabled = false;
+    };
+    carica();
   }
 
   // ------------------------------------------------------------------ avvio
