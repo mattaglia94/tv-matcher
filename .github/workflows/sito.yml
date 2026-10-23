@@ -18,7 +18,7 @@ permissions:
 jobs:
   piano:
     # ricerche grandi divise in parti, ognuna su una macchina GitHub diversa (in parallelo)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       parti: ${{ steps.p.outputs.parti }}
       n: ${{ steps.p.outputs.n }}
@@ -37,7 +37,7 @@ jobs:
           PY
   matching:
     needs: piano
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 240
     strategy:
       fail-fast: false

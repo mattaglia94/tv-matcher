@@ -9,7 +9,7 @@ on:
     - cron: "0 6 1 * *"   # ogni 1° del mese alle 8:00 (IT)
 jobs:
   matching:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
