@@ -4,25 +4,25 @@
    "paese": "IT",
    "nome": "MediaWorld",
    "url": "https://www.mediaworld.it/it/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "Euronics",
    "url": "https://www.euronics.it/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "Unieuro",
    "url": "https://www.unieuro.it/online/?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "Expert",
    "url": "https://www.expert.it/it/it/exp/shop/search?terms={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
@@ -88,31 +88,31 @@
    "paese": "UK",
    "nome": "AO.com",
    "url": "https://ao.com/search?search={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
    "nome": "Currys",
    "url": "https://www.currys.co.uk/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
    "nome": "Very",
    "url": "https://www.very.co.uk/e/q/{q}.end",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
    "nome": "Argos",
    "url": "https://www.argos.co.uk/search/{q}/",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
    "nome": "John Lewis",
    "url": "https://www.johnlewis.com/search?search-term={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-23T08:47:38.295Z"
+ "aggiornato": "2026-10-23T09:12:49.414Z"
 }
