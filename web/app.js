@@ -31,7 +31,8 @@
   function dataBreve(iso) {
     if (!iso) return "";
     const d = new Date(iso);
-    return d.toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" }) + ", " + d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+    const loc = (window.I18N && I18N.locale) || "it-IT";
+    return d.toLocaleDateString(loc, { day: "numeric", month: "short", year: "numeric" }) + ", " + d.toLocaleTimeString(loc, { hour: "2-digit", minute: "2-digit" });
   }
   function durata(da, a) {
     if (!da) return "";
@@ -140,6 +141,7 @@
     app.innerHTML = `
       <section class="login vista">
         <div class="login-box">
+          ${window.I18N ? I18N.selettore() : ""}
           <img src="logo.svg" alt="" width="84" height="84">
           <div><h1>TV Finder</h1><p class="tenue" style="margin-top:10px">Trova lo stesso modello o i modelli simili alle TV Amazon sui retailer europei.</p></div>
           ${barre}
@@ -497,6 +499,7 @@
     return "personalizzato";
   }
   function frase(P) {
+    if (window.I18N && I18N.lingua === "en") return fraseEn(P);
     if (P.ricerca === "identico") return "Cerca <strong>lo stesso modello</strong> della TV Amazon: codice <strong>identico</strong>, lettera per lettera (es. QE55Q7FAAUXZT trova solo QE55Q7FAAUXZT, non QE55Q7FAATXZT), stessa diagonale. Se il negozio indica un anno diverso da Amazon, il risultato lo segnala.";
     const conc = P.modalita === "concorrente";
     const parti = [conc ? "TV di <strong>altre marche</strong>" : "TV della <strong>stessa marca</strong> con codice diverso"];
@@ -508,6 +511,19 @@
     if (P.anno.attivo) parti.push(`${P.anno.modo === "fisso" ? `anno <strong>${P.anno.valore}</strong>` : "<strong>stesso anno</strong> della TV Amazon"}${P.anno.accetta_ignoto ? " (o non indicato)" : ""}`);
     if (!conc && P.pro.attivo) parti.push("PRO solo con PRO");
     return "Cerco " + parti.join(", ") + ".";
+  }
+  function fraseEn(P) {
+    if (P.ricerca === "identico") return "Searches for <strong>the same model</strong> as the Amazon TV: <strong>identical</strong> code, letter by letter (e.g. QE55Q7FAAUXZT only finds QE55Q7FAAUXZT, not QE55Q7FAATXZT), same size. If the store states a different year from Amazon, the result flags it.";
+    const conc = P.modalita === "concorrente";
+    const parti = [conc ? "TVs from <strong>other brands</strong>" : "TVs from the <strong>same brand</strong> with a different code"];
+    if (P.pollici.attivo) parti.push(P.pollici.tolleranza ? `size within <strong>±${P.pollici.tolleranza}"</strong>` : "<strong>same size</strong>");
+    if (P.tecnologia.attivo) parti.push("same <strong>technology</strong>");
+    if (P.famiglia.attivo) parti.push(conc ? "same or adjacent <strong>tier</strong>" : "same <strong>family</strong>");
+    if (P.risoluzione.attivo) parti.push("same resolution");
+    if (P.refresh.attivo) parti.push("same refresh rate");
+    if (P.anno.attivo) parti.push(`${P.anno.modo === "fisso" ? `year <strong>${P.anno.valore}</strong>` : "<strong>same year</strong> as the Amazon TV"}${P.anno.accetta_ignoto ? " (or not stated)" : ""}`);
+    if (!conc && P.pro.attivo) parti.push("PRO only with PRO");
+    return "Looking for " + parti.join(", ") + ".";
   }
   function passoParametri(box) {
     const P = S.bozza.parametri;
@@ -650,7 +666,9 @@
     const perParte = Math.ceil(coperti.length / parti), negoziMedi = coppie / Math.max(1, coperti.length);
     const minuti = Math.max(3, Math.round(3 + perParte * negoziMedi * 0.25));
     const attivi = T.parametriInfo.flatMap((g) => g.voci).filter((v) => P[v.chiave].attivo && (!v.solo || v.solo === P.modalita));
-    if (!b.nome) b.nome = `Ricerca ${new Date().toLocaleDateString("it-IT", { month: "long", year: "numeric" })}`;
+    if (!b.nome) b.nome = window.I18N && I18N.lingua === "en"
+      ? `${new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" })} search`
+      : `Ricerca ${new Date().toLocaleDateString("it-IT", { month: "long", year: "numeric" })}`;
     box.innerHTML = `
       <section class="scheda">
         <h2>Tutto pronto</h2>
@@ -1051,6 +1069,7 @@
   }
 
   // ------------------------------------------------------------------ export xlsx
+  const traduciRighe = (righe) => (window.I18N && I18N.lingua === "en" ? righe.map((r) => r.map((c) => (typeof c === "string" ? I18N.t(c) : c))) : righe);
   function esportaXlsx(s) {
     if (!window.XLSX) return toast("Generatore Excel non ancora caricato, riprova", "errore");
     const ris = s.risultati || [], retTutti = s.config?.retailer || [];
@@ -1069,7 +1088,7 @@
           return [e && e !== "trovato" ? testoEsito(e) : "", ""];
         })]);
       });
-      const ws = XLSX.utils.aoa_to_sheet(righe);
+      const ws = XLSX.utils.aoa_to_sheet(traduciRighe(righe));
       ws["!merges"] = [0, 1, 2].map((k) => ({ s: { r: 0, c: k }, e: { r: 1, c: k } })).concat(ret.map((_, i) => ({ s: { r: 0, c: 3 + i * 2 }, e: { r: 0, c: 4 + i * 2 } })));
       ws["!cols"] = [{ wch: 13 }, { wch: 55 }, { wch: 18 }, ...ret.flatMap(() => [{ wch: 18 }, { wch: 50 }])];
       XLSX.utils.book_append_sheet(wb, ws, `Matching ${c}`.slice(0, 31));
@@ -1079,9 +1098,9 @@
       det.push([r.asin, r.paese, "Amazon", r.amazon?.modello, r.amazon?.famiglia, r.amazon?.pollici, r.amazon?.anno, r.amazon?.url, r.errore || "riferimento", ""]);
       (r.dettaglio || []).forEach((d) => det.push([r.asin, r.paese, d.retailer, d.modello || "", d.famiglia || "", d.pollici || "", d.anno || "", d.url || "", d.esito || "", d.ricerca || ""]));
     });
-    const wd = XLSX.utils.aoa_to_sheet(det);
+    const wd = XLSX.utils.aoa_to_sheet(traduciRighe(det));
     wd["!cols"] = [{ wch: 13 }, { wch: 6 }, { wch: 16 }, { wch: 18 }, { wch: 28 }, { wch: 8 }, { wch: 7 }, { wch: 60 }, { wch: 34 }, { wch: 26 }];
-    XLSX.utils.book_append_sheet(wb, wd, "Dettaglio");
+    XLSX.utils.book_append_sheet(wb, wd, window.I18N ? I18N.t("Dettaglio") : "Dettaglio");
     const nome = (s.nome || "Matching_TV").replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "_");
     XLSX.writeFile(wb, `${nome}_${(s.iniziato || "").slice(0, 10)}.xlsx`);
   }
@@ -1504,7 +1523,7 @@
       const righe = [["Data", "Nome", "Tipo", "Stato", "Feedback", "Paese", "ASIN", "Negozio", "Modello", "Link", "Ricerca"],
         ...tutti.map((f) => [f.data.slice(0, 16).replace("T", " "), f.nome, f.tipo, f.stato, f.messaggio, f.paese, f.asin, f.negozio, f.modello, f.link, f.ricerca])];
       const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(righe);
+      const ws = XLSX.utils.aoa_to_sheet(traduciRighe(righe));
       ws["!cols"] = [16, 16, 18, 14, 70, 6, 12, 16, 18, 40, 22].map((w) => ({ wch: w }));
       XLSX.utils.book_append_sheet(wb, ws, "Feedback");
       XLSX.writeFile(wb, `TV_Finder_feedback_${new Date().toISOString().slice(0, 10)}.xlsx`);

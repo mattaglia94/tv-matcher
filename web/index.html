@@ -27,10 +27,13 @@
     <a class="pill-attiva" id="pillAttiva" href="#/esecuzioni" hidden>
       <span class="puntino"></span><span id="pillTesto">In corso</span>
     </a>
+    <div id="linguaTop"></div>
   </header>
   <main id="app" tabindex="-1"></main>
   <div class="toast-zona" id="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+  <script src="i18n.js"></script>
+  <script>document.getElementById("linguaTop").outerHTML = I18N.selettore();</script>
   <script src="dati.js"></script>
   <script src="app.js"></script>
 </body>
