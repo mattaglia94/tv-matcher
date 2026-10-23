@@ -999,27 +999,21 @@ def _cod_norm(c: str) -> str:
 
 
 def stesso_modello_esatto(a: InfoTV, b: InfoTV) -> bool:
-    """Modalità "Stesso modello": lo stesso nome/codice dell'ASIN, anche con varianti per paese o canale
-    (QE55Q7FAAUXZT = QE55Q7FAATXZT = GQ55Q7FAAT; 55UA73006LA = 55UA73006LA.AEU; Xiaomi L43MB-FPEU = F Pro 43).
-    Diagonale uguale. L'anno NON conta: lo stesso modello è spesso venduto con anni diversi nel titolo
-    (il motore lo segnala nel risultato)."""
+    """Modalità "Stesso modello": codice modello IDENTICO a quello Amazon (maiuscole, spazi e trattini a parte):
+    QE55Q7FAAUXZT ≠ QE55Q7FAATXZT, 50E7DS PRO ≠ 50E7DS. Diagonale uguale.
+    Unica eccezione Xiaomi, che non scrive codici nei titoli: vale il nome (TV F Pro 43 = L43MB-FPEU).
+    L'anno NON conta: lo stesso modello è spesso venduto con anni diversi nel titolo (il risultato lo segnala)."""
     if not a.codice or not b.codice or not a.marca or a.marca != b.marca:
         return False
     if "caratteristiche" in a.note or "caratteristiche" in b.note:
         return False  # "Metz 32\" QLED" non è un codice modello
     if a.pollici and b.pollici and a.pollici != b.pollici:
         return False
-    if a.marca in ("SAMSUNG", "HISENSE", "XIAOMI") and a.core and b.core:
-        return a.core == b.core  # il "core" toglie prefisso del paese e suffissi di distribuzione
-    # senza il prefisso di paese/canale prima dei pollici (K-55XR80 = 55XR80, TX-55… = 55…)
-    x, y = (re.sub(r"^[A-Z]+(?=\d)", "", _cod_norm(c)) for c in (a.codice, b.codice))
-    if x == y:
-        return True
-    corto, lungo = sorted((x, y), key=len)
-    if not lungo.startswith(corto):
+    if a.pro != b.pro:
         return False
-    resto = lungo[len(corto):]
-    return len(corto) >= 6 or (len(corto) >= 5 and len(resto) <= 2 and resto.isalpha())
+    if a.marca == "XIAOMI" and a.core and b.core:
+        return a.core == b.core
+    return _cod_norm(a.codice) == _cod_norm(b.codice)
 
 
 def confronta_identico(amz: InfoTV, cand: InfoTV, P: dict | None = None):

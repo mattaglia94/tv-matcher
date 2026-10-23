@@ -269,8 +269,13 @@ def main():
 
 
 IDENTICO = [  # modalità "Stesso modello": (titolo Amazon, risultati del negozio, titolo pagina, trovato?)
+    # codice IDENTICO: una variante di paese/canale non vale (feedback ottobre 2026)
     ("Samsung QE55Q7FAAUXZT QLED 4K 55 pollici 2025", [("SAMSUNG TV QLED 55\" QE55Q7FAATXZT Smart TV", "https://n.it/p1"),
-     ("SAMSUNG TV QLED 55\" QE55Q8FAATXZT", "https://n.it/p2")], "Samsung QE55Q7FAATXZT TV QLED 55", True),
+     ("SAMSUNG TV QLED 55\" QE55Q8FAATXZT", "https://n.it/p2")], "Samsung QE55Q7FAATXZT TV QLED 55", False),
+    ("Samsung QE55Q7FAAUXZT QLED 4K 55 pollici 2025", [("SAMSUNG TV QLED 55\" QE55Q7FAAUXZT Smart TV", "https://n.it/p1")],
+     "Samsung QE55Q7FAAUXZT TV QLED 55", True),
+    ("Hisense 50E7DS PRO Fernseher 50 Zoll QLED", [("Hisense 50E7DS QLED 50 Zoll", "https://n.de/a")], "Hisense 50E7DS", False),
+    ("Hisense 50E7DS PRO Fernseher 50 Zoll QLED", [("Hisense 50E7DS PRO QLED 50 Zoll", "https://n.de/b")], "Hisense 50E7DS PRO", True),
     ("Samsung QE55Q7FAAUXZT QLED 4K 55 pollici 2025", [("SAMSUNG TV QLED 55\" QE55Q8FAATXZT", "https://n.it/p2")], "Samsung QE55Q8FAATXZT", False),
     ("LG 55UA73006LA 55 pollici 4K", [("LG UHD 55UA73006LA.AEU Smart TV 55", "https://n.it/x")], "LG 55UA73006LA", True),
     ("Xiaomi TV A Pro 75 2026 QLED", [("Xiaomi TV A Pro 75 2025 QLED", "https://n.it/y")], "Xiaomi TV A Pro 75 2025", True),  # stesso nome, anno diverso: vale (segnalato)

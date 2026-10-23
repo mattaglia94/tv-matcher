@@ -497,7 +497,7 @@
     return "personalizzato";
   }
   function frase(P) {
-    if (P.ricerca === "identico") return "Cerca <strong>lo stesso modello</strong> della TV Amazon: stesso codice, anche con le varianti di paese o di canale (es. QE55Q7FAAUXZT = QE55Q7FAATXZT), stessa diagonale. Se il negozio indica un anno diverso da Amazon, il risultato lo segnala.";
+    if (P.ricerca === "identico") return "Cerca <strong>lo stesso modello</strong> della TV Amazon: codice <strong>identico</strong>, lettera per lettera (es. QE55Q7FAAUXZT trova solo QE55Q7FAAUXZT, non QE55Q7FAATXZT), stessa diagonale. Se il negozio indica un anno diverso da Amazon, il risultato lo segnala.";
     const conc = P.modalita === "concorrente";
     const parti = [conc ? "TV di <strong>altre marche</strong>" : "TV della <strong>stessa marca</strong> con codice diverso"];
     if (P.pollici.attivo) parti.push(P.pollici.tolleranza ? `diagonale entro <strong>±${P.pollici.tolleranza}"</strong>` : "<strong>stessa diagonale</strong>");
@@ -531,7 +531,7 @@
       <section class="scheda">
         <h2>Tipo di ricerca</h2>
         <div class="modalita" role="radiogroup" aria-label="Tipo di ricerca">
-          ${[["identico", "=", "Stesso modello", "Cerca nei negozi esattamente il modello Amazon, con il suo codice"], ["simile", "≈", "Modello simile", "Cerca un modello simile per caratteristiche, con le regole qui sotto"]].map(([v, ic, t, d]) => `
+          ${[["identico", "=", "Stesso modello", "Cerca nei negozi il modello Amazon con il codice identico"], ["simile", "≈", "Modello simile", "Cerca un modello simile per caratteristiche, con le regole qui sotto"]].map(([v, ic, t, d]) => `
             <label class="modalita-opz ${(P.ricerca || "simile") === v ? "scelta" : ""}">
               <input type="radio" name="ricerca" value="${v}" ${(P.ricerca || "simile") === v ? "checked" : ""}>
               <span class="modalita-icona" aria-hidden="true">${ic}</span>
