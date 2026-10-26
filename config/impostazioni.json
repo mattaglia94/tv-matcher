@@ -58,25 +58,25 @@
    "paese": "DE",
    "nome": "Euronics-DE",
    "url": "https://www.euronics.de/search?sSearch={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "MediaMarkt",
    "url": "https://www.mediamarkt.de/de/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Saturn",
    "url": "https://www.saturn.de/de/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Otto",
    "url": "https://www.otto.de/suche/{q}/",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-23T09:12:49.414Z"
+ "aggiornato": "2026-10-26T15:30:50.634Z"
 }
