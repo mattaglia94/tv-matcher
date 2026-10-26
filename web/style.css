@@ -594,3 +594,5 @@ label.btn { display: inline-flex; align-items: center; gap: 8px; }
 .topbar .lingua-sel { margin-left: auto; }
 .topbar .pill-attiva:not([hidden]) + .lingua-sel { margin-left: 0; }
 .login-box .lingua-sel { justify-self: end; }
+.match-tile.coperto { opacity: .55; }
+.seg-coperto { background: #4A4570; }

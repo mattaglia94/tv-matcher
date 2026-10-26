@@ -4,7 +4,7 @@ import re
 
 from regole import _cod_norm, _tec_equivalenti, analizza, anno_obiettivo, confronta_identico, stesso_modello_esatto, e_accessorio, arricchisci, classe_hz, hz_diverse, confronta_param, leggi_prezzo, leggi_scheda, stesso_modello, unisci_parametri
 
-ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
+ESITI = {"coperto": "Già mappato", "trovato": "Trovato", "non_presente": "Prodotto non presente",
          "nessun_simile": "Nessun modello simile", "errore": "Ricerca non riuscita",
          "illeggibile": "Sito non consultabile",
          "saltato": "Saltato: modello Amazon mancante"}
@@ -537,7 +537,7 @@ def gemelli_da_controllare(out, nomi):
     for a, da, b, db in GEMELLI:
         for src, d_src, dst, d_dst in ((a, da, b, db), (b, db, a, da)):
             if src in nomi and dst in nomi and (out.get("match") or {}).get(src) and not out["match"].get(dst) \
-                    and out.get("esito", {}).get(dst) not in (None, "saltato"):
+                    and out.get("esito", {}).get(dst) not in (None, "saltato", "coperto"):
                 coppie.append((src, d_src, dst, d_dst))
     return coppie
 
@@ -588,11 +588,23 @@ def unisci_retailer(out, parte):
     return out
 
 
+def da_cercare(riga, retailer):
+    """Negozi su cui cercare l'ASIN: se il file indica i competitor non ancora mappati ("solo"), solo quelli;
+    gli altri sono già coperti (esito "coperto")."""
+    solo = riga.get("solo")
+    if not solo:
+        return retailer, []
+    voluti = set(solo)
+    return [r for r in retailer if r["nome"] in voluti], [r for r in retailer if r["nome"] not in voluti]
+
+
 def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, anagrafica=None):
     """Versione sequenziale (exe e test): Amazon, poi un retailer alla volta.
     riga: {asin, paese, nome?, modello?}; retailer: [{nome, url}] del paese della riga."""
     P = unisci_parametri(parametri)
+    retailer, coperti = da_cercare(riga, retailer)
     out, info = prepara_asin(br, riga, retailer, P, log, anagrafica)
+    out["esito"].update({r["nome"]: "coperto" for r in coperti})
     if info is None:
         return out
     for r in retailer:
@@ -600,5 +612,5 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
             break
         unisci_retailer(out, confronta_retailer(br, info, r, P, out["paese"], log, stop))
     if not stop():
-        completa_gemelli(br, out, retailer, log)
+        completa_gemelli(br, out, retailer + coperti, log)
     return out

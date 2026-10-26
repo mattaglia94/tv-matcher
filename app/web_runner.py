@@ -221,7 +221,8 @@ def main():
     per_paese = {}
     for r in retailer:
         per_paese.setdefault(r["paese"].upper(), []).append(r)
-    totale = sum(len(per_paese.get(a.get("paese", "IT").upper(), [])) for a in asins) or 1
+    from nucleo import da_cercare
+    totale = sum(len(da_cercare(a, per_paese.get(a.get("paese", "IT").upper(), []))[0]) for a in asins) or 1
 
     if REPO and TOKEN:
         assicura_branch()
@@ -297,11 +298,12 @@ def main():
         br = Browser(visibile=False, log=log, cache=cache)  # Amazon: un ASIN alla volta
         for i, a in enumerate(asins, 1):
             paese = a.get("paese", "IT").upper()
-            ret = per_paese.get(paese, [])
+            ret, coperti = da_cercare(a, per_paese.get(paese, []))  # file con competitor non mappati: solo quelli
             stato["avanzamento"]["corrente"] = f"ASIN {i}/{len(asins)} · {a['asin']} ({paese})"
             log(f"[{i}/{len(asins)}] {a['asin']} · {paese}")
             out, info = prepara_asin(br, a, ret, P, log, anagrafica)
             out["_i"] = a["_i"]  # posizione nella lista originale (per riunire le parti)
+            out["esito"].update({r["nome"]: "coperto" for r in coperti})
             stato["risultati"].append(out)
             idx = len(stato["risultati"]) - 1
             am = out.get("amazon", {})

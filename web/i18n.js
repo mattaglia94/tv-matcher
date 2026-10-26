@@ -43,7 +43,7 @@
     "Incolla ASIN o link Amazon in qualsiasi formato: uno per riga, separati da virgole o copiati da Excel. Il paese si legge dal link (amazon.de → Germania) o dalla riga, altrimenti vale quello predefinito.": "Paste ASINs or Amazon links in any format: one per line, comma-separated or copied from Excel. The country is read from the link (amazon.de → Germany) or from the line, otherwise the default one applies.",
     "ASIN o link Amazon": "ASINs or Amazon links", "Paese predefinito": "Default country",
     "Incolla qui: B0F457MQCQ, B0F4548TCQ;DE oppure https://www.amazon.it/dp/B0F45BLD1H": "Paste here: B0F457MQCQ, B0F4548TCQ;DE or https://www.amazon.it/dp/B0F45BLD1H",
-    "Oppure trascina qui un CSV o un Excel: leggo tutti gli ASIN che contiene": "Or drop a CSV or Excel file here: all the ASINs it contains will be read",
+    "Oppure trascina qui un CSV o un Excel: leggo tutti gli ASIN che contiene. Con le colonne ASIN e Unmapped Competitors cerco solo su quei competitor.": "Or drop a CSV or Excel file here: all the ASINs it contains will be read. With ASIN and Unmapped Competitors columns, only those competitors are searched.",
     "Carica file": "Upload file", "Prova con 2 esempi": "Try 2 examples",
     "ASIN da confrontare": "ASINs to compare", "Paese per tutti": "Country for all", "Paese per tutti…": "Country for all…",
     "Cerca ASIN o modello": "Search ASIN or model", "Modello (facoltativo)": "Model (optional)", "Paese": "Country",
@@ -127,7 +127,7 @@
     "Filtra per esito": "Filter by outcome", "Con simili": "With similar", "Tutti i marketplace": "All marketplaces", "Vista": "View",
     "Schede": "Cards", "Tabella": "Table", "Modello Amazon": "Amazon model", "Apri su Amazon": "Open on Amazon",
     "Nessun ASIN corrisponde ai filtri.": "No ASIN matches the filters.", "Nessun risultato salvato.": "No saved results.",
-    "Saltato": "Skipped", "Trovato": "Found", "Prodotto non presente": "Product not available", "Nessun modello simile": "No similar model",
+    "Saltato": "Skipped", "Già mappato": "Already mapped", "Copertura già presente: non cercato.": "Already covered: not searched.", "Trovato": "Found", "Prodotto non presente": "Product not available", "Nessun modello simile": "No similar model",
     "Ricerca non riuscita": "Search failed", "Sito non consultabile": "Site not accessible", "Stesso modello non presente": "Same model not available",
     "Non presente": "Not available", "Nessun simile": "No similar", "Non leggibile": "Not readable", "Da verificare": "To be checked",
     "Nessuna TV con la marca e la diagonale cercate nel catalogo del retailer.": "No TV with the brand and size searched in the retailer's catalogue.",
@@ -321,6 +321,11 @@
   add(/^Controllo MediaMarkt \/ Saturn$/, () => "MediaMarkt / Saturn check");
   add(/^controllo MediaMarkt \/ Saturn non riuscito \((.+)\)$/, (m, x) => `MediaMarkt / Saturn check failed (${x})`);
   add(/^(.+?): (.+) \(stesso prodotto di (.+)\)$/, (m, n, x, y) => `${n}: ${x} (same product as ${y})`);
+  add(/^Solo: (.+)$/, (m, x) => "Only: " + x);
+  add(/^(\d+) ASIN dal file: cerco solo sui competitor non mappati(?: \((\d+) senza competitor da cercare\))?$/, (m, n, k) => `${n} ASINs from the file: searching only the unmapped competitors${k ? ` (${k} with no competitor to search)` : ""}`);
+  add(/^Competitor non riconosciuti: (.+)$/, (m, x) => "Unrecognised competitors: " + x);
+  add(/^(\d+) ASIN dal file: cerco solo sui competitor non mappati, gli altri marketplace risultano "Già mappato"\.$/, (m, n) => `${n} ASINs from the file: searching only the unmapped competitors, the other marketplaces show "Already mapped".`);
+  add(/^Già mappato: (\d+)$/, (m, n) => `Already mapped: ${n}`);
   // registro attività
   add(/^(\d\d:\d\d:\d\d(?: \[\d+\])?\s+)(.+)$/, (m, h, x) => h + tt(x));
   add(/^(.+?): sito non leggibile, provo tramite (\S+)$/, (m, n, c) => `${n}: site not readable, trying via ${c}`);

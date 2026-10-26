@@ -47,7 +47,7 @@
     tv: '<svg viewBox="0 0 64 48" fill="none"><rect x="2" y="2" width="60" height="38" rx="7" stroke="#A9A3D6" stroke-width="3"/><path d="M22 46h20" stroke="#A9A3D6" stroke-width="3" stroke-linecap="round"/><g opacity=".8"><rect x="10" y="10" width="8.8" height="22" fill="#FFD23F"/><rect x="18.8" y="10" width="8.8" height="22" fill="#2EE6F0"/><rect x="27.6" y="10" width="8.8" height="22" fill="#4BE38E"/><rect x="36.4" y="10" width="8.8" height="22" fill="#FF4FA3"/><rect x="45.2" y="10" width="8.8" height="22" fill="#7B61FF"/></g></svg>',
   };
   const testoEsito = (e) => (S.ricercaIdentica && e === "nessun_simile" ? "Stesso modello non presente" : ESITI[e]);
-  const ESITI = { saltato: "Saltato", trovato: "Trovato", non_presente: "Prodotto non presente", nessun_simile: "Nessun modello simile", errore: "Ricerca non riuscita", illeggibile: "Sito non consultabile" };
+  const ESITI = { coperto: "Già mappato", saltato: "Saltato", trovato: "Trovato", non_presente: "Prodotto non presente", nessun_simile: "Nessun modello simile", errore: "Ricerca non riuscita", illeggibile: "Sito non consultabile" };
   const ESITI_NOTA = {
     non_presente: "Nessuna TV con la marca e la diagonale cercate nel catalogo del retailer.",
     nessun_simile: "Ci sono TV con la marca e la diagonale cercate, ma nessuno rispetta i criteri.",
@@ -232,6 +232,56 @@
     }
     return trovati;
   }
+  // file con "Unmapped Competitors" (es. Euronics-IT, Expert-IT): per ogni ASIN si cerca solo sui competitor indicati
+  const normNome = (x) => String(x || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  function mappaCompetitor(c) {
+    const m = String(c).trim().match(/^(.*?)[\s_-]*\b(IT|DE|FR|ES|UK|GB)$/i);
+    const base = m ? m[1] : String(c).trim(), cc = m ? (m[2].toUpperCase() === "GB" ? "UK" : m[2].toUpperCase()) : "";
+    const cand = S.impostazioni.retailer.filter((r) => r.nome && (!cc || r.paese === cc));
+    const n = normNome(c), nb = normNome(base);
+    const r = cand.find((x) => normNome(x.nome) === n) || cand.find((x) => normNome(x.nome) === nb)
+      || cand.find((x) => normNome(x.nome) === nb + normNome(cc)) || cand.find((x) => nb.length >= 2 && normNome(x.nome).startsWith(nb));
+    return { testo: String(c).trim(), paese: r ? r.paese : cc, nome: r ? r.nome : "" };
+  }
+  function leggiCopertura(wb) {
+    for (const n of wb.SheetNames) {
+      const righe = XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, defval: "" });
+      const h = righe.slice(0, 15).findIndex((r) => r.some((c) => /^\s*asin\s*$/i.test(c)) && r.some((c) => /unmapped|competitor|non mappat/i.test(c)));
+      if (h < 0) continue;
+      const tes = righe[h].map((c) => String(c).trim());
+      const col = (re) => tes.findIndex((c) => re.test(c));
+      const cA = col(/^asin$/i), cC = col(/unmapped|competitor|non mappat/i), cN = col(/item name|titolo|title|nome articolo|product name/i),
+        cM = col(/brand|vendor|marca/i), cP = col(/^(country|paese|marketplace|mp)$/i);
+      const out = [];
+      for (const r of righe.slice(h + 1)) {
+        const asin = (String(r[cA]).toUpperCase().match(/B0[A-Z0-9]{8}/) || [])[0];
+        if (!asin) continue;
+        const comp = String(r[cC] || "").split(/[,;\n|]+/).map((x) => x.trim()).filter(Boolean).map(mappaCompetitor);
+        const pDich = cP >= 0 ? String(r[cP]).trim().toUpperCase().replace("GB", "UK") : "";
+        const conteggio = {}; comp.forEach((x) => x.paese && (conteggio[x.paese] = (conteggio[x.paese] || 0) + 1));
+        const pa = (/^(IT|DE|FR|ES|UK)$/.test(pDich) && pDich) || Object.keys(conteggio).sort((a, b) => conteggio[b] - conteggio[a])[0] || S.bozza.paeseDefault;
+        out.push({ asin, paese: pa, modello: "", nome: cN >= 0 ? String(r[cN]).trim().slice(0, 150) : "", marca: cM >= 0 ? String(r[cM]).trim() : "",
+          solo: [...new Set(comp.filter((x) => x.nome && x.paese === pa).map((x) => x.nome))],
+          ignoti: comp.filter((x) => !x.nome).map((x) => x.testo) });
+      }
+      if (out.length) return out;
+    }
+    return null;
+  }
+  function aggiungiCopertura(lista) {
+    const b = S.bozza, idx = new Map(b.asin.map((a, i) => [a.asin + a.paese, i]));
+    const daFare = lista.filter((a) => a.solo.length), ignoti = [...new Set(lista.flatMap((a) => a.ignoti))];
+    daFare.forEach((a) => { const { ignoti: _x, ...v } = a; if (idx.has(a.asin + a.paese)) b.asin[idx.get(a.asin + a.paese)] = { ...b.asin[idx.get(a.asin + a.paese)], ...v }; else b.asin.push({ ...v, _nuovo: true }); });
+    // i marketplace da cercare vanno accesi
+    const servono = new Set(daFare.flatMap((a) => a.solo.map((n) => n + "|" + a.paese)));
+    let accesi = 0;
+    S.impostazioni.retailer.forEach((r) => { if (servono.has(r.nome + "|" + r.paese) && !r.attivo) { r.attivo = true; accesi++; } });
+    if (accesi) salvaImpostazioni();
+    salvaBozza();
+    toast(`${daFare.length} ASIN dal file: cerco solo sui competitor non mappati` + (lista.length - daFare.length ? ` (${lista.length - daFare.length} senza competitor da cercare)` : ""), "ok");
+    if (ignoti.length) setTimeout(() => toast(`Competitor non riconosciuti: ${ignoti.slice(0, 6).join(", ")}${ignoti.length > 6 ? "…" : ""}`, "errore"), 600);
+    return daFare.length;
+  }
   function aggiungiAsin(lista) {
     const presenti = new Set(S.bozza.asin.map((a) => a.asin + a.paese));
     let nuovi = 0;
@@ -245,6 +295,7 @@
     return nuovi;
   }
   function statoAsin(a) {
+    if (a.solo && a.solo.length) return { cls: "info", t: `Solo: ${a.solo.join(", ")}` };
     const noto = S.anagrafica[`${a.asin}|${a.paese}`];
     if (S.bozza.mancanti?.includes(a.asin) && !a.modello) return { cls: "attenzione", t: "Serve il modello" };
     if (a.modello) return { cls: "info", t: "Modello a mano (solo se Amazon non basta)" };
@@ -277,7 +328,7 @@
               <input type="file" id="fileAsin" accept=".csv,.txt,.xlsx,.xls" hidden>
               ${b.asin.length ? "" : '<button class="btn fantasma piccolo" type="button" id="btnEsempio">Prova con 2 esempi</button>'}
             </div>
-            <div class="dropzona" id="drop" aria-hidden="true">${ICONE.carica}<span>Oppure trascina qui un CSV o un Excel: leggo tutti gli ASIN che contiene</span></div>
+            <div class="dropzona" id="drop" aria-hidden="true">${ICONE.carica}<span>Oppure trascina qui un CSV o un Excel: leggo tutti gli ASIN che contiene. Con le colonne ASIN e Unmapped Competitors cerco solo su quei competitor.</span></div>
           </div>
           <div>
             <div class="lista-testa">
@@ -342,7 +393,9 @@
       }));
       el.querySelectorAll("[data-campo]").forEach((x) => (x.onchange = () => {
         const v = x.dataset.campo === "modello" ? x.value.trim().toUpperCase() : x.value;
-        b.asin[Number(x.dataset.i)][x.dataset.campo] = v; salvaBozza();
+        b.asin[Number(x.dataset.i)][x.dataset.campo] = v;
+        if (x.dataset.campo === "paese") delete b.asin[Number(x.dataset.i)].solo;
+        salvaBozza();
         if (x.dataset.campo === "paese") vistaNuova(); else disegnaLista();
       }));
     };
@@ -356,8 +409,16 @@
       if (/\.xlsx?$/i.test(f.name)) {
         if (!window.XLSX) return toast("Lettore Excel non ancora caricato, riprova tra un secondo", "errore");
         const wb = XLSX.read(await f.arrayBuffer());
+        const cop = leggiCopertura(wb);
+        if (cop) { if (aggiungiCopertura(cop)) vistaNuova(); return; }
         testo = wb.SheetNames.map((n) => XLSX.utils.sheet_to_csv(wb.Sheets[n], { FS: ";" })).join("\n");
-      } else testo = await f.text();
+      } else {
+        testo = await f.text();
+        if (window.XLSX && /unmapped|competitor/i.test(testo.split(/\r?\n/).slice(0, 15).join(" "))) {
+          const cop = leggiCopertura(XLSX.read(testo, { type: "string" }));
+          if (cop) { if (aggiungiCopertura(cop)) vistaNuova(); return; }
+        }
+      }
       const l = estraiAsin(testo, b.paeseDefault);
       if (!l.length) return toast(`Nessun ASIN trovato in ${f.name}`, "errore");
       if (aggiungiAsin(l)) vistaNuova();
@@ -659,8 +720,10 @@
   }
   function passoAvvio(box) {
     const b = S.bozza, ret = retailerUsati(), P = b.parametri;
-    const coperti = b.asin.filter((a) => ret.some((r) => r.paese === a.paese));
-    const coppie = coperti.reduce((n, a) => n + ret.filter((r) => r.paese === a.paese).length, 0);
+    const negoziDi = (a) => ret.filter((r) => r.paese === a.paese && (!a.solo || !a.solo.length || a.solo.includes(r.nome)));
+    const coperti = b.asin.filter((a) => negoziDi(a).length);
+    const coppie = coperti.reduce((n, a) => n + negoziDi(a).length, 0);
+    const conFile = coperti.filter((a) => a.solo && a.solo.length).length;
     // misurato: ~12 ASIN per macchina, fino a 8 macchine in parallelo; ~15 s per coppia ASIN×negozio su ogni macchina
     const parti = Math.max(1, Math.min(8, Math.ceil(coperti.length / 12)));
     const perParte = Math.ceil(coperti.length / parti), negoziMedi = coppie / Math.max(1, coperti.length);
@@ -680,6 +743,7 @@
           <div><strong>~${minuti} min</strong><span class="tenue piccolo">durata stimata${parti > 1 ? ` · ${parti} parti in parallelo` : ""}</span></div>
         </div>
         <p class="piccolo tenue">Modalità: <span class="chip info">${nomeModalita(P)}</span></p>
+        ${conFile ? `<p class="piccolo tenue">${conFile} ASIN dal file: cerco solo sui competitor non mappati, gli altri marketplace risultano "Già mappato".</p>` : ""}
         <p class="piccolo tenue">Criteri attivi: ${attivi.map((v) => `<span class="chip">${v.titolo}${v.chiave === "pollici" && P.pollici.tolleranza ? ` ±${P.pollici.tolleranza}"` : ""}${v.chiave === "anno" ? (P.anno.modo === "fisso" ? ` ${P.anno.valore}` : " = Amazon") : ""}</span>`).join(" ") || "nessuno"}</p>
         <div style="margin-top:26px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
           <button class="btn primario grande" type="button" id="btnAvvia" ${coperti.length ? "" : "disabled"}>${ICONE.play} Avvia la ricerca</button>
@@ -694,7 +758,8 @@
       try {
         const { id } = await api("run", { metodo: "POST", corpo: {
           nome: b.nome, retailer: ret, parametri: P,
-          asin: coperti.map((a) => ({ asin: a.asin, paese: a.paese, ...(a.modello ? { modello: a.modello } : {}) })),
+          asin: coperti.map((a) => ({ asin: a.asin, paese: a.paese, ...(a.modello ? { modello: a.modello } : {}),
+            ...(a.nome ? { nome: a.nome } : {}), ...(a.solo && a.solo.length ? { solo: a.solo } : {}) })),
         } });
         const recenti = memoria.leggi("recenti", []);
         memoria.scrivi("recenti", [id, ...recenti].slice(0, 20));
@@ -908,11 +973,11 @@
     const pos = ris.reduce((n, r) => n + Object.values(r.match || {}).filter((m) => m.length).length, 0);
     const perc = copertura ? Math.round((pos / copertura) * 100) : 0;
     // esiti per marketplace: barra impilata
-    const GRUPPI = [["trovato", "Trovato", "ok"], ["nessun_simile", "Nessun simile", "medio"], ["non_presente", "Non presente", "neutro"], ["errore", "Non leggibile", "errore"], ["saltato", "Saltato", "spento"]];
+    const GRUPPI = [["trovato", "Trovato", "ok"], ["nessun_simile", "Nessun simile", "medio"], ["non_presente", "Non presente", "neutro"], ["errore", "Non leggibile", "errore"], ["saltato", "Saltato", "spento"], ["coperto", "Già mappato", "coperto"]];
     const gruppo = (e) => (e === "illeggibile" ? "errore" : e || "saltato");
     const perRet = retNomi.filter((x) => ris.some((r) => r.paese === x.paese)).map((x) => {
       const c = {}; ris.filter((r) => r.paese === x.paese).forEach((r) => { const g = gruppo((r.esito || {})[x.nome] || (r.errore ? "saltato" : "")); if ((r.esito || {})[x.nome] || r.errore) c[g] = (c[g] || 0) + 1; });
-      return { r: x, c, tot: Object.values(c).reduce((a2, b2) => a2 + b2, 0) };
+      return { r: x, c, tot: Object.values(c).reduce((a2, b2) => a2 + b2, 0) - (c.coperto || 0) };
     });
     box.innerHTML = `
       <div class="kpi">
@@ -927,7 +992,7 @@
         ${perRet.map((x) => `
           <button type="button" class="riga-ret ${filtri.retailer === x.r.nome ? "attiva" : ""}" data-filtra-ret="${esc(x.r.nome)}" title="Mostra solo ${esc(x.r.nome)}">
             <span class="nome-ret">${paese(x.r.paese).bandiera} ${esc(x.r.nome)}</span>
-            <span class="barra-imp">${GRUPPI.filter(([g]) => x.c[g]).map(([g, n, cl]) => `<i class="seg-${cl}" style="--w:${(x.c[g] / Math.max(1, x.tot)) * 100}%" title="${n}: ${x.c[g]}"></i>`).join("")}</span>
+            <span class="barra-imp">${GRUPPI.filter(([g]) => x.c[g]).map(([g, n, cl]) => `<i class="seg-${cl}" style="--w:${(x.c[g] / Math.max(1, x.tot + (x.c.coperto || 0))) * 100}%" title="${n}: ${x.c[g]}"></i>`).join("")}</span>
             <span class="tenue piccolo num-ret">${x.c.trovato || 0}/${x.tot}</span>
           </button>`).join("")}
       </section>` : ""}
@@ -1037,6 +1102,7 @@
             ${retDi(r).map((ret) => {
               const m = (r.match || {})[ret.nome];
               const es = (r.esito || {})[ret.nome];
+              if (es === "coperto") return `<div class="match-tile nessuno coperto"><div class="retailer">${esc(ret.nome)}<span class="chip">Già mappato</span></div><span class="piccolo">Copertura già presente: non cercato.</span></div>`;
               if (es === "saltato" || (m === undefined && r.errore)) return `<div class="match-tile nessuno"><div class="retailer">${esc(ret.nome)}</div><span class="piccolo">Saltato: serve il modello Amazon</span></div>`;
               if (m === undefined) return `<div class="match-tile nessuno"><div class="retailer">${esc(ret.nome)}</div><span>In attesa</span></div>`;
               if (!m.length) {
@@ -1080,15 +1146,22 @@
         ["ASIN", "Amazon product name", "Amazon Model", ...ret.flatMap((r) => [r.nome, ""])],
         ["", "", "", ...ret.flatMap(() => ["Model Name", "Product URL"])],
       ];
+      const grigie = [];  // competitor già mappati (file con "Unmapped Competitors"): celle grigie
       ris.filter((r) => r.paese === c).forEach((r) => {
-        righe.push([r.asin, r.amazon?.titolo || "", r.amazon?.modello || "", ...ret.flatMap((x) => {
+        righe.push([r.asin, r.amazon?.titolo || "", r.amazon?.modello || "", ...ret.flatMap((x, i) => {
           const m = (r.match || {})[x.nome] || [];
           const e = (r.esito || {})[x.nome];
+          if (e === "coperto") { grigie.push([righe.length, 3 + i * 2], [righe.length, 4 + i * 2]); return [testoEsito(e), ""]; }
           if (m.length) return [m.map((y) => y.modello).join(" / "), m.map((y) => y.url).join(" ")];
           return [e && e !== "trovato" ? testoEsito(e) : "", ""];
         })]);
       });
       const ws = XLSX.utils.aoa_to_sheet(traduciRighe(righe));
+      grigie.forEach(([rr, cc]) => {
+        const a = XLSX.utils.encode_cell({ r: rr, c: cc });
+        ws[a] = ws[a] || { t: "s", v: "" };
+        ws[a].s = { fill: { patternType: "solid", fgColor: { rgb: "D9D9D9" } }, font: { color: { rgb: "595959" } } };
+      });
       ws["!merges"] = [0, 1, 2].map((k) => ({ s: { r: 0, c: k }, e: { r: 1, c: k } })).concat(ret.map((_, i) => ({ s: { r: 0, c: 3 + i * 2 }, e: { r: 0, c: 4 + i * 2 } })));
       ws["!cols"] = [{ wch: 13 }, { wch: 55 }, { wch: 18 }, ...ret.flatMap(() => [{ wch: 18 }, { wch: 50 }])];
       XLSX.utils.book_append_sheet(wb, ws, `Matching ${c}`.slice(0, 31));
