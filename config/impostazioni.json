@@ -4,7 +4,7 @@
    "paese": "IT",
    "nome": "MediaWorld",
    "url": "https://www.mediaworld.it/it/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-26T16:39:10.329Z"
+ "aggiornato": "2026-10-26T16:42:21.825Z"
 }
