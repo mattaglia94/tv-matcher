@@ -16,13 +16,13 @@
    "paese": "IT",
    "nome": "Unieuro",
    "url": "https://www.unieuro.it/online/?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "Expert",
    "url": "https://www.expert.it/it/it/exp/shop/search?terms={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-26T16:42:21.825Z"
+ "aggiornato": "2026-10-26T16:42:23.705Z"
 }
