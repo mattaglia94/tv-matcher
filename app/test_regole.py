@@ -265,6 +265,7 @@ def main():
     errori += invarianza_modello()
     errori += ponte_uk()
     errori += stesso_modello_test()
+    errori += gemelli_test()
     sys.exit(1 if errori else 0)
 
 
@@ -393,6 +394,32 @@ def banco_amazon():
         errori += perc < soglia
         print(f"{segno} banco Amazon {k}: {perc:.0f}% su {tot[k]} TV (minimo {soglia}%)")
     return errori
+
+
+def gemelli_test():
+    """MediaMarkt ha trovato il modello, Saturn no: si apre la stessa pagina su saturn.de."""
+    from nucleo import completa_gemelli
+
+    class B:
+        def __init__(self, titoli):
+            self.titoli = titoli
+
+        def verifica(self, url):
+            t = self.titoli.get(url)
+            return (bool(t), t or "", "", "", {})
+
+        def cerca(self, url, q):
+            return url, [], "ok"
+    ret = [{"nome": "MediaMarkt", "url": "https://www.mediamarkt.de/de/search.html?query={q}"},
+           {"nome": "Saturn", "url": "https://www.saturn.de/de/search.html?query={q}"}]
+    base = lambda: {"paese": "DE", "match": {"MediaMarkt": [{"modello": "65E7S", "titolo": "HISENSE 65E7S QLED 65 Zoll",
+                    "url": "https://www.mediamarkt.de/de/product/_hisense-65e7s-123456.html", "nota": ""}], "Saturn": []},
+                    "esito": {"MediaMarkt": "trovato", "Saturn": "nessun_simile"}, "dettaglio": []}
+    o1 = completa_gemelli(B({"https://www.saturn.de/de/product/_hisense-65e7s-123456.html": "HISENSE 65E7S QLED TV | SATURN"}), base(), ret, log=lambda m: None)
+    o2 = completa_gemelli(B({"https://www.saturn.de/de/product/_hisense-65e7s-123456.html": "HISENSE 65U7S Mini LED | SATURN"}), base(), ret, log=lambda m: None)
+    ok = o1["esito"]["Saturn"] == "trovato" and o1["match"]["Saturn"][0]["url"].startswith("https://www.saturn.de") and o2["esito"]["Saturn"] == "nessun_simile"
+    print(("✓" if ok else "✗") + " MediaMarkt / Saturn: controllo incrociato")
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":

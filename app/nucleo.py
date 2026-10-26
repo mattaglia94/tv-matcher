@@ -2,7 +2,7 @@
 Usato sia dall'exe/CLI (motore.py) sia dal runner del sito (web_runner.py)."""
 import re
 
-from regole import _tec_equivalenti, analizza, anno_obiettivo, confronta_identico, stesso_modello_esatto, e_accessorio, arricchisci, classe_hz, hz_diverse, confronta_param, leggi_prezzo, leggi_scheda, stesso_modello, unisci_parametri
+from regole import _cod_norm, _tec_equivalenti, analizza, anno_obiettivo, confronta_identico, stesso_modello_esatto, e_accessorio, arricchisci, classe_hz, hz_diverse, confronta_param, leggi_prezzo, leggi_scheda, stesso_modello, unisci_parametri
 
 ESITI = {"trovato": "Trovato", "non_presente": "Prodotto non presente",
          "nessun_simile": "Nessun modello simile", "errore": "Ricerca non riuscita",
@@ -527,6 +527,59 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
     return out
 
 
+# negozi dello stesso gruppo con lo stesso catalogo (stessa pagina prodotto, cambia solo il dominio)
+GEMELLI = [("MediaMarkt", "mediamarkt.de", "Saturn", "saturn.de")]
+
+
+def gemelli_da_controllare(out, nomi):
+    """Coppie (da, a) in cui un negozio gemello ha trovato modelli e l'altro no."""
+    coppie = []
+    for a, da, b, db in GEMELLI:
+        for src, d_src, dst, d_dst in ((a, da, b, db), (b, db, a, da)):
+            if src in nomi and dst in nomi and (out.get("match") or {}).get(src) and not out["match"].get(dst) \
+                    and out.get("esito", {}).get(dst) not in (None, "saltato"):
+                coppie.append((src, d_src, dst, d_dst))
+    return coppie
+
+
+def completa_gemelli(br, out, retailer, log=print):
+    """MediaMarkt e Saturn hanno lo stesso catalogo: se uno trova un modello e l'altro no,
+    si apre la stessa pagina prodotto sull'altro sito (o si cerca il codice) e, se c'è, si aggiunge."""
+    nomi = {r["nome"]: r for r in retailer}
+    for src, d_src, dst, d_dst in gemelli_da_controllare(out, nomi):
+        nuovi = []
+        for m in out["match"][src]:
+            if m.get("via") or d_src not in (m.get("url") or ""):
+                continue
+            rif = analizza(f"{m.get('modello', '')} {m.get('titolo', '')}")
+            cod = _cod_norm(m.get("modello", ""))
+
+            def stesso(testo):
+                c = analizza(testo)
+                return bool(cod and len(cod) >= 5 and cod in _cod_norm(testo)) or \
+                    (c.codice and c.pollici == rif.pollici and stesso_modello_esatto(rif, c))
+            url2 = m["url"].replace(d_src, d_dst)
+            res = br.verifica(url2)
+            trovato = url2 if res[0] and stesso(res[1]) else None
+            if not trovato and m.get("modello"):
+                _, links, _st = br.cerca(nomi[dst]["url"], m["modello"])
+                for l in links:
+                    if d_dst in l["url"] and "/product/" in l["url"] and stesso(l["testo"]):
+                        trovato = l["url"]
+                        break
+            out["dettaglio"].append({"retailer": dst, "modello": m.get("modello", ""), "url": trovato or url2,
+                                     "esito": (f"VALIDO stesso prodotto di {src}" if trovato
+                                               else f"scartato: prodotto di {src} non presente su {dst}")})
+            if trovato:
+                nota = ", ".join(x for x in [m.get("nota", ""), f"stesso prodotto di {src}"] if x)
+                nuovi.append({**m, "url": trovato, "nota": nota})
+        if nuovi:
+            out["match"][dst] = nuovi
+            out["esito"][dst] = "trovato"
+            log(f"   {dst}: {', '.join(x['modello'] for x in nuovi)} (stesso prodotto di {src})")
+    return out
+
+
 def unisci_retailer(out, parte):
     out["match"].update(parte["match"])
     out["esito"].update(parte["esito"])
@@ -546,4 +599,6 @@ def elabora_asin(br, riga, retailer, parametri, log=print, stop=lambda: False, a
         if stop():
             break
         unisci_retailer(out, confronta_retailer(br, info, r, P, out["paese"], log, stop))
+    if not stop():
+        completa_gemelli(br, out, retailer, log)
     return out

@@ -315,6 +315,12 @@
   add(/^scheda tecnica: (.+) \((\d+) voci\)$/, (m, x, n) => `spec sheet: ${x === "nessun dato utile" ? "no useful data" : x} (${n} entries)`);
   add(/^Amazon \(letto il (.+)\)$/, (m, x) => `Amazon (read on ${x})`);
   add(/^pollici codice (\d+) ≠ titolo (\d+)$/, (m, a, b) => `inches in code ${a} ≠ title ${b}`);
+  add(/^stesso prodotto di (.+)$/, (m, x) => `same product as ${x}`);
+  add(/^prodotto di (.+) non presente su (.+)$/, (m, a, b) => `${a} product not available on ${b}`);
+  add(/^Controllo incrociato MediaMarkt \/ Saturn su (\d+) ASIN$/, (m, n) => `MediaMarkt / Saturn cross-check on ${n} ASINs`);
+  add(/^Controllo MediaMarkt \/ Saturn$/, () => "MediaMarkt / Saturn check");
+  add(/^controllo MediaMarkt \/ Saturn non riuscito \((.+)\)$/, (m, x) => `MediaMarkt / Saturn check failed (${x})`);
+  add(/^(.+?): (.+) \(stesso prodotto di (.+)\)$/, (m, n, x, y) => `${n}: ${x} (same product as ${y})`);
   // registro attività
   add(/^(\d\d:\d\d:\d\d(?: \[\d+\])?\s+)(.+)$/, (m, h, x) => h + tt(x));
   add(/^(.+?): sito non leggibile, provo tramite (\S+)$/, (m, n, c) => `${n}: site not readable, trying via ${c}`);

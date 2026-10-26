@@ -332,6 +332,23 @@ def main():
         raccogli()
         if attesi > 0:
             raise RuntimeError(f"{attesi} confronti non completati (un browser si è chiuso)")
+        # MediaMarkt e Saturn (stesso gruppo, stesso catalogo): se uno ha trovato il modello e l'altro no, si ricontrolla
+        from nucleo import completa_gemelli, gemelli_da_controllare
+        da_fare = [o for o in stato["risultati"]
+                   if gemelli_da_controllare(o, {r["nome"] for r in per_paese.get(o.get("paese", ""), [])})]
+        if da_fare:
+            stato["avanzamento"]["corrente"] = "Controllo MediaMarkt / Saturn"
+            log(f"Controllo incrociato MediaMarkt / Saturn su {len(da_fare)} ASIN")
+            br = Browser(visibile=False, log=log, cache=cache)
+            for o in da_fare:
+                try:
+                    completa_gemelli(br, o, per_paese.get(o["paese"], []), log)
+                except Exception as e:  # il controllo in più non deve far fallire la ricerca
+                    log(f"   controllo MediaMarkt / Saturn non riuscito ({e})")
+                pub.salva(stato)
+            cache_nuova.update(br.cache_nuova())
+            br.chiudi()
+            br = None
         stato["stato"] = "completato"
     except Exception as e:
         stato["stato"] = "errore"
