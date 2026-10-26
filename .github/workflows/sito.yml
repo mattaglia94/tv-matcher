@@ -48,17 +48,12 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install playwright==1.56.0 openpyxl
-      - name: Installa il browser
-        timeout-minutes: 12
-        # a volte i server dei pacchetti Ubuntu si bloccano: limite di 4 minuti per tentativo, poi si riprova
-        run: |
-          for i in 1 2 3; do
-            timeout 240 python -m playwright install --with-deps chromium && exit 0
-            echo "installazione non riuscita (tentativo $i), riprovo"
-            sudo pkill -f "apt-get|dpkg" || true; sleep 3; sudo dpkg --configure -a || true
-            sudo apt-get update -o Acquire::Retries=3 || true
-          done
-          exit 1
+      - name: Prepara il browser
+        # Edge e Chrome sono già installati sulle macchine GitHub e il motore usa quelli:
+        # qui si scarica solo Chromium di riserva, senza pacchetti di sistema (che a volte si bloccano)
+        timeout-minutes: 5
+        continue-on-error: true
+        run: timeout 180 python -m playwright install chromium || echo "uso Edge/Chrome già presenti sulla macchina"
       - name: Matching
         env:
           CONFIG: ${{ inputs.config }}
