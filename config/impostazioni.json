@@ -88,37 +88,37 @@
    "paese": "UK",
    "nome": "AO.com",
    "url": "https://ao.com/search?search={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
    "nome": "Currys",
    "url": "https://www.currys.co.uk/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
    "nome": "Very",
    "url": "https://www.very.co.uk/e/q/{q}.end",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
    "nome": "Argos",
    "url": "https://www.argos.co.uk/search/{q}/",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
    "nome": "John Lewis",
    "url": "https://www.johnlewis.com/search?search-term={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
    "nome": "Joybuy-UK",
    "url": "https://www.joybuy.co.uk/search?keyword={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-10-26T16:42:23.705Z"
+ "aggiornato": "2026-10-27T08:47:02.515Z"
 }
