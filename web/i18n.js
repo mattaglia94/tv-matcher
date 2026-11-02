@@ -107,7 +107,10 @@
     "Se un sito blocca la ricerca, usa un comparatore": "If a site blocks the search, use a price comparison site", "Usa idealo come ponte": "Use idealo as a bridge",
     "Cerca il modello simile su idealo (nel Regno Unito su PriceRunner) e tiene solo le offerte di quel retailer. Il risultato è segnalato come trovato tramite servizio terzo.": "Searches for the similar model on idealo (PriceRunner in the UK) and keeps only that retailer's offers. The result is flagged as found via a third-party service.",
 
-    "Tutto pronto": "All set", "Nome della ricerca": "Search name",
+    "Tutto pronto": "All set", "Nome della ricerca": "Search name", "Rinomina": "Rename", "✎ Rinomina": "✎ Rename", "Rinomina la ricerca": "Rename the search", "Nome salvato": "Name saved",
+    "es. LG Italia novembre, Hisense DE competitor…": "e.g. LG Italy November, Hisense DE competitors…",
+    "Il nome si vede nello Storico. Si può cambiare anche dopo, dalla pagina della ricerca.": "The name shows in History. It can be changed later from the search page.",
+    "Scrivi un nome": "Type a name",
     "ASIN nella ricerca": "ASINs in the search", "durata stimata": "estimated duration", "Criteri attivi:": "Active criteria:", "Modalità:": "Mode:",
     "stessa marca": "same brand", "stessa diagonale": "same size", "stesso anno": "same year", "tecnologia": "technology", "pollici": "inches",
     "Avvia la ricerca": "Start the search", "Riusa le impostazioni": "Reuse the settings",
@@ -272,8 +275,8 @@
   add(/^Nessun ASIN trovato in (.+)$/, (m, x) => "No ASIN found in " + x);
   add(/^Nessun marketplace attivo per: (.+)\. Gli ASIN di questi paesi non verranno confrontati\.$/, (m, x) => `No active marketplace for: ${x.split(", ").map(tt).join(", ")}. ASINs from these countries won't be compared.`);
   add(/^Ci sono serie senza codice in: (.+)$/, (m, x) => "Some series have no code in: " + x);
-  add(/^(Avvio non riuscito|Impostazioni non salvate|Feedback non inviato|Catalogo non disponibile|Non riesco a leggere le ricerche|Non salvato|Stato non aggiornato): (.*)$/, (m, k, x) => ({
-    "Avvio non riuscito": "Start failed", "Impostazioni non salvate": "Settings not saved", "Feedback non inviato": "Feedback not sent",
+  add(/^(Avvio non riuscito|Nome non salvato|Impostazioni non salvate|Feedback non inviato|Catalogo non disponibile|Non riesco a leggere le ricerche|Non salvato|Stato non aggiornato): (.*)$/, (m, k, x) => ({
+    "Avvio non riuscito": "Start failed", "Nome non salvato": "Name not saved", "Impostazioni non salvate": "Settings not saved", "Feedback non inviato": "Feedback not sent",
     "Catalogo non disponibile": "Catalog not available", "Non riesco a leggere le ricerche": "Can't read the searches", "Non salvato": "Not saved",
     "Stato non aggiornato": "Status not updated" }[k]) + ": " + tt(x));
   add(/^(.+): modelli mancanti$/, (m, x) => `${x}: missing models`);

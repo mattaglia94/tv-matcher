@@ -729,14 +729,15 @@
     const perParte = Math.ceil(coperti.length / parti), negoziMedi = coppie / Math.max(1, coperti.length);
     const minuti = Math.max(3, Math.round(3 + perParte * negoziMedi * 0.25));
     const attivi = T.parametriInfo.flatMap((g) => g.voci).filter((v) => P[v.chiave].attivo && (!v.solo || v.solo === P.modalita));
-    if (!b.nome) b.nome = window.I18N && I18N.lingua === "en"
+    const nomeProposto = window.I18N && I18N.lingua === "en"
       ? `${new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" })} search`
       : `Ricerca ${new Date().toLocaleDateString("it-IT", { month: "long", year: "numeric" })}`;
     box.innerHTML = `
       <section class="scheda">
         <h2>Tutto pronto</h2>
         <p class="tenue" style="margin-top:6px">Il motore gira su GitHub: puoi chiudere la pagina, cambiare dispositivo o perdere la connessione. Ritrovi la ricerca nello <a href="#/esecuzioni">Storico</a>.</p>
-        <label class="campo" style="margin-top:20px">Nome della ricerca<input type="text" id="nomeRicerca" maxlength="80" value="${esc(b.nome)}"></label>
+        <label class="campo" style="margin-top:20px">Nome della ricerca<input type="text" id="nomeRicerca" maxlength="80" value="${esc(b.nome || "")}" placeholder="es. LG Italia novembre, Hisense DE competitor…"></label>
+        <p class="piccolo tenue" style="margin-top:6px">Il nome si vede nello Storico. Si può cambiare anche dopo, dalla pagina della ricerca.</p>
         <div class="riepilogo">
           <div><strong>${coperti.length}</strong><span class="tenue piccolo">ASIN da confrontare${coperti.length < b.asin.length ? ` (${b.asin.length - coperti.length} senza marketplace)` : ""}</span></div>
           <div><strong>${ret.length}</strong><span class="tenue piccolo">marketplace in ${[...new Set(ret.map((r) => r.paese))].map((c) => paese(c).bandiera).join(" ")}</span></div>
@@ -757,10 +758,11 @@
       const anim = animazioneAvvio(coperti.length, ret.length);
       try {
         const { id } = await api("run", { metodo: "POST", corpo: {
-          nome: b.nome, retailer: ret, parametri: P,
+          nome: (b.nome || "").trim() || nomeProposto, retailer: ret, parametri: P,
           asin: coperti.map((a) => ({ asin: a.asin, paese: a.paese, ...(a.modello ? { modello: a.modello } : {}),
             ...(a.nome ? { nome: a.nome } : {}), ...(a.solo && a.solo.length ? { solo: a.solo } : {}) })),
         } });
+        b.nome = ""; salvaBozza();  // la prossima ricerca riparte senza nome
         const recenti = memoria.leggi("recenti", []);
         memoria.scrivi("recenti", [id, ...recenti].slice(0, 20));
         await anim.ok();
@@ -897,7 +899,7 @@
       <div class="vista" id="runPagina" data-id="${esc(id)}">
         <div class="run-testa">
           <div>
-            <h1>${esc(nome)}</h1>
+            <div class="titolo-run"><h1 id="runNome">${esc(nome)}</h1><button class="btn fantasma piccolo" type="button" id="btnRinomina" title="Rinomina" aria-label="Rinomina la ricerca">✎ Rinomina</button></div>
             <div class="meta">
               <span class="chip ${st.chip}" id="runStato">${st.testo}</span>
               <span class="chip">Avviata ${dataBreve(s.iniziato || gh.creato)}</span>
@@ -929,6 +931,27 @@
     document.getElementById("btnAnnulla").onclick = async () => {
       if (!confirm("Annullare la ricerca? I risultati già trovati restano consultabili.")) return;
       try { await api("annulla", { metodo: "POST", corpo: { id } }); toast("Annullamento richiesto"); } catch (e) { toast(e.message, "errore"); }
+    };
+    document.getElementById("btnRinomina").onclick = () => {
+      const h = document.getElementById("runNome"), vecchio = h.textContent;
+      const box = document.createElement("form");
+      box.className = "rinomina";
+      box.innerHTML = `<input type="text" maxlength="80" value="${esc(vecchio)}" aria-label="Nome della ricerca"><button class="btn primario piccolo" type="submit">Salva</button><button class="btn fantasma piccolo" type="button">Annulla</button>`;
+      const titolo = h.parentNode; titolo.hidden = true; titolo.after(box);
+      const inp = box.querySelector("input"); inp.focus(); inp.select();
+      const chiudi = () => { box.remove(); titolo.hidden = false; };
+      box.querySelector("button[type=button]").onclick = chiudi;
+      box.onsubmit = async (e) => {
+        e.preventDefault();
+        const nuovo = inp.value.trim();
+        if (!nuovo || nuovo === vecchio) return chiudi();
+        box.querySelector("button[type=submit]").disabled = true;
+        try {
+          const r = await api("rinomina", { metodo: "POST", corpo: { id, nome: nuovo } });
+          h.textContent = r.nome; if (S.statoRun) S.statoRun.nome = r.nome;
+          toast("Nome salvato", "ok"); chiudi();
+        } catch (err) { toast("Nome non salvato: " + err.message, "errore"); box.querySelector("button[type=submit]").disabled = false; }
+      };
     };
     document.getElementById("btnDuplica").onclick = () => {
       const c = S.statoRun.config;

@@ -40,5 +40,7 @@ module.exports = async (req, res) => {
   if (parti.length) stato = unisci(await Promise.all(parti.map((n) => leggiJSON(`runs/${id}/${n}`))));
   else if (file.includes("stato.json")) stato = await leggiJSON(`runs/${id}/stato.json`);
   if (!stato && !github) return send(res, 404, { errore: "Ricerca non trovata" });
+  const nomi = (await leggiJSON("config/nomi.json")) || {};
+  if (nomi[id]) { if (stato) stato.nome = nomi[id]; if (github) github.nome = nomi[id]; }
   return send(res, 200, { stato, github });
 };

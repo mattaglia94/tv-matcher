@@ -596,3 +596,8 @@ label.btn { display: inline-flex; align-items: center; gap: 8px; }
 .login-box .lingua-sel { justify-self: end; }
 .match-tile.coperto { opacity: .55; }
 .seg-coperto { background: #4A4570; }
+.titolo-run { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.titolo-run .btn { opacity: .7; }
+.titolo-run .btn:hover { opacity: 1; }
+.rinomina { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.rinomina input { font-size: 1.4rem; font-weight: 700; max-width: 520px; flex: 1 1 260px; }
