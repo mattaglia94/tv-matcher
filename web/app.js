@@ -173,7 +173,7 @@
   const PASSI = [
     { titolo: "ASIN", sotto: "Incolla o carica la lista" },
     { titolo: "Retailer", sotto: "Dove cercare" },
-    { titolo: "Somiglianza", sotto: "Quando due TV sono simili" },
+    { titolo: "Tipo di ricerca", sotto: "Scegli se cercare il modello identico o uno simile" },
     { titolo: "Avvio", sotto: "Riepilogo e run" },
   ];
 

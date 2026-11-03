@@ -65,7 +65,7 @@
     "Ripristinare l'elenco originale dei retailer? Le modifiche fatte andranno perse.": "Restore the original list of retailers? Your changes will be lost.",
     "Nessun retailer per questo paese.": "No retailer for this country.",
 
-    "Tipo di ricerca": "Search type", "Stesso modello": "Same model", "Modello simile": "Similar model",
+    "Tipo di ricerca": "Search type", "Scegli se cercare il modello identico o uno simile": "Choose whether to look for the exact or a similar model", "Stesso modello": "Same model", "Modello simile": "Similar model",
     "Cerca nei negozi il modello Amazon con il codice identico": "Searches the stores for the Amazon model with the identical code",
     "Cerca un modello simile per caratteristiche, con le regole qui sotto": "Searches for a model with similar features, using the rules below",
     "Cosa cerchi?": "What are you looking for?", "Modalità di ricerca": "Search mode",
