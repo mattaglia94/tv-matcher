@@ -853,7 +853,7 @@ PARAMETRI_DEFAULT = {
     # ricerca "simile" (regole di somiglianza) oppure "identico" (lo stesso modello dell'ASIN, anche con varianti di codice)
     "ricerca": "simile",
     # modo "asin": stesso anno del TV Amazon (se non si ricava, vale "valore"); modo "fisso": sempre "valore"
-    "anno": {"attivo": True, "modo": "asin", "valore": __import__("datetime").date.today().year, "accetta_ignoto": True},
+    "anno": {"attivo": True, "modo": "asin", "valore": __import__("datetime").date.today().year, "accetta_ignoto": False},
     "pro": {"attivo": True},
     "dolby_vision": {"attivo": False},
     "hdr10plus": {"attivo": False},

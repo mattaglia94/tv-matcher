@@ -1,4 +1,4 @@
-// Dati predefiniti del sito: marketplace, parametri di somiglianza, regole di famiglia.
+// Dati predefiniti del sito: retailer, parametri di somiglianza, regole di famiglia.
 window.TVM = {
   paesi: [
     { codice: "IT", nome: "Italia", bandiera: "🇮🇹", amazon: "amazon.it" },
@@ -49,7 +49,7 @@ window.TVM = {
     tecnologia: { attivo: true, equivalenze: [["MINILED", "NEOQLED"]] },
     risoluzione: { attivo: true },
     refresh: { attivo: true },
-    anno: { attivo: true, modo: "asin", valore: new Date().getFullYear(), accetta_ignoto: true },
+    anno: { attivo: true, modo: "asin", valore: new Date().getFullYear(), accetta_ignoto: false },
     pro: { attivo: true },
     dolby_vision: { attivo: false },
     hdr10plus: { attivo: false },

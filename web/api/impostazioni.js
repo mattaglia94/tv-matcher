@@ -1,4 +1,4 @@
-// GET/PUT: marketplace e preset dei parametri, condivisi tra tutti i dispositivi
+// GET/PUT: retailer e preset dei parametri, condivisi tra tutti i dispositivi
 const { send, protezione, leggiJSON, scriviJSON, leggiCorpo } = require("./_lib");
 
 const PERCORSO = "config/impostazioni.json";

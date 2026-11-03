@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
   const asin = (b.asin || []).filter((a) => /^B0[A-Z0-9]{8}$/.test(a.asin));
   const retailer = (b.retailer || []).filter((r) => r.attivo !== false && r.url && r.nome);
   if (!asin.length) return send(res, 400, { errore: "Nessun ASIN valido" });
-  if (!retailer.length) return send(res, 400, { errore: "Nessun marketplace selezionato" });
+  if (!retailer.length) return send(res, 400, { errore: "Nessun retailer selezionato" });
   const ora = new Date();
   const id = ora.toISOString().replace(/[-:T]/g, "").slice(0, 14) + "-" + Math.random().toString(36).slice(2, 6);
   const nome = String(b.nome || "").replace(/\|/g, "/").slice(0, 80);

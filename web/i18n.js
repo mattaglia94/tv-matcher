@@ -30,13 +30,13 @@
     "Parti da una lista di ASIN Amazon e trova, per ogni retailer europeo, lo stesso modello oppure la TV più simile.": "Start from a list of Amazon ASINs and find, at each European retailer, the same model or the most similar TV.",
     "Incolla gli ASIN": "Paste the ASINs",
     "Copia da Excel, scrivi uno per riga o carica un file. Il paese si legge dalla riga oppure si sceglie per ogni ASIN.": "Copy from Excel, type one per line or upload a file. The country is read from the line or chosen for each ASIN.",
-    "Scegli marketplace e criteri": "Choose marketplaces and criteria",
+    "Scegli retailer e criteri": "Choose retailers and criteria",
     "Spunta i retailer su cui cercare e decidi quando due TV sono simili: pollici, tecnologia, fascia, anno e altro.": "Tick the retailers to search and decide when two TVs are similar: inches, technology, tier, year and more.",
     "Avvia e chiudi pure": "Start it and feel free to close",
     "La ricerca gira su GitHub: le ricerche grandi si dividono su più macchine in parallelo (100 ASIN in circa 20–30 minuti). Puoi chiudere il browser: la ritrovi nello Storico, con i risultati da scaricare in Excel.": "The search runs on GitHub: large searches are split across several machines in parallel (100 ASINs in about 20–30 minutes). You can close the browser: you will find it in History, with the results to download in Excel.",
 
     // --- nuova ricerca: passi
-    "ASIN": "ASIN", "Incolla o carica la lista": "Paste or upload the list", "Marketplace": "Marketplaces", "Dove cercare": "Where to search",
+    "ASIN": "ASIN", "Incolla o carica la lista": "Paste or upload the list", "Retailer": "Retailers", "Dove cercare": "Where to search",
     "Somiglianza": "Similarity", "Quando due TV sono simili": "When two TVs are similar", "Riepilogo e run": "Summary and run",
     "Parti da una lista di ASIN Amazon: il motore trova, per ogni retailer, lo stesso modello oppure la TV più simile.": "Start from a list of Amazon ASINs: the engine finds, at each retailer, the same model or the most similar TV.",
     "Quali TV vuoi confrontare?": "Which TVs do you want to compare?",
@@ -57,13 +57,13 @@
     "Scrivi il modello accanto a ogni ASIN evidenziato, poi avvia": "Type the model next to each highlighted ASIN, then start",
     "Impostazioni caricate: controlla e avvia": "Settings loaded: check and start",
 
-    "Su quali marketplace cercare?": "Which marketplaces should be searched?",
-    "Ogni ASIN viene cercato sui marketplace attivi del suo paese. Le modifiche valgono per tutti e restano salvate.": "Each ASIN is searched on the active marketplaces of its country. Changes apply to everyone and are saved.",
+    "Su quali retailer cercare?": "Which retailers should be searched?",
+    "Ogni ASIN viene cercato sui retailer attivi del suo paese. Le modifiche valgono per tutti e restano salvate.": "Each ASIN is searched on the active retailers of its country. Changes apply to everyone and are saved.",
     "Ripristina originale": "Restore original", "Come scrivere l'URL di ricerca": "How to write the search URL",
     "Apri il sito del retailer, cerca ad esempio": "Open the retailer's website, search for example",
     "e copia l'indirizzo della pagina dei risultati. Poi sostituisci il testo cercato con": "and copy the address of the results page. Then replace the searched text with",
-    "Ripristinare l'elenco originale dei marketplace? Le modifiche fatte andranno perse.": "Restore the original list of marketplaces? Your changes will be lost.",
-    "Nessun marketplace per questo paese.": "No marketplace for this country.",
+    "Ripristinare l'elenco originale dei retailer? Le modifiche fatte andranno perse.": "Restore the original list of retailers? Your changes will be lost.",
+    "Nessun retailer per questo paese.": "No retailer for this country.",
 
     "Tipo di ricerca": "Search type", "Stesso modello": "Same model", "Modello simile": "Similar model",
     "Cerca nei negozi il modello Amazon con il codice identico": "Searches the stores for the Amazon model with the identical code",
@@ -78,8 +78,8 @@
     "Pochi risultati, molto vicini": "Few results, very close", "Consigliato: le regole del documento": "Recommended: the rules of the document",
     "Più risultati, anche meno simili": "More results, even less similar", "Impostazioni personalizzate": "Custom settings",
     "Personalizza i criteri": "Customise the criteria", "interruttori singoli, preset salvati, opzioni dei risultati": "individual switches, saved presets, result options",
-    "Preset salvati": "Saved presets", "Standard (regole del documento)": "Standard (document rules)", "Salva come preset": "Save as preset",
-    "Ripristina predefiniti": "Restore defaults", "Nome del preset (es. Largo, Solo stessa marca):": "Preset name (e.g. Broad, Same brand only):",
+    "Preset salvati": "Saved presets", "Standard (Stretto)": "Standard (Strict)", "Salva come preset": "Save as preset",
+    "Ripristina predefiniti": "Restore defaults", "Nome del preset (es. Solo stessa marca):": "Preset name (e.g. Same brand only):",
     "Eliminare il preset?": "Delete the preset?",
     "Schermo": "Screen", "Caratteristiche": "Features", "Risultati": "Results",
     "Pollici": "Inches", "Il modello simile deve avere la stessa diagonale. Con la tolleranza accetti anche diagonali vicine.": "The similar model must have the same screen size. With a tolerance, nearby sizes are accepted too.",
@@ -100,7 +100,7 @@
     "Dolby Vision": "Dolby Vision", "Se l'ASIN Amazon lo supporta, anche il modello simile deve supportarlo.": "If the Amazon ASIN supports it, the similar model must support it too.",
     "Se l'ASIN Amazon ha HDMI 2.1, anche il modello simile deve averlo.": "If the Amazon ASIN has HDMI 2.1, the similar model must have it too.",
     "Si leggono dalla pagina prodotto: servono la verifica pagina accesa e qualche secondo in più per prodotto.": "Read from the product page: page check must be on, and it takes a few more seconds per product.",
-    "Modelli simili da mostrare per ogni marketplace": "Similar models to show for each marketplace", "1, il più vicino": "1, the closest",
+    "Modelli simili da mostrare per ogni retailer": "Similar models to show for each retailer", "1, il più vicino": "1, the closest",
     "Fino a 2": "Up to 2", "Fino a 3": "Up to 3",
     "Verifica la pagina prodotto": "Check the product page", "Verifica pagina prodotto": "Check product page",
     "Apre ogni link scelto: controlla che sia attivo e legge anno e caratteristiche. Più lento ma più affidabile.": "Opens each chosen link: checks it is live and reads year and features. Slower but more reliable.",
@@ -126,8 +126,8 @@
     "GitHub sta preparando la macchina: di solito serve meno di un minuto. Puoi chiudere la pagina, la ricerca prosegue.": "GitHub is preparing the machine: it usually takes less than a minute. You can close the page, the search continues.",
     "Completa i modelli mancanti": "Fill in the missing models", "Scarica xlsx": "Download xlsx", "Scarica Excel": "Download Excel",
     "ASIN elaborati": "ASINs processed", "modelli simili trovati": "similar models found", "con almeno un modello simile": "with at least one similar model",
-    "confronti con esito positivo": "successful comparisons", "Esiti per marketplace": "Outcomes per marketplace", "Registro attività": "Activity log",
-    "Filtra per esito": "Filter by outcome", "Con simili": "With similar", "Tutti i marketplace": "All marketplaces", "Vista": "View",
+    "confronti con esito positivo": "successful comparisons", "Esiti per retailer": "Outcomes per retailer", "Registro attività": "Activity log",
+    "Filtra per esito": "Filter by outcome", "Con simili": "With similar", "Tutti i retailer": "All retailers", "Vista": "View",
     "Schede": "Cards", "Tabella": "Table", "Modello Amazon": "Amazon model", "Apri su Amazon": "Open on Amazon",
     "Nessun ASIN corrisponde ai filtri.": "No ASIN matches the filters.", "Nessun risultato salvato.": "No saved results.",
     "Saltato": "Skipped", "Già mappato": "Already mapped", "Copertura già presente: non cercato.": "Already covered: not searched.", "Trovato": "Found", "Prodotto non presente": "Product not available", "Nessun modello simile": "No similar model",
@@ -177,10 +177,10 @@
     "Rivedi il tutorial": "Replay the tutorial", "Inserisci gli ASIN": "Enter the ASINs",
     "Incolla la lista o carica un CSV/Excel. Ogni ASIN ha un paese: lo leggo dalla riga (es.": "Paste the list or upload a CSV/Excel file. Each ASIN has a country: it is read from the line (e.g.",
     ") o uso il paese predefinito. Se Amazon non risponde, scrivi a mano il modello nella colonna facoltativa.": ") or the default country is used. If Amazon doesn't respond, type the model in the optional column.",
-    "Scegli i marketplace": "Choose the marketplaces",
+    "Scegli i retailer": "Choose the retailers",
     "Spunta i retailer su cui cercare. Puoi modificare un URL, aggiungerne di nuovi o disattivarli: le modifiche valgono per tutti e restano salvate.": "Tick the retailers to search. You can edit a URL, add new ones or disable them: changes apply to everyone and are saved.",
     "Imposta la somiglianza": "Set the similarity",
-    "Scegli se cerchi un'alternativa della stessa marca o un concorrente equivalente, poi quanto stretto deve essere il confronto: Stretto, Bilanciato (le regole del documento) o Largo. Per regolare i singoli criteri apri \"Personalizza i criteri\".": "Choose whether you want an alternative from the same brand or an equivalent competitor, then how strict the comparison should be: Strict, Balanced (the document rules) or Broad. To adjust individual criteria open \"Customise the criteria\".",
+    "Scegli se cerchi un'alternativa della stessa marca o un concorrente equivalente. Il confronto è sempre stretto: stessa diagonale, tecnologia, famiglia, risoluzione, frequenza e anno. Per regolare i singoli criteri apri \"Personalizza i criteri\".": "Choose whether you want an alternative from the same brand or an equivalent competitor. The comparison is always strict: same size, technology, family, resolution, refresh rate and year. To adjust individual criteria open \"Customise the criteria\".",
     "Tieni aggiornato il Catalogo": "Keep the Catalog up to date",
     "Nel Catalogo trovi marche e serie con tecnologia e fascia. Puoi aggiungere una marca, una serie nuova o correggere una fascia: vale dalla ricerca successiva. Con \"Prova un titolo\" vedi subito come viene classificata una TV.": "The Catalog lists brands and series with technology and tier. You can add a brand or a new series, or fix a tier: it applies from the next search. With \"Try a title\" you see right away how a TV is classified.",
     "Avvia e attendi": "Start and wait",
@@ -189,7 +189,7 @@
     "Per ogni ASIN vedi i modelli simili per retailer con foto e link. \"Anno da verificare\" segnala i modelli il cui anno non si ricava dal codice. Scarica l'Excel con un foglio per paese più il foglio Dettaglio con tutti i candidati scartati e il motivo.": "For each ASIN you see the similar models per retailer with photo and link. \"Year to be checked\" flags models whose year can't be read from the code. Download the Excel with one sheet per country plus the Details sheet with all discarded candidates and the reason.",
     "Domande frequenti": "Frequently asked questions",
     "Perché un retailer non trova niente?": "Why does a retailer find nothing?",
-    "Il sito può aver cambiato l'indirizzo di ricerca o bloccato l'accesso automatico. Controlla l'URL nel passo Marketplace e guarda il foglio Dettaglio: \"ricerca: timeout\" o \"HTTP 403\" indicano un blocco.": "The site may have changed its search address or blocked automated access. Check the URL in the Marketplaces step and look at the Details sheet: \"search: timeout\" or \"HTTP 403\" indicate a block.",
+    "Il sito può aver cambiato l'indirizzo di ricerca o bloccato l'accesso automatico. Controlla l'URL nel passo Retailer e guarda il foglio Dettaglio: \"ricerca: timeout\" o \"HTTP 403\" indicano un blocco.": "The site may have changed its search address or blocked automated access. Check the URL in the Retailers step and look at the Details sheet: \"search: timeout\" or \"HTTP 403\" indicate a block.",
     "Amazon ha bloccato la lettura (captcha): cosa faccio?": "Amazon blocked the read (captcha): what do I do?",
     "Amazon a volte blocca le visite automatiche. Il motore riprova con indirizzi diversi e poi cerca l'ASIN sul web. Se non basta, apri la ricerca, premi \"Completa i modelli mancanti\", scrivi il modello accanto all'ASIN (basta il codice, es. 85U8075F) e avvia. Il modello resta salvato per le ricerche successive.": "Amazon sometimes blocks automated visits. The engine retries with different addresses and then looks up the ASIN on the web. If that isn't enough, open the search, press \"Fill in the missing models\", type the model next to the ASIN (the code is enough, e.g. 85U8075F) and start. The model stays saved for later searches.",
     "Cosa vuol dire \"anno da verificare\"?": "What does \"year to be checked\" mean?",
@@ -247,9 +247,9 @@
   add(/^Mostra solo (.+)$/, (m, x) => "Show only " + x);
   add(/^Modello di (.+)$/, (m, x) => "Model of " + x);
   add(/^Paese di (.+)$/, (m, x) => "Country of " + x);
-  add(/^Tutti i marketplace (.+)$/, (m, x) => "All marketplaces " + tt(x));
-  add(/^\+ Aggiungi marketplace in (.+)$/, (m, x) => "+ Add marketplace in " + tt(x));
-  add(/^marketplace in (.*)$/, (m, x) => "marketplaces in " + x);
+  add(/^Tutti i retailer (.+)$/, (m, x) => "All retailers " + tt(x));
+  add(/^\+ Aggiungi retailer in (.+)$/, (m, x) => "+ Add retailer in " + tt(x));
+  add(/^retailer in (.*)$/, (m, x) => "retailers in " + x);
   add(/^ASIN nella ricerca(.*)$/, (m, x) => "ASINs in the search" + x);
   add(/^(\d+)\/(\d+) attivi$/, (m, a, b) => `${a}/${b} active`);
   add(/^(\d+) serie$/, (m, n) => `${n} series`);
@@ -273,7 +273,7 @@
   add(/^Il sito di (.+) non era leggibile: offerta trovata sul comparatore (\S+)(?: \((.+)\))?\. Il link passa da (\S+)\.$/, (m, n, c, p, c2) => `${n}'s website wasn't readable: offer found on the comparison site ${c}${p ? ` (${p})` : ""}. The link goes through ${c2}.`);
   add(/^(.*?) ?Cercato anche su (\S+): nessuna offerta di (.+) per un modello simile\.$/, (m, a, c, n) => `${a ? tt(a) + " " : ""}Also searched on ${c}: no offer from ${n} for a similar model.`);
   add(/^Nessun ASIN trovato in (.+)$/, (m, x) => "No ASIN found in " + x);
-  add(/^Nessun marketplace attivo per: (.+)\. Gli ASIN di questi paesi non verranno confrontati\.$/, (m, x) => `No active marketplace for: ${x.split(", ").map(tt).join(", ")}. ASINs from these countries won't be compared.`);
+  add(/^Nessun retailer attivo per: (.+)\. Gli ASIN di questi paesi non verranno confrontati\.$/, (m, x) => `No active retailer for: ${x.split(", ").map(tt).join(", ")}. ASINs from these countries won't be compared.`);
   add(/^Ci sono serie senza codice in: (.+)$/, (m, x) => "Some series have no code in: " + x);
   add(/^(Avvio non riuscito|Nome non salvato|Impostazioni non salvate|Feedback non inviato|Catalogo non disponibile|Non riesco a leggere le ricerche|Non salvato|Stato non aggiornato): (.*)$/, (m, k, x) => ({
     "Avvio non riuscito": "Start failed", "Nome non salvato": "Name not saved", "Impostazioni non salvate": "Settings not saved", "Feedback non inviato": "Feedback not sent",
@@ -327,7 +327,7 @@
   add(/^Solo: (.+)$/, (m, x) => "Only: " + x);
   add(/^(\d+) ASIN dal file: cerco solo sui competitor non mappati(?: \((\d+) senza competitor da cercare\))?$/, (m, n, k) => `${n} ASINs from the file: searching only the unmapped competitors${k ? ` (${k} with no competitor to search)` : ""}`);
   add(/^Competitor non riconosciuti: (.+)$/, (m, x) => "Unrecognised competitors: " + x);
-  add(/^(\d+) ASIN dal file: cerco solo sui competitor non mappati, gli altri marketplace risultano "Già mappato"\.$/, (m, n) => `${n} ASINs from the file: searching only the unmapped competitors, the other marketplaces show "Already mapped".`);
+  add(/^(\d+) ASIN dal file: cerco solo sui competitor non mappati, gli altri retailer risultano "Già mappato"\.$/, (m, n) => `${n} ASINs from the file: searching only the unmapped competitors, the other retailers show "Already mapped".`);
   add(/^Già mappato: (\d+)$/, (m, n) => `Already mapped: ${n}`);
   // registro attività
   add(/^(\d\d:\d\d:\d\d(?: \[\d+\])?\s+)(.+)$/, (m, h, x) => h + tt(x));

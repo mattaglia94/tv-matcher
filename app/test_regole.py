@@ -182,6 +182,8 @@ CASI_ASIN = [  # (riga ASIN come la manda il sito, anagrafica, titolo Amazon) ->
 
 
 STRETTO = {"modalita": "stessa_marca", "verifica_url": True, "anno": {"attivo": True, "valore": 2026, "accetta_ignoto": False}}
+# anno non ricavabile accettato (non più un livello del sito, ma resta un'opzione dei criteri personalizzati)
+TOLLERANTE = {"modalita": "stessa_marca", "verifica_url": True, "anno": {"attivo": True, "modo": "asin", "accetta_ignoto": True}}
 F75 = "Xiaomi TV F Pro 75 (190 cm), 4K UHD QLED, Smart TV, Fire OS8, HDR10+, MEMC"
 OTTO75 = "Xiaomi L75MB-APEU 189 cm (75 Zoll) 4K Ultra HD Smart TV Google TV"
 SCHEDE = [  # (titolo ASIN, scheda Amazon, titolo negozio, scheda negozio, parametri, simile?, campo Amazon atteso)
@@ -189,10 +191,10 @@ SCHEDE = [  # (titolo ASIN, scheda Amazon, titolo negozio, scheda negozio, param
     # MediaWorld reale: A Pro 75 a 60 Hz; l'F Pro 75 su Amazon dice "Game Boost 120Hz" (non è la frequenza del pannello)
     ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED,Smart TV,Fire TV, HDR10+, Modalità Game Boost 120Hz, MEMC", {},
      "Xiaomi A Pro 75 2026 ELA5840EU TV QLED piatto 75 UHD 4K",
-     {"frequenza di aggiornamento": "60 Hz", "risoluzione": "3840 x 2160 Pixel"}, {"modalita": "stessa_marca", "verifica_url": True}, True, None),
+     {"frequenza di aggiornamento": "60 Hz", "risoluzione": "3840 x 2160 Pixel"}, TOLLERANTE, True, None),
     (F75, {}, OTTO75, {"modelljahr": "2025"}, STRETTO, False, None),
     (F75, {}, OTTO75, {}, STRETTO, False, None),                                   # anno sconosciuto ovunque: Stretto scarta
-    (F75, {}, OTTO75, {}, {"modalita": "stessa_marca", "verifica_url": True}, True, None),  # Bilanciato: da verificare
+    (F75, {}, OTTO75, {}, TOLLERANTE, True, None),  # Bilanciato: da verificare
     (F75, {}, OTTO75, {"modelljahr": "2026", "auflösung": "1920 x 1080"}, STRETTO, False, None),  # risoluzione diversa
     (F75, {}, OTTO75, {"modelljahr": "2026", "bildschirmdiagonale": "165 cm"}, STRETTO, False, None),  # in realtà un 65"
     (F75, {"anno del modello": "2026"}, OTTO75, {"modelljahr": "2026"}, STRETTO, True, ("anno", 2026)),  # anno ASIN da scheda
@@ -207,7 +209,7 @@ SCHEDE = [  # (titolo ASIN, scheda Amazon, titolo negozio, scheda negozio, param
     (F75, {"_idealo": [("Xiaomi A Pro 75 (2025)", "nessun codice"), ("Xiaomi A Pro 75 (2026)", "nessun codice")]},
      OTTO75, {"_stato": 400}, STRETTO, False, None),
     (F75, {}, OTTO75, {"_stato": 400}, STRETTO, False, None),                    # anno introvabile: Stretto scarta
-    (F75, {}, OTTO75, {"_stato": 400}, {"modalita": "stessa_marca", "verifica_url": True}, True, None),
+    (F75, {}, OTTO75, {"_stato": 400}, TOLLERANTE, True, None),
     (F75, {}, OTTO75, {"_stato": 404}, {"modalita": "stessa_marca", "verifica_url": True}, False, None),  # prodotto sparito
 ]
 

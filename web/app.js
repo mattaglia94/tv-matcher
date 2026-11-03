@@ -171,7 +171,7 @@
   // ------------------------------------------------------------------ nuova ricerca
   const PASSI = [
     { titolo: "ASIN", sotto: "Incolla o carica la lista" },
-    { titolo: "Marketplace", sotto: "Dove cercare" },
+    { titolo: "Retailer", sotto: "Dove cercare" },
     { titolo: "Somiglianza", sotto: "Quando due TV sono simili" },
     { titolo: "Avvio", sotto: "Riepilogo e run" },
   ];
@@ -201,7 +201,7 @@
       </div>`;
     app.querySelectorAll("[data-passo]").forEach((b) => (b.onclick = () => { location.hash = `#/nuova/${b.dataset.passo}`; }));
     const box = document.getElementById("contenutoPasso");
-    ({ 1: passoAsin, 2: passoMarketplace, 3: passoParametri, 4: passoAvvio })[p](box);
+    ({ 1: passoAsin, 2: passoRetailer, 3: passoParametri, 4: passoAvvio })[p](box);
   }
 
   function piedePasso(box, { avanti = true, testoAvanti = "Avanti", bloccato = false } = {}) {
@@ -251,7 +251,7 @@
       const tes = righe[h].map((c) => String(c).trim());
       const col = (re) => tes.findIndex((c) => re.test(c));
       const cA = col(/^asin$/i), cC = col(/unmapped|competitor|non mappat/i), cN = col(/item name|titolo|title|nome articolo|product name/i),
-        cM = col(/brand|vendor|marca/i), cP = col(/^(country|paese|marketplace|mp)$/i);
+        cM = col(/brand|vendor|marca/i), cP = col(/^(country|paese|retailer|mp)$/i);
       const out = [];
       for (const r of righe.slice(h + 1)) {
         const asin = (String(r[cA]).toUpperCase().match(/B0[A-Z0-9]{8}/) || [])[0];
@@ -272,7 +272,7 @@
     const b = S.bozza, idx = new Map(b.asin.map((a, i) => [a.asin + a.paese, i]));
     const daFare = lista.filter((a) => a.solo.length), ignoti = [...new Set(lista.flatMap((a) => a.ignoti))];
     daFare.forEach((a) => { const { ignoti: _x, ...v } = a; if (idx.has(a.asin + a.paese)) b.asin[idx.get(a.asin + a.paese)] = { ...b.asin[idx.get(a.asin + a.paese)], ...v }; else b.asin.push({ ...v, _nuovo: true }); });
-    // i marketplace da cercare vanno accesi
+    // i retailer da cercare vanno accesi
     const servono = new Set(daFare.flatMap((a) => a.solo.map((n) => n + "|" + a.paese)));
     let accesi = 0;
     S.impostazioni.retailer.forEach((r) => { if (servono.has(r.nome + "|" + r.paese) && !r.attivo) { r.attivo = true; accesi++; } });
@@ -430,10 +430,10 @@
     piedePasso(box, { bloccato: !b.asin.length });
   }
 
-  // ---------------- passo 2: marketplace
+  // ---------------- passo 2: retailer
   function paesiAsin() { return [...new Set(S.bozza.asin.map((a) => a.paese))]; }
 
-  function passoMarketplace(box) {
+  function passoRetailer(box) {
     const R = S.impostazioni.retailer;
     const usati = paesiAsin();
     const ordine = [...usati, ...T.paesi.map((p) => p.codice).filter((c) => !usati.includes(c))];
@@ -441,8 +441,8 @@
     box.innerHTML = `
       <section class="scheda">
         <div class="scheda-testa">
-          <div><h2>Su quali marketplace cercare?</h2>
-          <p class="tenue">Ogni ASIN viene cercato sui marketplace attivi del suo paese. Le modifiche valgono per tutti e restano salvate.</p></div>
+          <div><h2>Su quali retailer cercare?</h2>
+          <p class="tenue">Ogni ASIN viene cercato sui retailer attivi del suo paese. Le modifiche valgono per tutti e restano salvate.</p></div>
           <div class="riga-strumenti" style="margin:0">
             <button class="btn piccolo" type="button" id="tuttiOn">Seleziona tutti</button>
             <button class="btn piccolo" type="button" id="tuttiOff">Deseleziona tutti</button>
@@ -457,7 +457,7 @@
             return `
               <details class="paese-blocco" ${usati.includes(c) || S.apertiPaese?.has(c) ? "open" : ""} data-blocco="${c}">
                 <summary class="paese-testa">
-                  <label class="check"><input type="checkbox" data-paese-tutti="${c}" ${lista.length && att === lista.length ? "checked" : ""} aria-label="Tutti i marketplace ${p.nome}"></label>
+                  <label class="check"><input type="checkbox" data-paese-tutti="${c}" ${lista.length && att === lista.length ? "checked" : ""} aria-label="Tutti i retailer ${p.nome}"></label>
                   <span class="bandiera" aria-hidden="true">${p.bandiera}</span>
                   <h3>${esc(p.nome)}</h3>
                   ${usati.includes(c) ? `<span class="chip info">${S.bozza.asin.filter((a) => a.paese === c).length} ASIN</span>` : '<span class="chip">nessun ASIN</span>'}
@@ -466,7 +466,7 @@
                 </summary>
                 ${lista.map((r) => rigaRetailer(r)).join("")}
                 <div class="retailer-riga" style="grid-template-columns:1fr">
-                  <button class="btn fantasma piccolo" type="button" data-aggiungi="${c}" style="justify-self:start">+ Aggiungi marketplace in ${esc(p.nome)}</button>
+                  <button class="btn fantasma piccolo" type="button" data-aggiungi="${c}" style="justify-self:start">+ Aggiungi retailer in ${esc(p.nome)}</button>
                 </div>
               </details>`;
           }).join("")}
@@ -479,10 +479,10 @@
     S.apertiPaese = S.apertiPaese || new Set();
     box.querySelectorAll("[data-blocco]").forEach((d) => d.addEventListener("toggle", () => { if (d.open) S.apertiPaese.add(d.dataset.blocco); else S.apertiPaese.delete(d.dataset.blocco); }));
     box.querySelectorAll("[data-paese-tutti]").forEach((x) => x.addEventListener("click", (e) => e.stopPropagation()));
-    const ridisegna = () => { salvaImpostazioni(); passoMarketplace(box); };
+    const ridisegna = () => { salvaImpostazioni(); passoRetailer(box); };
     box.querySelectorAll("[data-attiva]").forEach((x) => (x.onchange = () => { R[Number(x.dataset.attiva)].attivo = x.checked; ridisegna(); }));
     box.querySelectorAll("[data-paese-tutti]").forEach((x) => (x.onchange = () => { R.forEach((r) => { if (r.paese === x.dataset.paeseTutti) r.attivo = x.checked; }); ridisegna(); }));
-    box.querySelectorAll("[data-modifica]").forEach((x) => (x.onclick = () => { R[Number(x.dataset.modifica)]._mod = true; passoMarketplace(box); }));
+    box.querySelectorAll("[data-modifica]").forEach((x) => (x.onclick = () => { R[Number(x.dataset.modifica)]._mod = true; passoRetailer(box); }));
     box.querySelectorAll("[data-elimina]").forEach((x) => (x.onclick = () => {
       const r = R[Number(x.dataset.elimina)];
       if (confirm(`Eliminare ${r.nome}?`)) { R.splice(Number(x.dataset.elimina), 1); ridisegna(); }
@@ -496,20 +496,20 @@
     box.querySelectorAll("[data-annulla]").forEach((x) => (x.onclick = () => {
       const i = Number(x.dataset.annulla);
       if (!R[i].nome) R.splice(i, 1); else delete R[i]._mod;
-      passoMarketplace(box);
+      passoRetailer(box);
     }));
-    box.querySelectorAll("[data-aggiungi]").forEach((x) => (x.onclick = () => { R.push({ paese: x.dataset.aggiungi, nome: "", url: "", attivo: true, _mod: true }); passoMarketplace(box); }));
+    box.querySelectorAll("[data-aggiungi]").forEach((x) => (x.onclick = () => { R.push({ paese: x.dataset.aggiungi, nome: "", url: "", attivo: true, _mod: true }); passoRetailer(box); }));
     document.getElementById("tuttiOn").onclick = () => { R.forEach((r) => (r.attivo = true)); ridisegna(); };
     document.getElementById("tuttiOff").onclick = () => { R.forEach((r) => (r.attivo = false)); ridisegna(); };
     document.getElementById("ripristina").onclick = () => {
-      if (confirm("Ripristinare l'elenco originale dei marketplace? Le modifiche fatte andranno perse.")) { S.impostazioni.retailer = clona(T.retailer); salvaImpostazioni(); passoMarketplace(box); }
+      if (confirm("Ripristinare l'elenco originale dei retailer? Le modifiche fatte andranno perse.")) { S.impostazioni.retailer = clona(T.retailer); salvaImpostazioni(); passoRetailer(box); }
     };
     const scoperti = usati.filter((c) => !R.some((r) => r.paese === c && r.attivo));
     if (scoperti.length) {
       const avv = document.createElement("p");
       avv.className = "chip attenzione";
       avv.style.cssText = "margin-top:16px;white-space:normal;padding:8px 14px";
-      avv.textContent = `Nessun marketplace attivo per: ${scoperti.map((c) => paese(c).nome).join(", ")}. Gli ASIN di questi paesi non verranno confrontati.`;
+      avv.textContent = `Nessun retailer attivo per: ${scoperti.map((c) => paese(c).nome).join(", ")}. Gli ASIN di questi paesi non verranno confrontati.`;
       box.querySelector(".scheda").appendChild(avv);
     }
     piedePasso(box, { bloccato: !usati.some((c) => R.some((r) => r.paese === c && r.attivo)) });
@@ -520,7 +520,7 @@
       return `
         <div class="retailer-riga modifica">
           <span></span>
-          <input type="text" data-n value="${esc(r.nome)}" placeholder="Nome" aria-label="Nome marketplace">
+          <input type="text" data-n value="${esc(r.nome)}" placeholder="Nome" aria-label="Nome retailer">
           <input type="url" data-u value="${esc(r.url)}" placeholder="https://…{q}" aria-label="URL di ricerca">
           <span style="display:flex;gap:6px"><button class="btn primario piccolo" type="button" data-salva="${r.i}">Salva</button><button class="btn fantasma piccolo" type="button" data-annulla="${r.i}">Annulla</button></span>
         </div>`;
@@ -544,12 +544,6 @@
     stretto: { titolo: "Stretto", testo: "Pochi risultati, molto vicini", imposta: (P) => {
       Object.assign(P.pollici, { attivo: true, tolleranza: 0 }); ["famiglia", "tecnologia", "risoluzione", "refresh", "pro"].forEach((k) => (P[k].attivo = true));
       Object.assign(P.anno, { attivo: true, accetta_ignoto: false }); } },
-    bilanciato: { titolo: "Bilanciato", testo: "Consigliato: le regole del documento", imposta: (P) => {
-      Object.assign(P.pollici, { attivo: true, tolleranza: 0 }); ["famiglia", "tecnologia", "risoluzione", "refresh", "pro"].forEach((k) => (P[k].attivo = true));
-      Object.assign(P.anno, { attivo: true, accetta_ignoto: true }); } },
-    largo: { titolo: "Largo", testo: "Più risultati, anche meno simili", imposta: (P) => {
-      Object.assign(P.pollici, { attivo: true, tolleranza: 3 }); ["famiglia", "tecnologia", "risoluzione"].forEach((k) => (P[k].attivo = true));
-      P.refresh.attivo = false; P.pro.attivo = false; P.anno.attivo = false; } },
   };
   function livelloDi(P) {
     for (const [k, l] of Object.entries(LIVELLI)) {
@@ -625,14 +619,6 @@
               <strong>${m.titolo}</strong><span>${m.testo}</span>
             </label>`).join("")}
         </div>
-        <h3 style="margin-top:26px">Quanto devono essere simili?</h3>
-        <div class="livelli" role="radiogroup" aria-label="Livello di somiglianza">
-          ${Object.entries(LIVELLI).map(([k, l], i) => `
-            <button type="button" role="radio" aria-checked="${liv === k}" class="livello ${liv === k ? "scelto" : ""}" data-liv="${k}">
-              <span class="livello-barre" aria-hidden="true">${[0, 1, 2].map((j) => `<i class="${j <= 2 - i ? "on" : ""}"></i>`).join("")}</span>
-              <strong>${l.titolo}</strong><span class="tenue piccolo">${l.testo}</span>
-            </button>`).join("")}
-        </div>
         <p class="frase-criteri" id="fraseCriteri">${frase(P)}${liv === "personalizzato" ? ' <span class="chip attenzione">personalizzato</span>' : ""}</p>`}
       </section>
       <details class="scheda avanzate" ${liv === "personalizzato" || S.avanzateAperte ? "open" : ""} id="avanzate">
@@ -640,7 +626,7 @@
         <div class="preset-barra" style="margin-top:14px">
           <select id="selPreset" aria-label="Preset salvati">
             <option value="">Impostazioni personalizzate</option>
-            <option value="__std">Standard (regole del documento)</option>
+            <option value="__std">Standard (Stretto)</option>
             ${preset.map((p, i) => `<option value="${i}" ${S.bozza.preset === String(i) ? "selected" : ""}>${esc(p.nome)}</option>`).join("")}
           </select>
           <button class="btn piccolo" type="button" id="salvaPreset">Salva come preset</button>
@@ -658,7 +644,7 @@
       <section class="gruppo-param">
         <h3>Risultati</h3>
         <div class="opz-avanzate" style="margin-top:14px">
-          <label class="campo">Modelli simili da mostrare per ogni marketplace
+          <label class="campo">Modelli simili da mostrare per ogni retailer
             <select data-num="max_match"><option value="1" ${P.max_match == 1 ? "selected" : ""}>1, il più vicino</option><option value="2" ${P.max_match == 2 ? "selected" : ""}>Fino a 2</option><option value="3" ${P.max_match == 3 ? "selected" : ""}>Fino a 3</option></select>
           </label>
           <div class="param" style="grid-template-columns:auto 1fr;padding:12px">
@@ -673,7 +659,6 @@
       </section>
       </details>`;
     document.getElementById("avanzate").addEventListener("toggle", (e) => { S.avanzateAperte = e.target.open; });
-    box.querySelectorAll("[data-liv]").forEach((x) => (x.onclick = () => { LIVELLI[x.dataset.liv].imposta(P); cambia(); }));
     const cambia = () => { S.bozza.preset = ""; salvaBozza(); passoParametri(box); };
     const imposta = (path, val) => { const [a, b] = path.split("."); if (b) P[a][b] = val; else P[a] = val; };
     box.querySelectorAll('input[name="modalita"]').forEach((x) => (x.onchange = () => { P.modalita = x.value; cambia(); }));
@@ -698,7 +683,7 @@
       salvaBozza(); passoParametri(box);
     };
     document.getElementById("salvaPreset").onclick = () => {
-      const nome = prompt("Nome del preset (es. Largo, Solo stessa marca):");
+      const nome = prompt("Nome del preset (es. Solo stessa marca):");
       if (!nome) return;
       S.impostazioni.preset = preset;
       preset.push({ nome: nome.slice(0, 40), parametri: clona(P) });
@@ -739,12 +724,12 @@
         <label class="campo" style="margin-top:20px">Nome della ricerca<input type="text" id="nomeRicerca" maxlength="80" value="${esc(b.nome || "")}" placeholder="es. LG Italia novembre, Hisense DE competitor…"></label>
         <p class="piccolo tenue" style="margin-top:6px">Il nome si vede nello Storico. Si può cambiare anche dopo, dalla pagina della ricerca.</p>
         <div class="riepilogo">
-          <div><strong>${coperti.length}</strong><span class="tenue piccolo">ASIN da confrontare${coperti.length < b.asin.length ? ` (${b.asin.length - coperti.length} senza marketplace)` : ""}</span></div>
-          <div><strong>${ret.length}</strong><span class="tenue piccolo">marketplace in ${[...new Set(ret.map((r) => r.paese))].map((c) => paese(c).bandiera).join(" ")}</span></div>
+          <div><strong>${coperti.length}</strong><span class="tenue piccolo">ASIN da confrontare${coperti.length < b.asin.length ? ` (${b.asin.length - coperti.length} senza retailer)` : ""}</span></div>
+          <div><strong>${ret.length}</strong><span class="tenue piccolo">retailer in ${[...new Set(ret.map((r) => r.paese))].map((c) => paese(c).bandiera).join(" ")}</span></div>
           <div><strong>~${minuti} min</strong><span class="tenue piccolo">durata stimata${parti > 1 ? ` · ${parti} parti in parallelo` : ""}</span></div>
         </div>
         <p class="piccolo tenue">Modalità: <span class="chip info">${nomeModalita(P)}</span></p>
-        ${conFile ? `<p class="piccolo tenue">${conFile} ASIN dal file: cerco solo sui competitor non mappati, gli altri marketplace risultano "Già mappato".</p>` : ""}
+        ${conFile ? `<p class="piccolo tenue">${conFile} ASIN dal file: cerco solo sui competitor non mappati, gli altri retailer risultano "Già mappato".</p>` : ""}
         <p class="piccolo tenue">Criteri attivi: ${attivi.map((v) => `<span class="chip">${v.titolo}${v.chiave === "pollici" && P.pollici.tolleranza ? ` ±${P.pollici.tolleranza}"` : ""}${v.chiave === "anno" ? (P.anno.modo === "fisso" ? ` ${P.anno.valore}` : " = Amazon") : ""}</span>`).join(" ") || "nessuno"}</p>
         <div style="margin-top:26px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
           <button class="btn primario grande" type="button" id="btnAvvia" ${coperti.length ? "" : "disabled"}>${ICONE.play} Avvia la ricerca</button>
@@ -783,7 +768,7 @@
     const el = document.createElement("div");
     el.className = "avvio-sfondo";
     el.setAttribute("role", "status");
-    const fasi = ["Preparo la configurazione", `Invio ${nAsin} ASIN e ${nRet} marketplace`, "Accendo il motore su GitHub"];
+    const fasi = ["Preparo la configurazione", `Invio ${nAsin} ASIN e ${nRet} retailer`, "Accendo il motore su GitHub"];
     el.innerHTML = `
       <div class="avvio">
         <div class="avvio-tv" aria-hidden="true">
@@ -957,6 +942,7 @@
       const c = S.statoRun.config;
       if (!c) return toast("Configurazione non ancora disponibile", "errore");
       S.bozza = { asin: c.asin.map((a) => ({ modello: "", ...a })), nome: "", paeseDefault: c.asin[0]?.paese || "IT", parametri: normalizzaParametri(c.parametri), preset: "" };
+      LIVELLI.stretto.imposta(S.bozza.parametri);  // la somiglianza è sempre Stretta
       salvaBozza();
       toast("Impostazioni caricate: controlla e avvia", "ok");
       location.hash = "#/nuova/1";
@@ -995,7 +981,7 @@
     const copertura = ris.reduce((n, r) => n + Object.keys(r.match || {}).length, 0);
     const pos = ris.reduce((n, r) => n + Object.values(r.match || {}).filter((m) => m.length).length, 0);
     const perc = copertura ? Math.round((pos / copertura) * 100) : 0;
-    // esiti per marketplace: barra impilata
+    // esiti per retailer: barra impilata
     const GRUPPI = [["trovato", "Trovato", "ok"], ["nessun_simile", "Nessun simile", "medio"], ["non_presente", "Non presente", "neutro"], ["errore", "Non leggibile", "errore"], ["saltato", "Saltato", "spento"], ["coperto", "Già mappato", "coperto"]];
     const gruppo = (e) => (e === "illeggibile" ? "errore" : e || "saltato");
     const perRet = retNomi.filter((x) => ris.some((r) => r.paese === x.paese)).map((x) => {
@@ -1010,7 +996,7 @@
         <div class="kpi-anello"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15.9" class="anello-fondo"/><circle cx="18" cy="18" r="15.9" class="anello-valore" style="--p:${perc}"/></svg><div><strong data-num-anim="${perc}" data-suff="%">${perc}%</strong><span class="tenue piccolo">confronti con esito positivo</span></div></div>
       </div>
       ${perRet.length ? `<section class="scheda grafico-ret">
-        <div class="grafico-testa"><h3>Esiti per marketplace</h3>
+        <div class="grafico-testa"><h3>Esiti per retailer</h3>
           <span class="legenda">${GRUPPI.filter(([g]) => perRet.some((x) => x.c[g])).map(([g, n, cl]) => `<span><i class="seg-${cl}"></i>${n}</span>`).join("")}</span></div>
         ${perRet.map((x) => `
           <button type="button" class="riga-ret ${filtri.retailer === x.r.nome ? "attiva" : ""}" data-filtra-ret="${esc(x.r.nome)}" title="Mostra solo ${esc(x.r.nome)}">
@@ -1022,7 +1008,7 @@
       <div class="filtri">
         <input type="search" id="fTesto" placeholder="Cerca ASIN o modello" value="${esc(filtri.testo)}" aria-label="Cerca">
         ${paesiR.length > 1 ? `<select id="fPaese"><option value="">Tutti i paesi</option>${paesiR.map((c) => `<option value="${c}" ${filtri.paese === c ? "selected" : ""}>${paese(c).bandiera} ${paese(c).nome}</option>`).join("")}</select>` : ""}
-        <select id="fRet"><option value="">Tutti i marketplace</option>${retNomi.map((r) => `<option ${filtri.retailer === r.nome ? "selected" : ""}>${esc(r.nome)}</option>`).join("")}</select>
+        <select id="fRet"><option value="">Tutti i retailer</option>${retNomi.map((r) => `<option ${filtri.retailer === r.nome ? "selected" : ""}>${esc(r.nome)}</option>`).join("")}</select>
         <span class="segmenti" role="group" aria-label="Filtra per esito">
           ${[["", "Tutti"], ["match", "Con simili"], ["nomatch", "Senza"], ["errori", "Da verificare"]].map(([v, n]) => `<button type="button" data-fe="${v}" class="${filtri.esito === v ? "attivo" : ""}">${n}</button>`).join("")}
         </span>
@@ -1145,7 +1131,7 @@
                   <button type="button" class="segnala" data-segnala="${esc(JSON.stringify({ asin: r.asin, paese: r.paese, negozio: ret.nome, modello: x.modello, link: x.url, amazon: a.modello || "" }))}">Segnala questo abbinamento</button>
                   ${altri.length ? `<div class="altri">Anche: ${altri.map((y) => `<a href="${esc(y.url)}" target="_blank" rel="noopener">${esc(y.modello)}</a>`).join(", ")}</div>` : ""}
                 </div>`;
-            }).join("") || '<p class="tenue">Nessun marketplace per questo paese.</p>'}
+            }).join("") || '<p class="tenue">Nessun retailer per questo paese.</p>'}
           </div>
         </article>`;
     }).join("");
@@ -1472,7 +1458,7 @@
   const SLIDE = [
     { titolo: "Benvenuto in TV Finder", testo: "Parti da una lista di ASIN Amazon e trova, per ogni retailer europeo, lo stesso modello oppure la TV più simile.", colore: "var(--giallo)" },
     { titolo: "Incolla gli ASIN", testo: "Copia da Excel, scrivi uno per riga o carica un file. Il paese si legge dalla riga oppure si sceglie per ogni ASIN.", colore: "var(--ciano)" },
-    { titolo: "Scegli marketplace e criteri", testo: "Spunta i retailer su cui cercare e decidi quando due TV sono simili: pollici, tecnologia, fascia, anno e altro.", colore: "var(--verde)" },
+    { titolo: "Scegli retailer e criteri", testo: "Spunta i retailer su cui cercare e decidi quando due TV sono simili: pollici, tecnologia, fascia, anno e altro.", colore: "var(--verde)" },
     { titolo: "Avvia e chiudi pure", testo: "La ricerca gira su GitHub: le ricerche grandi si dividono su più macchine in parallelo (100 ASIN in circa 20–30 minuti). Puoi chiudere il browser: la ritrovi nello Storico, con i risultati da scaricare in Excel.", colore: "var(--magenta)" },
   ];
   function tutorial() {
@@ -1520,15 +1506,15 @@
         <div class="guida">
           <ol>
             <li><div><h3>Inserisci gli ASIN</h3><p>Incolla la lista o carica un CSV/Excel. Ogni ASIN ha un paese: lo leggo dalla riga (es. <code>B0F457MQCQ;IT</code>) o uso il paese predefinito. Se Amazon non risponde, scrivi a mano il modello nella colonna facoltativa.</p></div></li>
-            <li><div><h3>Scegli i marketplace</h3><p>Spunta i retailer su cui cercare. Puoi modificare un URL, aggiungerne di nuovi o disattivarli: le modifiche valgono per tutti e restano salvate.</p></div></li>
-            <li><div><h3>Imposta la somiglianza</h3><p>Scegli se cerchi un'alternativa della stessa marca o un concorrente equivalente, poi quanto stretto deve essere il confronto: Stretto, Bilanciato (le regole del documento) o Largo. Per regolare i singoli criteri apri "Personalizza i criteri".</p></div></li>
+            <li><div><h3>Scegli i retailer</h3><p>Spunta i retailer su cui cercare. Puoi modificare un URL, aggiungerne di nuovi o disattivarli: le modifiche valgono per tutti e restano salvate.</p></div></li>
+            <li><div><h3>Imposta la somiglianza</h3><p>Scegli se cerchi un'alternativa della stessa marca o un concorrente equivalente. Il confronto è sempre stretto: stessa diagonale, tecnologia, famiglia, risoluzione, frequenza e anno. Per regolare i singoli criteri apri "Personalizza i criteri".</p></div></li>
             <li><div><h3>Tieni aggiornato il Catalogo</h3><p>Nel Catalogo trovi marche e serie con tecnologia e fascia. Puoi aggiungere una marca, una serie nuova o correggere una fascia: vale dalla ricerca successiva. Con "Prova un titolo" vedi subito come viene classificata una TV.</p></div></li>
             <li><div><h3>Avvia e attendi</h3><p>Il motore gira su GitHub. Una ricerca da 10 ASIN su 4 retailer richiede circa 10–15 minuti; da 100 ASIN circa 20–30 minuti, perché si divide su più macchine in parallelo. Puoi chiudere la pagina: la pillola verde in alto e lo Storico ti riportano all'avanzamento.</p></div></li>
             <li><div><h3>Leggi e scarica</h3><p>Per ogni ASIN vedi i modelli simili per retailer con foto e link. "Anno da verificare" segnala i modelli il cui anno non si ricava dal codice. Scarica l'Excel con un foglio per paese più il foglio Dettaglio con tutti i candidati scartati e il motivo.</p></div></li>
           </ol>
           <aside class="scheda faq">
             <h3>Domande frequenti</h3>
-            <details><summary>Perché un retailer non trova niente?</summary><p>Il sito può aver cambiato l'indirizzo di ricerca o bloccato l'accesso automatico. Controlla l'URL nel passo Marketplace e guarda il foglio Dettaglio: "ricerca: timeout" o "HTTP 403" indicano un blocco.</p></details>
+            <details><summary>Perché un retailer non trova niente?</summary><p>Il sito può aver cambiato l'indirizzo di ricerca o bloccato l'accesso automatico. Controlla l'URL nel passo Retailer e guarda il foglio Dettaglio: "ricerca: timeout" o "HTTP 403" indicano un blocco.</p></details>
             <details><summary>Amazon ha bloccato la lettura (captcha): cosa faccio?</summary><p>Amazon a volte blocca le visite automatiche. Il motore riprova con indirizzi diversi e poi cerca l'ASIN sul web. Se non basta, apri la ricerca, premi "Completa i modelli mancanti", scrivi il modello accanto all'ASIN (basta il codice, es. 85U8075F) e avvia. Il modello resta salvato per le ricerche successive.</p></details>
                         <details><summary>Cosa vuol dire "anno da verificare"?</summary><p>Il codice non dichiara l'anno e il titolo non lo riporta. Il modello rispetta gli altri criteri: verifica l'anno sulla pagina prodotto o spegni "Accetta anno non ricavabile".</p></details>
             <details><summary>Posso lanciare più ricerche insieme?</summary><p>Sì, girano in parallelo su GitHub. Ognuna compare nello Storico con il suo stato.</p></details>
@@ -1642,6 +1628,8 @@
   }
 
   // ------------------------------------------------------------------ avvio
+  // parametri salvati prima dell'unico livello Stretto (Bilanciato/Largo): si riparte da Stretto, una volta sola
+  if (!memoria.leggi("solo_stretto", false)) { LIVELLI.stretto.imposta(S.bozza.parametri); salvaBozza(); memoria.scrivi("solo_stretto", true); }
   (async () => {
     try {
       const { autenticato } = await api("login");
