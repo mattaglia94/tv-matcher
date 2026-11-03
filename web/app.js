@@ -13,6 +13,7 @@
     const out = Object.assign(clona(T.parametriDefault), p || {});
     if (vecchio && !(p && p.modalita)) out.modalita = vecchio.attivo === false ? "concorrente" : "stessa_marca";
     delete out.stessa_marca;
+    out.modalita = "stessa_marca";  // si cercano solo alternative della stessa marca
     return out;
   }
   const paese = (c) => T.paesi.find((p) => p.codice === c) || { codice: c, nome: c, bandiera: "🏳️" };
@@ -610,15 +611,6 @@
             </label>`).join("")}
         </div>
         ${P.ricerca === "identico" ? `<p class="frase-criteri" id="fraseCriteri">${frase(P)}</p>` : `
-        <h3 style="margin-top:26px">Cosa cerchi?</h3>
-        <div class="modalita" role="radiogroup" aria-label="Modalità di ricerca">
-          ${T.modalita.map((m) => `
-            <label class="modalita-opz ${P.modalita === m.valore ? "scelta" : ""}">
-              <input type="radio" name="modalita" value="${m.valore}" ${P.modalita === m.valore ? "checked" : ""}>
-              <span class="modalita-icona" aria-hidden="true">${m.valore === "concorrente" ? "⇄" : "↻"}</span>
-              <strong>${m.titolo}</strong><span>${m.testo}</span>
-            </label>`).join("")}
-        </div>
         <p class="frase-criteri" id="fraseCriteri">${frase(P)}${liv === "personalizzato" ? ' <span class="chip attenzione">personalizzato</span>' : ""}</p>`}
       </section>
       <details class="scheda avanzate" ${liv === "personalizzato" || S.avanzateAperte ? "open" : ""} id="avanzate">
@@ -1507,7 +1499,7 @@
           <ol>
             <li><div><h3>Inserisci gli ASIN</h3><p>Incolla la lista o carica un CSV/Excel. Ogni ASIN ha un paese: lo leggo dalla riga (es. <code>B0F457MQCQ;IT</code>) o uso il paese predefinito. Se Amazon non risponde, scrivi a mano il modello nella colonna facoltativa.</p></div></li>
             <li><div><h3>Scegli i retailer</h3><p>Spunta i retailer su cui cercare. Puoi modificare un URL, aggiungerne di nuovi o disattivarli: le modifiche valgono per tutti e restano salvate.</p></div></li>
-            <li><div><h3>Imposta la somiglianza</h3><p>Scegli se cerchi un'alternativa della stessa marca o un concorrente equivalente. Il confronto è sempre stretto: stessa diagonale, tecnologia, famiglia, risoluzione, frequenza e anno. Per regolare i singoli criteri apri "Personalizza i criteri".</p></div></li>
+            <li><div><h3>Imposta la somiglianza</h3><p>Si cercano alternative della stessa marca, con confronto sempre stretto: stessa diagonale, tecnologia, famiglia, risoluzione, frequenza e anno. Per regolare i singoli criteri apri "Personalizza i criteri".</p></div></li>
             <li><div><h3>Tieni aggiornato il Catalogo</h3><p>Nel Catalogo trovi marche e serie con tecnologia e fascia. Puoi aggiungere una marca, una serie nuova o correggere una fascia: vale dalla ricerca successiva. Con "Prova un titolo" vedi subito come viene classificata una TV.</p></div></li>
             <li><div><h3>Avvia e attendi</h3><p>Il motore gira su GitHub. Una ricerca da 10 ASIN su 4 retailer richiede circa 10–15 minuti; da 100 ASIN circa 20–30 minuti, perché si divide su più macchine in parallelo. Puoi chiudere la pagina: la pillola verde in alto e lo Storico ti riportano all'avanzamento.</p></div></li>
             <li><div><h3>Leggi e scarica</h3><p>Per ogni ASIN vedi i modelli simili per retailer con foto e link. "Anno da verificare" segnala i modelli il cui anno non si ricava dal codice. Scarica l'Excel con un foglio per paese più il foglio Dettaglio con tutti i candidati scartati e il motivo.</p></div></li>

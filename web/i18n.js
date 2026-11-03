@@ -180,7 +180,7 @@
     "Scegli i retailer": "Choose the retailers",
     "Spunta i retailer su cui cercare. Puoi modificare un URL, aggiungerne di nuovi o disattivarli: le modifiche valgono per tutti e restano salvate.": "Tick the retailers to search. You can edit a URL, add new ones or disable them: changes apply to everyone and are saved.",
     "Imposta la somiglianza": "Set the similarity",
-    "Scegli se cerchi un'alternativa della stessa marca o un concorrente equivalente. Il confronto è sempre stretto: stessa diagonale, tecnologia, famiglia, risoluzione, frequenza e anno. Per regolare i singoli criteri apri \"Personalizza i criteri\".": "Choose whether you want an alternative from the same brand or an equivalent competitor. The comparison is always strict: same size, technology, family, resolution, refresh rate and year. To adjust individual criteria open \"Customise the criteria\".",
+    "Si cercano alternative della stessa marca, con confronto sempre stretto: stessa diagonale, tecnologia, famiglia, risoluzione, frequenza e anno. Per regolare i singoli criteri apri \"Personalizza i criteri\".": "Alternatives from the same brand are searched, always with a strict comparison: same size, technology, family, resolution, refresh rate and year. To adjust individual criteria open \"Customise the criteria\".",
     "Tieni aggiornato il Catalogo": "Keep the Catalog up to date",
     "Nel Catalogo trovi marche e serie con tecnologia e fascia. Puoi aggiungere una marca, una serie nuova o correggere una fascia: vale dalla ricerca successiva. Con \"Prova un titolo\" vedi subito come viene classificata una TV.": "The Catalog lists brands and series with technology and tier. You can add a brand or a new series, or fix a tier: it applies from the next search. With \"Try a title\" you see right away how a TV is classified.",
     "Avvia e attendi": "Start and wait",
@@ -215,6 +215,13 @@
     "Grazie! Feedback inviato": "Thanks! Feedback sent", "Stato aggiornato": "Status updated", "Scrivi il feedback": "Write your feedback",
     "Impostazioni salvate": "Settings saved",
 
+    "Il modello alternativo deve essere della stessa famiglia (es. Hisense E7 = QLED Entry, LG NANO = UHD Premium).": "The alternative model must be from the same family (e.g. Hisense E7 = QLED Entry, LG NANO = UHD Premium).",
+    "Il concorrente deve essere della stessa fascia (base, entry, media, premium, top). Una fascia di distanza è ammessa ma segnalata, e vince sempre la fascia identica.": "The competitor must be in the same tier (base, entry, mid, premium, top). One tier apart is allowed but flagged, and the identical tier always wins.",
+    "Solo modelli dello stesso anno della TV Amazon (oppure di un anno fisso a scelta). L'anno si ricava dal codice (Samsung/Metz: H = 2026, Hisense: S = 2026, LG OLED: C6 = 2026) o dal titolo.": "Only models from the same year as the Amazon TV (or a fixed year of your choice). The year is read from the code (Samsung/Metz: H = 2026, Hisense: S = 2026, LG OLED: C6 = 2026) or from the title.",
+    "nessuna": "none", "nessuno": "none", "ricerca in corso": "search running",
+    "Mini-LED (stesse fasce di QN)": "Mini-LED (same tiers as QN)", "QN 3 cifre": "QN 3 digits", "M + numero": "M + number",
+    "Neo QLED 8K (Entry <800, Mid 800–949, Premium 990)": "Neo QLED 8K (Entry <800, Mid 800–949, Premium 990)",
+    "Ricerca ottobre 2026": "October 2026 search", "Ricerca novembre 2026": "November 2026 search",
     // --- note del motore
     "altra serie": "other series", "pagina non verificabile": "page could not be checked", "anno da verificare": "year to be checked",
     "tecnologia da verificare": "technology to be checked", "riconosciuto dalle caratteristiche": "recognised from features",
