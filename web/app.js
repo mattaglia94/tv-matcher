@@ -880,7 +880,6 @@
             <div class="meta">
               <span class="chip ${st.chip}" id="runStato">${st.testo}</span>
               <span class="chip">Avviata ${dataBreve(s.iniziato || gh.creato)}</span>
-              ${gh.url ? `<a class="chip" href="${esc(gh.url)}" target="_blank" rel="noopener">Dettagli tecnici su GitHub</a>` : ""}
             </div>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">

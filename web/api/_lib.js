@@ -102,7 +102,7 @@ async function elencoRun(quanti = 50) {
     const [id, ...nome] = String(w.display_title || "").split(" | ");
     return {
       id: id.trim(), nome: nome.join(" | ").trim(), github_id: w.id,
-      status: w.status, conclusion: w.conclusion, creato: w.created_at, aggiornato: w.updated_at, url: w.html_url,
+      status: w.status, conclusion: w.conclusion, creato: w.created_at, aggiornato: w.updated_at,
     };
   });
 }
