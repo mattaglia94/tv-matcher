@@ -191,7 +191,23 @@ def ponte_idealo(br, info, r, P, paese, out, max_m, log=print):
                 return chiave in n
             # nomi corti (AO) devono aprire il testo; gli altri possono stare poco dopo (logo, "Valid until...")
             return n.startswith(chiave) or (len(chiave) >= 4 and chiave in n[:40])
-        off = next((o for o in offerte if del_negozio(o)), None)
+        # la scheda del comparatore può raccogliere più diagonali (es. "Sony BRAVIA 2 II" 43/50/55):
+        # l'offerta del negozio deve essere proprio quella TV (stessa diagonale; con Stesso modello, stesso codice)
+        def coerente(o):
+            t = analizza(o.get("testo", ""))
+            if t.pollici and c.pollici and t.pollici != c.pollici:
+                return False
+            if identico and t.codice and t.marca == info.marca and "caratteristiche" not in t.note \
+                    and not stesso_modello_esatto(info, t):
+                return False
+            return True
+        del_neg = [o for o in offerte if del_negozio(o)]
+        off = next((o for o in del_neg if coerente(o)), None)
+        for o in del_neg:
+            if not coerente(o):
+                t = analizza(o.get("testo", ""))
+                out["dettaglio"].append({"retailer": r["nome"], "modello": t.codice or c.codice, "pollici": t.pollici, "url": url, "ricerca": dom,
+                                         "esito": f"scartato: l'offerta {r['nome']} sul comparatore è un altro modello ({t.codice or ''} {t.pollici or '?'}\")".replace("( ", "(")})
         out["dettaglio"].append({"retailer": r["nome"], "modello": c.codice, "famiglia": c.famiglia, "pollici": c.pollici,
                                  "anno": c.anno, "url": url, "ricerca": f"{dom}",
                                  "esito": (f"VALIDO via {dom}: offerta {r['nome']} {off.get('prezzo', '')}".strip() if off

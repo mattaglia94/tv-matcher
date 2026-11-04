@@ -325,6 +325,7 @@
   add(/^scheda tecnica: (.+) \((\d+) voci\)$/, (m, x, n) => `spec sheet: ${x === "nessun dato utile" ? "no useful data" : x} (${n} entries)`);
   add(/^Amazon \(letto il (.+)\)$/, (m, x) => `Amazon (read on ${x})`);
   add(/^pollici codice (\d+) ≠ titolo (\d+)$/, (m, a, b) => `inches in code ${a} ≠ title ${b}`);
+  add(/^l'offerta (.+) sul comparatore è un altro modello \((.*)\)$/, (m, n, x) => `the ${n} offer on the comparison site is a different model (${x})`);
   add(/^stesso prodotto di (.+)$/, (m, x) => `same product as ${x}`);
   add(/^prodotto di (.+) non presente su (.+)$/, (m, a, b) => `${a} product not available on ${b}`);
   add(/^Controllo incrociato MediaMarkt \/ Saturn su (\d+) ASIN$/, (m, n) => `MediaMarkt / Saturn cross-check on ${n} ASINs`);

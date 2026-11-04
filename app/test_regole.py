@@ -268,6 +268,7 @@ def main():
     errori += ponte_uk()
     errori += stesso_modello_test()
     errori += gemelli_test()
+    errori += ponte_diagonale_test()
     sys.exit(1 if errori else 0)
 
 
@@ -396,6 +397,32 @@ def banco_amazon():
         errori += perc < soglia
         print(f"{segno} banco Amazon {k}: {perc:.0f}% su {tot[k]} TV (minimo {soglia}%)")
     return errori
+
+
+def ponte_diagonale_test():
+    """Feedback: scheda idealo "Sony BRAVIA 2 II" con più diagonali, l'offerta PcComponentes era il 43": non va presa per il 50"."""
+    from nucleo import ponte_idealo
+
+    class B:
+        def __init__(self, offerte):
+            self.o = offerte
+
+        def idealo_cerca(self, dom, q):
+            return [{"url": "https://www.idealo.es/precios/212017846/sony-bravia-2-ii.html", "testo": "Sony BRAVIA 2 II 50 2026 4K LED"}]
+
+        def idealo_offerte(self, url):
+            return self.o
+    amz = analizza("Sony BRAVIA 2 II 50 Pulgadas TV 4K Smart TV (Google TV), 50S20M2, Modelo 2026", "K50S20M2PB", "Sony")
+    P = unisci_parametri({"modalita": "stessa_marca", "anno": {"attivo": True, "modo": "asin", "accetta_ignoto": True}})
+    r = {"nome": "PcComponentes", "url": "https://www.pccomponentes.com/search/?query={q}"}
+    o43 = {"url": "https://www.idealo.es/relocator/x", "negozio": "PcComponentes", "testo": "TV Sony LED K-43S25M2 43\" 4K UltraHD 60Hz Smart TV Google TV 480,92 €", "prezzo": "480,92 €"}
+    o50 = {"url": "https://www.idealo.es/relocator/y", "negozio": "PcComponentes", "testo": "TV Sony LED K-50S25M2 50\" 4K UltraHD Smart TV Google TV", "prezzo": ""}
+    out = {"dettaglio": []}
+    v1 = ponte_idealo(B([o43]), amz, r, P, "ES", out, 1, log=lambda m: None)
+    v2 = ponte_idealo(B([o43, o50]), amz, r, P, "ES", {"dettaglio": []}, 1, log=lambda m: None)
+    ok = not v1 and v2 and v2[0]["url"].endswith("/y")
+    print(("✓" if ok else "✗") + " comparatore: offerta di un'altra diagonale scartata" + ("" if ok else f" {v1} {v2} {out['dettaglio'][-2:]}"))
+    return 0 if ok else 1
 
 
 def gemelli_test():
