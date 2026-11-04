@@ -4,7 +4,7 @@
    "paese": "IT",
    "nome": "MediaWorld",
    "url": "https://www.mediaworld.it/it/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
@@ -16,13 +16,13 @@
    "paese": "IT",
    "nome": "Unieuro",
    "url": "https://www.unieuro.it/online/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Expert",
    "url": "https://www.expert.it/it/it/exp/shop/search?terms={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-04T13:15:56.111Z"
+ "aggiornato": "2026-11-04T18:55:02.392Z"
 }
