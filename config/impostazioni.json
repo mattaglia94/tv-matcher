@@ -76,7 +76,7 @@
    "paese": "DE",
    "nome": "Otto",
    "url": "https://www.otto.de/suche/{q}/",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-05T14:29:20.712Z"
+ "aggiornato": "2026-11-05T14:29:29.165Z"
 }
