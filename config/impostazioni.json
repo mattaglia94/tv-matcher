@@ -64,7 +64,7 @@
    "paese": "DE",
    "nome": "MediaMarkt",
    "url": "https://www.mediamarkt.de/de/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-04T18:55:07.634Z"
+ "aggiornato": "2026-11-05T13:46:03.954Z"
 }
