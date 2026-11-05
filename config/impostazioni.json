@@ -4,55 +4,55 @@
    "paese": "IT",
    "nome": "MediaWorld",
    "url": "https://www.mediaworld.it/it/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "Euronics",
    "url": "https://www.euronics.it/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "Unieuro",
    "url": "https://www.unieuro.it/online/?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "Expert",
    "url": "https://www.expert.it/it/it/exp/shop/search?terms={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
    "nome": "MediaMarkt-ES",
    "url": "https://www.mediamarkt.es/es/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
    "nome": "El Corte Inglés",
    "url": "https://www.elcorteingles.es/search-nwx/1/?s={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
    "nome": "Carrefour",
    "url": "https://www.carrefour.es/?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
    "nome": "PcComponentes",
    "url": "https://www.pccomponentes.com/search/?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
    "nome": "Alcampo",
    "url": "https://www.compraonline.alcampo.es/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
@@ -88,93 +88,93 @@
    "paese": "UK",
    "nome": "AO.com",
    "url": "https://ao.com/search?search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Currys",
    "url": "https://www.currys.co.uk/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Very",
    "url": "https://www.very.co.uk/e/q/{q}.end",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Argos",
    "url": "https://www.argos.co.uk/search/{q}/",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "John Lewis",
    "url": "https://www.johnlewis.com/search?search-term={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Joybuy-UK",
    "url": "https://www.joybuy.co.uk/search?keyword={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Boulanger",
    "url": "https://www.boulanger.com/resultats?tr={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Conforama",
    "url": "https://www.conforama.fr/recherche-conforama/{q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Carrefour-FR",
    "url": "https://www.carrefour.fr/s?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "E.Leclerc",
    "url": "https://www.e.leclerc/recherche?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Auchan",
    "url": "https://www.auchan.fr/recherche?text={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Darty",
    "url": "https://www.darty.com/nav/recherche?text={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Cdiscount",
    "url": "https://www.cdiscount.com/search/10/{q}.html",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Fnac",
    "url": "https://www.fnac.com/SearchResult/ResultList.aspx?Search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Joybuy-FR",
    "url": "https://www.joybuy.fr/search?keyword={q}",
-   "attivo": true
+   "attivo": false
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-05T13:46:27.593Z"
+ "aggiornato": "2026-11-05T13:54:23.675Z"
 }
