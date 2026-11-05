@@ -70,7 +70,7 @@
    "paese": "DE",
    "nome": "Saturn",
    "url": "https://www.saturn.de/de/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-05T13:46:03.954Z"
+ "aggiornato": "2026-11-05T13:46:10.477Z"
 }
