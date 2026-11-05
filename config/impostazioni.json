@@ -64,13 +64,13 @@
    "paese": "DE",
    "nome": "MediaMarkt",
    "url": "https://www.mediamarkt.de/de/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Saturn",
    "url": "https://www.saturn.de/de/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-05T13:54:23.675Z"
+ "aggiornato": "2026-11-05T14:29:20.712Z"
 }
