@@ -28,7 +28,7 @@
    "paese": "ES",
    "nome": "MediaMarkt-ES",
    "url": "https://www.mediamarkt.es/es/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -40,13 +40,13 @@
    "paese": "ES",
    "nome": "Carrefour",
    "url": "https://www.carrefour.es/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
    "nome": "PcComponentes",
    "url": "https://www.pccomponentes.com/search/?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-05T17:13:46.537Z"
+ "aggiornato": "2026-11-13T13:24:37.383Z"
 }
