@@ -34,7 +34,7 @@
    "paese": "ES",
    "nome": "El Corte Inglés",
    "url": "https://www.elcorteingles.es/search-nwx/1/?s={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -52,7 +52,7 @@
    "paese": "ES",
    "nome": "Alcampo",
    "url": "https://www.compraonline.alcampo.es/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-13T13:24:55.374Z"
+ "aggiornato": "2026-11-13T13:25:06.829Z"
 }
