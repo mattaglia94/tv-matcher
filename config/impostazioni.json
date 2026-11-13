@@ -94,7 +94,7 @@
    "paese": "UK",
    "nome": "Currys",
    "url": "https://www.currys.co.uk/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
@@ -176,5 +176,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-13T13:24:52.138Z"
+ "aggiornato": "2026-11-13T13:24:53.563Z"
 }
