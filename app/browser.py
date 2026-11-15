@@ -39,10 +39,10 @@ JS_LINKS = """
   document.querySelectorAll('li.product-card').forEach(c => {
     if (c.querySelector('a[href*="/product/"]')) return;
     const nome = (c.querySelector('h3, [class*="name" i]') || {}).innerText || '';
-    if (!nome || !/\/search\//.test(location.pathname)) return;
-    const base = location.origin + location.pathname.replace(/\/search\/.*$/, '/search/');
+    if (!nome || !/\\/search\\//.test(location.pathname)) return;
+    const base = location.origin + location.pathname.replace(/\\/search\\/.*$/, '/search/');
     const im = c.querySelector('img');
-    out.push({href: base + encodeURIComponent(nome.trim()), testo: (nome + ' ' + c.innerText).replace(/\s+/g, ' ').slice(0, 600),
+    out.push({href: base + encodeURIComponent(nome.trim()), testo: (nome + ' ' + c.innerText).replace(/\\s+/g, ' ').slice(0, 600),
               img: im ? (im.currentSrc || im.src || '') : ''});
   });
   return out;
