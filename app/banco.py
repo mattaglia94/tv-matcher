@@ -256,7 +256,12 @@ def sonda(urls):
                     padre: (a.closest('li,article,[class*=offer i],[data-testid]') || {}).className || ''}))""")
             except Exception as e:
                 extra = [str(e)]
-            out.append({"url": u, "finale": br.page.url, "stato": getattr(r, "status", None), "titolo": br.page.title(),
+            try:  # riquadri che contengono "TV" (per capire i siti dove il prodotto non è un link <a>)
+                riquadri = br.page.evaluate("""() => [...document.querySelectorAll('div,li,article,a')].filter(e => /\\bTV\\b/.test(e.innerText || '') && (e.innerText || '').length < 250 && (e.innerText || '').length > 10)
+                    .slice(-12).map(e => e.outerHTML.slice(0, 700))""")
+            except Exception as e:
+                riquadri = [str(e)]
+            out.append({"url": u, "riquadri": riquadri, "finale": br.page.url, "stato": getattr(r, "status", None), "titolo": br.page.title(),
                         "n_link": len(links), "link_prodotto": prod, "extra": extra, "corpo": corpo,
                         "html_len": len(html), "html_prodotti": [m.group(0)[:300] for m in re.finditer(r"<[^>]+(product|tile|card)[^>]*>", html, re.I)][:10]})
             print(u, out[-1]["stato"], out[-1]["titolo"][:60], len(links), len(prod), flush=True)
