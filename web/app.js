@@ -491,7 +491,7 @@
     box.querySelectorAll("[data-salva]").forEach((x) => (x.onclick = () => {
       const i = Number(x.dataset.salva), riga = x.closest(".retailer-riga");
       const nome = riga.querySelector("[data-n]").value.trim(), url = riga.querySelector("[data-u]").value.trim();
-      if (!nome || !/^https?:\/\/.+\{q\}/.test(url)) return toast("Serve un nome e un URL che inizi con http e contenga {q}", "errore");
+      if (!nome || !/^https?:\/\/.+\{q(20)?\}/.test(url)) return toast("Serve un nome e un URL che inizi con http e contenga {q}", "errore");
       Object.assign(R[i], { nome, url }); delete R[i]._mod; ridisegna();
     }));
     box.querySelectorAll("[data-annulla]").forEach((x) => (x.onclick = () => {

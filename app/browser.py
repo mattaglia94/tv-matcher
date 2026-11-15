@@ -6,7 +6,7 @@ dal layout specifico di ogni sito."""
 import random
 import re
 import time
-from urllib.parse import quote_plus, urljoin
+from urllib.parse import quote, quote_plus, urljoin
 
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 
@@ -341,7 +341,8 @@ class Browser:
 
     # ------------------------------------------------------------ Retailer
     def cerca(self, url_template, query):
-        url = url_template.replace("{q}", quote_plus(query))
+        # {q20}: testo nel percorso dell'indirizzo (spazi = %20, es. mi.com/it/search/TV%20A%20Pro)
+        url = url_template.replace("{q20}", quote(query)).replace("{q}", quote_plus(query))
         if url in self._ricerche:  # stessa ricerca già fatta per un altro ASIN (es. "Xiaomi 65 LED")
             return self._ricerche[url]
         dominio = re.match(r"(https?://[^/]+)", url).group(1)
