@@ -329,6 +329,9 @@ def prepara_asin(br, riga, retailer, P, log=print, anagrafica=None):
     return out, info
 
 
+MARCHE_NEGOZIO = {"SAMSUNG", "LG", "HISENSE", "XIAOMI", "SONY", "PHILIPS", "PANASONIC", "TCL"}
+
+
 def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
     """Fase 2 (un negozio): cerca i modelli simili all'ASIN su un retailer.
     Ritorna {match, esito, dettaglio, ponte} per quel retailer (indipendente dagli altri: si può parallelizzare)."""
@@ -340,6 +343,8 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
     r = {**r, "url": URL_CORRETTI.get(r["url"], r["url"])}
     validi, da_leggere = {}, {}
     pertinenti, ricerche_ok, errori, tv_letti = 0, 0, [], 0
+    # negozio ufficiale di un brand (es. "Samsung-IT"): i titoli spesso non ripetono la marca ("55\" QLED Q7F")
+    marca_negozio = r["nome"].split("-")[0].strip().upper() if r["nome"].split("-")[0].strip().upper() in MARCHE_NEGOZIO else ""
     for q in query_ricerca(info, P):
         url_s, links, stato = br.cerca(r["url"], q)
         # 404 su una pagina di ricerca = nessun risultato, non un errore
@@ -355,15 +360,19 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
                 continue  # filtri della pagina di ricerca (marca, prezzo...), non prodotti
             if e_accessorio(l["testo"], l["url"]):
                 continue  # telecomandi, staffe, cornici, elettrodomestici: non sono TV
+            if marca_negozio and marca_negozio not in l["testo"].upper():
+                l = {**l, "testo": f"{marca_negozio.title()} {l['testo']}"}
             c = analizza(l["testo"], prezzo=leggi_prezzo(l["testo"]))
-            if not c.codice or "caratteristiche" in c.note:
-                # molti retailer mettono il codice modello solo nell'indirizzo (es. _tcl-75t69c-..., pidSAMQE75QN70H)
-                # Unieuro: pid + 3 lettere della marca (pidSAMQE75QN70H, pidXIA50APRO2)
-                slug = l["url"].split("?")[0].rsplit("/", 1)[-1]
+            corto = c.codice and len(_cod_norm(c.codice)) < 9  # es. "U7000F" nel titolo, "UE50U7000FUXZT" nell'indirizzo
+            if not c.codice or "caratteristiche" in c.note or corto:
+                # molti retailer mettono il codice modello solo nell'indirizzo (es. _tcl-75t69c-..., pidSAMQE75QN70H,
+                # samsung.com/…/q7f-55-inch-…-qe55q7faauxzt/). Unieuro: pid + 3 lettere della marca (pidSAMQE75QN70H)
+                slug = l["url"].split("?")[0].rstrip("/").rsplit("/", 1)[-1]
                 slug = re.sub(r"pid([A-Z]{3})", lambda m: f" {PID_MARCHE.get(m.group(1), '')} " + ("XIA" if m.group(1) == "XIA" else ""), slug)
                 c2 = analizza(f"{l['testo']} {re.sub(r'[-_.]+', ' ', slug)}", prezzo=leggi_prezzo(l["testo"]))
-                if c2.codice and "caratteristiche" not in c2.note and (not c.marca or c2.marca == c.marca) and \
-                        (not c.pollici or c2.pollici == c.pollici):
+                ok_slug = c2.codice and "caratteristiche" not in c2.note and (not c.marca or c2.marca == c.marca) and \
+                    (not c.pollici or c2.pollici == c.pollici)
+                if ok_slug and (not corto or (_cod_norm(c.codice) in _cod_norm(c2.codice) and len(c2.codice) > len(c.codice))):
                     c = c2
             if not c.marca or not c.pollici:
                 continue
