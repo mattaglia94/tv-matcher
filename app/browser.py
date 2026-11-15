@@ -402,7 +402,7 @@ class Browser:
             base = h.split("?")[0].rstrip("/")
             if not re.search(r"\d{5,}|\.html$", base):  # il prodotto potrebbe essere nei parametri: chiave completa
                 base = h
-            if base in visti or not h.startswith("http") or re.search(r"\.(pdf|jpe?g|png|webp)$", base, re.I):
+            if base in visti or not h.startswith("http") or re.search(r"\.(pdf|jpe?g|png|webp)$", h.split("?")[0], re.I):
                 continue  # stessa pagina con parametri diversi, o allegati (etichetta energetica, foto)
             visti.add(base)
             out.append({"url": urljoin(url, h), "testo": l["testo"],

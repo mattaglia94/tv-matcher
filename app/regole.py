@@ -1013,7 +1013,13 @@ def stesso_modello_esatto(a: InfoTV, b: InfoTV) -> bool:
         return False
     if a.marca == "XIAOMI" and a.core and b.core:
         return a.core == b.core
-    return _cod_norm(a.codice) == _cod_norm(b.codice)
+    ca, cb = _cod_norm(a.codice), _cod_norm(b.codice)
+    if ca == cb:
+        return True
+    # un codice è lo stesso con in più solo il suffisso di paese finale (Amazon UK "UE65U8020FK" = "UE65U8020FKXXU"):
+    # varianti con suffissi diversi (QE55Q7FAAUXZT / QE55Q7FAATXZT) restano diverse
+    corto, lungo = sorted((ca, cb), key=len)
+    return len(corto) >= 10 and lungo.startswith(corto) and len(lungo) - len(corto) <= 4
 
 
 def confronta_identico(amz: InfoTV, cand: InfoTV, P: dict | None = None):

@@ -451,8 +451,10 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
             if identico:
                 # stesso modello: la pagina deve mostrare lo stesso codice (se ne mostra uno) e lo stesso anno
                 cpag = analizza(f"{sp.get('modello', '')} {titolo_pag}")
+                # la pagina può mostrare solo una parte del codice (samsung.com: "U7000F" per UE50U7000FUXZT): non è un altro modello
+                parziale = cpag.codice and len(_cod_norm(cpag.codice)) < 9 and _cod_norm(cpag.codice) in _cod_norm(info.codice or "")
                 if cpag.codice and cpag.marca == info.marca and "caratteristiche" not in cpag.note \
-                        and not stesso_modello_esatto(info, cpag):
+                        and not parziale and not stesso_modello_esatto(info, cpag):
                     out["dettaglio"].append({"retailer": r["nome"], "modello": cpag.codice, "url": url,
                                              "esito": f"scartato: la pagina mostra un altro modello ({cpag.codice})"})
                     continue
