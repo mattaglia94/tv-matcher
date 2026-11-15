@@ -250,13 +250,13 @@
    "paese": "IT",
    "nome": "LG-IT",
    "url": "https://www.lg.com/it/search/?search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "Xiaomi-IT",
    "url": "https://www.mi.com/it/search/{q20}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
@@ -278,5 +278,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-15T22:34:53.015Z"
+ "aggiornato": "2026-11-15T22:34:55.279Z"
 }
