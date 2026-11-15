@@ -374,6 +374,17 @@ class Browser:
                 time.sleep(1.5)
         if links is None:
             return url, [], f"errore lettura: {errore}"
+        # risultati caricati dopo la pagina (es. samsung.com, mi.com): se ci sono pochi link "da prodotto", si aspetta un po'
+        def prodotti(ls):
+            return sum(1 for l in ls if re.search(r"\d{2}", l.get("testo", "")) and len(l.get("testo", "")) >= 15)
+        attese = 0
+        while prodotti(links) < 3 and attese < 4:
+            time.sleep(1.5)
+            attese += 1
+            try:
+                links = self.page.evaluate(JS_LINKS)
+            except Exception:
+                break
         visti, out = set(), []
         for l in links:
             h = l["href"].split("#")[0]
