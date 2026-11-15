@@ -34,6 +34,17 @@ JS_LINKS = """
     if (src.startsWith('data:')) src = im.getAttribute('data-src') || '';
     if (t.length > 12) out.push({href: a.href, testo: t.slice(0, 600), img: src});
   });
+  // riquadri prodotto senza link (mi.com: <li class="product-card"> apre la pagina via script):
+  // si usa come indirizzo la ricerca del nome esatto sul sito, che porta a quel prodotto
+  document.querySelectorAll('li.product-card').forEach(c => {
+    if (c.querySelector('a[href*="/product/"]')) return;
+    const nome = (c.querySelector('h3, [class*="name" i]') || {}).innerText || '';
+    if (!nome || !/\/search\//.test(location.pathname)) return;
+    const base = location.origin + location.pathname.replace(/\/search\/.*$/, '/search/');
+    const im = c.querySelector('img');
+    out.push({href: base + encodeURIComponent(nome.trim()), testo: (nome + ' ' + c.innerText).replace(/\s+/g, ' ').slice(0, 600),
+              img: im ? (im.currentSrc || im.src || '') : ''});
+  });
   return out;
 }
 """
