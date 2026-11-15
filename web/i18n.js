@@ -4,7 +4,9 @@
 (() => {
   "use strict";
   let L = "it";
-  try { L = localStorage.getItem("tvm_lingua") === "en" ? "en" : "it"; } catch { /* memoria non disponibile */ }
+  // inglese predefinito: l'italiano solo se scelto dal selettore IT | EN
+  L = "en";
+  try { L = localStorage.getItem("tvm_lingua") === "it" ? "it" : "en"; } catch { /* memoria non disponibile */ }
 
   const PAESI = { "Italia": "Italy", "Germania": "Germany", "Francia": "France", "Spagna": "Spain", "Regno Unito": "United Kingdom" };
 
