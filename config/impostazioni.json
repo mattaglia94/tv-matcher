@@ -184,13 +184,13 @@
    "paese": "UK",
    "nome": "LG-UK",
    "url": "https://www.lg.com/uk/search/?search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Xiaomi-UK",
    "url": "https://www.mi.com/uk/search/{q20}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
@@ -278,5 +278,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-15T22:34:31.354Z"
+ "aggiornato": "2026-11-15T22:34:33.839Z"
 }
