@@ -60,6 +60,8 @@ RICONOSCIMENTO = [
 # questi casi usano l'anno FISSO 2026 (es. Xiaomi F Pro 2025 -> sostituto A Pro 2026); STESSO_ANNO usa il predefinito
 FISSO = {"attivo": True, "modo": "fisso", "valore": 2026, "accetta_ignoto": True}
 STESSO_ANNO = [  # predefinito: stesso anno del TV Amazon
+    ("Samsung TQ42S90FAEXXC OLED 42 2025", "Samsung TQ42S92H OLED 42", "stessa_marca", False),  # feedback novembre: modello di un altro anno
+    ("Samsung TQ65LS03FAUXXC The Frame 65 2025", "Samsung TQ65LS03HA The Frame 65", "stessa_marca", False),  # feedback novembre: modello di un altro anno
     ("Metz 40 Pouces Smart TV FHD QLED 40MQH7000Y", "Metz 40MQF7000Z QLED 40\" Full HD", "stessa_marca", False),  # F = 2025
     # 7000 e 7030 sono modelli diversi (feedback ottobre 2026: "Different model, new model / 2026 energy class")
     ("Metz 40 Pouces Smart TV FHD QLED 40MQH7000Y", "TV QLED 40\" Metz 40MQH7030Z Full HD Smart TV", "stessa_marca", False),
@@ -83,6 +85,15 @@ SOMIGLIANZA = [
     ("XIAOMI TV F Pro 50 2025, 50 pollici, 4K UHD QLED", "Xiaomi 50APRO2 TV 127 cm (50\") 4K Ultra HD", "stessa_marca", True),
     ("XIAOMI TV F Pro 75,75 pollici (190 cm),4K UHD QLED", "XIAOMI TV F Pro 75 QLED", "stessa_marca", False),  # stesso modello
     ("Hisense 55E7Q 4K QLED 2026", "Hisense 55A7Q QLED 4K 2026", "stessa_marca", False),  # E7 ≠ A7 (feedback)
+    # --- mapping segnalati come errati (feedback novembre 2026) ---
+    ("Samsung UE50U7020HK Crystal UHD 4K 2026", "Samsung UE50U8000H Crystal UHD 4K", "stessa_marca", False),
+    ("Samsung UE65U7020HKXXU 65 Crystal UHD", "Samsung UE65U8000H 65 Crystal UHD", "stessa_marca", False),
+    ("Samsung TQ75QN70HAUXXC Neo QLED 75", "Samsung TU75M73HAU Mini LED 75", "stessa_marca", False),
+    ("Samsung TQ43QN70HAUXXC Neo QLED 43", "Samsung TU43M74HAUXXC Mini LED 43", "stessa_marca", False),
+    ("Samsung TQ85QN70HAUXXC Neo QLED 85", "Samsung TU85M72HAUXXC Mini LED 85", "stessa_marca", False),
+    ("Samsung 50M72H Mini LED 50 2026", "Samsung TQ50QN73HAUXXC Neo QLED 50", "stessa_marca", False),
+    ("Hisense 65U79S PRO Mini LED 65", "Hisense 65Q8S Mini LED 65", "stessa_marca", False),
+    ("Hisense 43E7S PRO QLED 43", "Hisense 43E79S QLED 43", "stessa_marca", False),
     # --- mapping segnalati come errati (feedback ottobre 2026) ---
     ("Hisense 50E7DS PRO Fernseher 50 Zoll, 4K UHD QLED, 144Hz", "Hisense 50Q7S QLED 4K", "stessa_marca", False),  # PRO vs entry
     ("Hisense 65E7DS PRO Fernseher 65 Zoll, 4K UHD QLED, 144Hz", "Hisense 65E7S QLED 4K", "stessa_marca", False),
