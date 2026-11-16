@@ -178,19 +178,19 @@
    "paese": "UK",
    "nome": "Samsung-UK",
    "url": "https://www.samsung.com/uk/search/?searchvalue={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
    "nome": "LG-UK",
    "url": "https://www.lg.com/uk/search/?search={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
    "nome": "Xiaomi-UK",
    "url": "https://www.mi.com/uk/search/{q20}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
@@ -278,5 +278,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-16T10:16:20.898Z"
+ "aggiornato": "2026-11-16T10:16:41.889Z"
 }
