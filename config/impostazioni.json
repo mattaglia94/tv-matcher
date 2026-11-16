@@ -58,13 +58,13 @@
    "paese": "DE",
    "nome": "Euronics-DE",
    "url": "https://www.euronics.de/search?sSearch={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "MediaMarkt",
    "url": "https://www.mediamarkt.de/de/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
@@ -278,5 +278,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-16T18:07:44.474Z"
+ "aggiornato": "2026-11-16T18:07:54.721Z"
 }
