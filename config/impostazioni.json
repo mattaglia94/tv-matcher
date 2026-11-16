@@ -70,19 +70,19 @@
    "paese": "DE",
    "nome": "Saturn",
    "url": "https://www.saturn.de/de/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Otto",
    "url": "https://www.otto.de/suche/{q}/",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Joybuy-DE",
    "url": "https://www.joybuy.de/search?keyword={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
@@ -278,5 +278,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-16T18:07:54.721Z"
+ "aggiornato": "2026-11-16T18:07:57.150Z"
 }
