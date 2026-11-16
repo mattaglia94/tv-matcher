@@ -196,7 +196,7 @@
    "paese": "DE",
    "nome": "Samsung-DE",
    "url": "https://www.samsung.com/de/search/?searchvalue={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
@@ -278,5 +278,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-16T14:33:19.453Z"
+ "aggiornato": "2026-11-16T18:05:17.115Z"
 }
