@@ -88,37 +88,37 @@
    "paese": "UK",
    "nome": "AO.com",
    "url": "https://ao.com/search?search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Currys",
    "url": "https://www.currys.co.uk/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Very",
    "url": "https://www.very.co.uk/e/q/{q}.end",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Argos",
    "url": "https://www.argos.co.uk/search/{q}/",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "John Lewis",
    "url": "https://www.johnlewis.com/search?search-term={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Joybuy-UK",
    "url": "https://www.joybuy.co.uk/search?keyword={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
@@ -178,19 +178,19 @@
    "paese": "UK",
    "nome": "Samsung-UK",
    "url": "https://www.samsung.com/uk/search/?searchvalue={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "LG-UK",
    "url": "https://www.lg.com/uk/search/?search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Xiaomi-UK",
    "url": "https://www.mi.com/uk/search/{q20}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
@@ -278,5 +278,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-16T14:32:38.280Z"
+ "aggiornato": "2026-11-16T14:33:19.453Z"
 }
