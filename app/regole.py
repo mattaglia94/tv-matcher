@@ -998,6 +998,17 @@ def _cod_norm(c: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", (c or "").upper())
 
 
+_SONY_NOMI = {"9": "XR90", "8II": "XR8M2", "8": "XR80", "7": "XR70", "5": "XR50", "3": "S30"}
+
+
+def _sony_cod(i: InfoTV, c: str) -> str:
+    """Codice Sony senza la K iniziale; un titolo con il solo nome ("BRAVIA 8 65") diventa il codice (65XR80)."""
+    m = re.search(r"BRAVIA\s*(\d)\s*(II)?\b", (i.codice or "").upper())
+    if m and i.pollici and not re.search(r"\d{2}[A-Z]{1,2}\d", c[1:] if c.startswith("K") else c):
+        return f"{i.pollici}{_SONY_NOMI.get(m.group(1) + (m.group(2) or ''), '?')}"
+    return re.sub(r"^K(?=\d)", "", c)
+
+
 def stesso_modello_esatto(a: InfoTV, b: InfoTV) -> bool:
     """Modalità "Stesso modello": codice modello IDENTICO a quello Amazon (maiuscole, spazi e trattini a parte):
     QE55Q7FAAUXZT ≠ QE55Q7FAATXZT, 50E7DS PRO ≠ 50E7DS. Diagonale uguale.
@@ -1020,7 +1031,7 @@ def stesso_modello_esatto(a: InfoTV, b: InfoTV) -> bool:
     # varianti con suffissi diversi (QE55Q7FAAUXZT / QE55Q7FAATXZT) restano diverse
     corto, lungo = sorted((ca, cb), key=len)
     if a.marca == "SONY":  # K-65XR80 (Amazon) = K65XR80PAEP / K65XR80PU (negozi): conta solo il suffisso di paese, solo lettere
-        corto, lungo = sorted((re.sub(r"^K(?=\d)", "", ca), re.sub(r"^K(?=\d)", "", cb)), key=len)
+        corto, lungo = sorted((_sony_cod(a, ca), _sony_cod(b, cb)), key=len)
         return lungo.startswith(corto) and bool(re.fullmatch(r"[A-Z]{0,4}", lungo[len(corto):]))
     return len(corto) >= 10 and lungo.startswith(corto) and len(lungo) - len(corto) <= 4
 

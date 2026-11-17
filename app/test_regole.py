@@ -305,6 +305,9 @@ IDENTICO = [  # modalità "Stesso modello": (titolo Amazon, risultati del negozi
     ("Sony BRAVIA 8 K-65XR80 OLED 65 pollici 2024", [("Sony BRAVIA 8 II K-65XR8M25BP OLED", "https://n.uk/s2")], "Sony K-65XR8M25BP", False),
     ("Sony BRAVIA 8 K-65XR80 OLED 65 pollici 2024", [("Sony 4.6 (171) 4.6 out of 5 stars. 171 reviews for BRAVIA 8 | XR Processor | OLED",
      "https://n.it/bravia/products/bravia-8?sku=k65xr80paep")], "Sony BRAVIA 8 K-65XR80PAEP", True),
+    # caso reale B0D3HX915G: Amazon scrive solo il nome "BRAVIA 8" (= K-65XR80); BRAVIA 8 II è un altro modello
+    ("Sony BRAVIA 8 OLED 65 Pollici 4K HDR Google Smart TV (2024)", [("Sony BRAVIA 8 | OLED", "https://n.it/b8?sku=k65xr80paep")], "Sony K-65XR80PAEP", True),
+    ("Sony BRAVIA 8 OLED 65 Pollici 4K HDR Google Smart TV (2024)", [("Sony BRAVIA 8 II | OLED", "https://n.it/b8ii?sku=k65xr8m25bp.cei")], "Sony K-65XR8M25BP", False),
 ]
 
 
