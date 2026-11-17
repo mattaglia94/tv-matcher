@@ -362,6 +362,17 @@ def confronta_retailer(br, info, r, P, paese, log=print, stop=lambda: False):
                 continue  # telecomandi, staffe, cornici, elettrodomestici: non sono TV
             if marca_negozio and marca_negozio not in l["testo"].upper():
                 l = {**l, "testo": f"{marca_negozio.title()} {l['testo']}"}
+            sku = re.search(r"[?&]sku=([a-z0-9.\-]+)", l["url"], re.I)
+            if sku:  # sony.*: un riquadro per modello, codice solo nel parametro sku (k55xr80paep) in una diagonale qualsiasi
+                s_ = sku.group(1)
+                mp = re.match(r"(?i)k(\d{2,3})", s_)
+                if marca_negozio == "SONY" and mp and info.pollici and int(mp.group(1)) != info.pollici:
+                    # si prova la stessa serie nella diagonale cercata: la verifica della pagina conferma che esiste
+                    s_ = f"{s_[0]}{info.pollici}{s_[len(mp.group(0)):]}"
+                    l = {**l, "url": l["url"].replace(sku.group(0), sku.group(0)[0] + "sku=" + s_)}
+                # via le valutazioni ("4.6 (171) 4.6 out of 5 stars. 171 reviews"): "171" non è una diagonale
+                t_ = re.sub(r"\d[\d.,]*\s*\(\d+\)|\d[\d.,]*\s+(?:\w+\s+){1,2}5\s+\w+\.?|\b\d+\s+(?:reviews?|recensioni|bewertungen|avis|opiniones)\b", " ", l["testo"], flags=re.I)
+                l = {**l, "testo": f"{t_} {re.sub(r'^(?i:k)(?=\d)', 'K-', s_).split('.')[0].upper()}"}
             c = analizza(l["testo"], prezzo=leggi_prezzo(l["testo"]))
             corto = c.codice and len(_cod_norm(c.codice)) < 9  # es. "U7000F" nel titolo, "UE50U7000FUXZT" nell'indirizzo
             if not c.codice or "caratteristiche" in c.note or corto:

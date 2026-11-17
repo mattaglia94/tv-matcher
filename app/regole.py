@@ -1019,6 +1019,9 @@ def stesso_modello_esatto(a: InfoTV, b: InfoTV) -> bool:
     # un codice è lo stesso con in più solo il suffisso di paese finale (Amazon UK "UE65U8020FK" = "UE65U8020FKXXU"):
     # varianti con suffissi diversi (QE55Q7FAAUXZT / QE55Q7FAATXZT) restano diverse
     corto, lungo = sorted((ca, cb), key=len)
+    if a.marca == "SONY":  # K-65XR80 (Amazon) = K65XR80PAEP / K65XR80PU (negozi): conta solo il suffisso di paese, solo lettere
+        corto, lungo = sorted((re.sub(r"^K(?=\d)", "", ca), re.sub(r"^K(?=\d)", "", cb)), key=len)
+        return lungo.startswith(corto) and bool(re.fullmatch(r"[A-Z]{0,4}", lungo[len(corto):]))
     return len(corto) >= 10 and lungo.startswith(corto) and len(lungo) - len(corto) <= 4
 
 

@@ -300,6 +300,11 @@ IDENTICO = [  # modalità "Stesso modello": (titolo Amazon, risultati del negozi
     ("Xiaomi TV F Pro 43 2025,43 pollici (101 cm), 4K UHD QLED", [("Xiaomi 43 F PRO 2026 Smart TV 43 QLED", "https://n.it/c"),
      ("Xiaomi 32 F PRO 2026 Smart TV 32 QLED HD", "https://n.it/d")], "Xiaomi 43 F PRO 2026", True),
     ("Metz 40 Pouces Smart TV FHD QLED 40MQH7000Y", [("Metz 40MQH7030Z QLED 40", "https://n.it/z")], "Metz 40MQH7030Z", False),
+    # Sony: suffisso di paese solo lettere (PAEP, PU) = stesso modello; codice nel parametro sku del negozio Sony
+    ("Sony BRAVIA 8 K-65XR80 OLED 65 pollici 2024", [("Sony K-65XR80PU BRAVIA 8 OLED", "https://n.uk/s1")], "Sony K-65XR80PU", True),
+    ("Sony BRAVIA 8 K-65XR80 OLED 65 pollici 2024", [("Sony BRAVIA 8 II K-65XR8M25BP OLED", "https://n.uk/s2")], "Sony K-65XR8M25BP", False),
+    ("Sony BRAVIA 8 K-65XR80 OLED 65 pollici 2024", [("Sony 4.6 (171) 4.6 out of 5 stars. 171 reviews for BRAVIA 8 | XR Processor | OLED",
+     "https://n.it/bravia/products/bravia-8?sku=k65xr80paep")], "Sony BRAVIA 8 K-65XR80PAEP", True),
 ]
 
 
