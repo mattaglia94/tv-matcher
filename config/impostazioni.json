@@ -275,6 +275,96 @@
    "nome": "Xiaomi-ES",
    "url": "https://www.mi.com/es/search/{q20}",
    "attivo": false
+  },
+  {
+   "paese": "UK",
+   "nome": "Sony-UK",
+   "url": "https://www.sony.co.uk/search?query={q}",
+   "attivo": true
+  },
+  {
+   "paese": "UK",
+   "nome": "Philips-UK",
+   "url": "https://www.philips.co.uk/c-w/search?q={q}",
+   "attivo": true
+  },
+  {
+   "paese": "UK",
+   "nome": "Panasonic-UK",
+   "url": "https://store.eu.panasonic.com/uk/catalogsearch/result/?q={q}",
+   "attivo": true
+  },
+  {
+   "paese": "DE",
+   "nome": "Sony-DE",
+   "url": "https://www.sony.de/search?query={q}",
+   "attivo": true
+  },
+  {
+   "paese": "DE",
+   "nome": "Philips-DE",
+   "url": "https://www.philips.de/c-w/search?q={q}",
+   "attivo": true
+  },
+  {
+   "paese": "DE",
+   "nome": "Panasonic-DE",
+   "url": "https://store.eu.panasonic.com/de-de/catalogsearch/result/?q={q}",
+   "attivo": true
+  },
+  {
+   "paese": "FR",
+   "nome": "Sony-FR",
+   "url": "https://www.sony.fr/search?query={q}",
+   "attivo": true
+  },
+  {
+   "paese": "FR",
+   "nome": "Philips-FR",
+   "url": "https://www.philips.fr/c-w/search?q={q}",
+   "attivo": true
+  },
+  {
+   "paese": "FR",
+   "nome": "Panasonic-FR",
+   "url": "https://store.eu.panasonic.com/fr-fr/catalogsearch/result/?q={q}",
+   "attivo": true
+  },
+  {
+   "paese": "IT",
+   "nome": "Sony-IT",
+   "url": "https://www.sony.it/search?query={q}",
+   "attivo": true
+  },
+  {
+   "paese": "IT",
+   "nome": "Philips-IT",
+   "url": "https://www.philips.it/c-w/search?q={q}",
+   "attivo": true
+  },
+  {
+   "paese": "IT",
+   "nome": "Panasonic-IT",
+   "url": "https://store.eu.panasonic.com/it-it/catalogsearch/result/?q={q}",
+   "attivo": true
+  },
+  {
+   "paese": "ES",
+   "nome": "Sony-ES",
+   "url": "https://www.sony.es/search?query={q}",
+   "attivo": true
+  },
+  {
+   "paese": "ES",
+   "nome": "Philips-ES",
+   "url": "https://www.philips.es/c-w/search?q={q}",
+   "attivo": true
+  },
+  {
+   "paese": "ES",
+   "nome": "Panasonic-ES",
+   "url": "https://store.eu.panasonic.com/es-es/catalogsearch/result/?q={q}",
+   "attivo": true
   }
  ],
  "preset": [],
