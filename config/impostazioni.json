@@ -196,7 +196,7 @@
    "paese": "DE",
    "nome": "Samsung-DE",
    "url": "https://www.samsung.com/de/search/?searchvalue={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
@@ -298,19 +298,19 @@
    "paese": "DE",
    "nome": "Sony-DE",
    "url": "https://www.sony.de/search?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Philips-DE",
    "url": "https://www.philips.de/c-w/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Panasonic-DE",
    "url": "https://store.eu.panasonic.com/de-de/catalogsearch/result/?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-16T18:07:57.150Z"
+ "aggiornato": "2026-11-19T15:09:20.732Z"
 }
