@@ -124,55 +124,55 @@
    "paese": "FR",
    "nome": "Boulanger",
    "url": "https://www.boulanger.com/resultats?tr={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Conforama",
    "url": "https://www.conforama.fr/recherche-conforama/{q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Carrefour-FR",
    "url": "https://www.carrefour.fr/s?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "E.Leclerc",
    "url": "https://www.e.leclerc/recherche?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Auchan",
    "url": "https://www.auchan.fr/recherche?text={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Darty",
    "url": "https://www.darty.com/nav/recherche?text={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Cdiscount",
    "url": "https://www.cdiscount.com/search/10/{q}.html",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Fnac",
    "url": "https://www.fnac.com/SearchResult/ResultList.aspx?Search={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Joybuy-FR",
    "url": "https://www.joybuy.fr/search?keyword={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
@@ -220,7 +220,7 @@
    "paese": "FR",
    "nome": "Samsung-FR",
    "url": "https://www.samsung.com/fr/search/?searchvalue={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
@@ -232,13 +232,13 @@
    "paese": "FR",
    "nome": "Hisense-FR",
    "url": "https://hisense.fr/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Xiaomi-FR",
    "url": "https://www.mi.com/fr/search/{q20}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
@@ -316,19 +316,19 @@
    "paese": "FR",
    "nome": "Sony-FR",
    "url": "https://www.sony.fr/search?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Philips-FR",
    "url": "https://www.philips.fr/c-w/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
    "nome": "Panasonic-FR",
    "url": "https://store.eu.panasonic.com/fr-fr/catalogsearch/result/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-23T07:59:47.723Z"
+ "aggiornato": "2026-11-23T07:59:50.231Z"
 }
