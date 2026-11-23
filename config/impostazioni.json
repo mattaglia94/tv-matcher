@@ -220,7 +220,7 @@
    "paese": "FR",
    "nome": "Samsung-FR",
    "url": "https://www.samsung.com/fr/search/?searchvalue={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-23T08:08:39.976Z"
+ "aggiornato": "2026-11-23T17:28:12.276Z"
 }
