@@ -184,7 +184,7 @@
    "paese": "UK",
    "nome": "LG-UK",
    "url": "https://www.lg.com/uk/search/?search={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-23T08:08:37.557Z"
+ "aggiornato": "2026-11-23T08:08:39.976Z"
 }
