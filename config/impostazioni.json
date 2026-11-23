@@ -226,7 +226,7 @@
    "paese": "FR",
    "nome": "LG-FR",
    "url": "https://www.lg.com/fr/search/?search={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-23T07:51:11.717Z"
+ "aggiornato": "2026-11-23T07:51:17.643Z"
 }
