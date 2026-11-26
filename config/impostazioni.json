@@ -316,7 +316,7 @@
    "paese": "FR",
    "nome": "Sony-FR",
    "url": "https://www.sony.fr/search?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T14:59:54.057Z"
+ "aggiornato": "2026-11-26T15:00:00.797Z"
 }
