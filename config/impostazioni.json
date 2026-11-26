@@ -22,7 +22,7 @@
    "paese": "IT",
    "nome": "Expert",
    "url": "https://www.expert.it/it/it/exp/shop/search?terms={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T21:12:57.494Z"
+ "aggiornato": "2026-11-26T21:12:59.474Z"
 }
