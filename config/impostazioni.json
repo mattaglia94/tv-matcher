@@ -4,25 +4,25 @@
    "paese": "IT",
    "nome": "MediaWorld",
    "url": "https://www.mediaworld.it/it/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Euronics",
    "url": "https://www.euronics.it/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Unieuro",
    "url": "https://www.unieuro.it/online/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Expert",
    "url": "https://www.expert.it/it/it/exp/shop/search?terms={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -124,55 +124,55 @@
    "paese": "FR",
    "nome": "Boulanger",
    "url": "https://www.boulanger.com/resultats?tr={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Conforama",
    "url": "https://www.conforama.fr/recherche-conforama/{q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Carrefour-FR",
    "url": "https://www.carrefour.fr/s?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "E.Leclerc",
    "url": "https://www.e.leclerc/recherche?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Auchan",
    "url": "https://www.auchan.fr/recherche?text={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Darty",
    "url": "https://www.darty.com/nav/recherche?text={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Cdiscount",
    "url": "https://www.cdiscount.com/search/10/{q}.html",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Fnac",
    "url": "https://www.fnac.com/SearchResult/ResultList.aspx?Search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Joybuy-FR",
    "url": "https://www.joybuy.fr/search?keyword={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
@@ -220,43 +220,43 @@
    "paese": "FR",
    "nome": "Samsung-FR",
    "url": "https://www.samsung.com/fr/search/?searchvalue={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "LG-FR",
    "url": "https://www.lg.com/fr/search/?search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Hisense-FR",
    "url": "https://hisense.fr/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Xiaomi-FR",
    "url": "https://www.mi.com/fr/search/{q20}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "Samsung-IT",
    "url": "https://www.samsung.com/it/search/?searchvalue={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "LG-IT",
    "url": "https://www.lg.com/it/search/?search={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Xiaomi-IT",
    "url": "https://www.mi.com/it/search/{q20}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -316,37 +316,37 @@
    "paese": "FR",
    "nome": "Sony-FR",
    "url": "https://www.sony.fr/search?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Philips-FR",
    "url": "https://www.philips.fr/c-w/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Panasonic-FR",
    "url": "https://store.eu.panasonic.com/fr-fr/catalogsearch/result/?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "Sony-IT",
    "url": "https://www.sony.it/search?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Philips-IT",
    "url": "https://www.philips.it/c-w/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Panasonic-IT",
    "url": "https://store.eu.panasonic.com/it-it/catalogsearch/result/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-25T14:58:21.871Z"
+ "aggiornato": "2026-11-26T13:01:20.205Z"
 }
