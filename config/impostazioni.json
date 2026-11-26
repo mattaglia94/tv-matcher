@@ -58,31 +58,31 @@
    "paese": "DE",
    "nome": "Euronics-DE",
    "url": "https://www.euronics.de/search?sSearch={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "MediaMarkt",
    "url": "https://www.mediamarkt.de/de/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Saturn",
    "url": "https://www.saturn.de/de/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Otto",
    "url": "https://www.otto.de/suche/{q}/",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Joybuy-DE",
    "url": "https://www.joybuy.de/search?keyword={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
@@ -298,19 +298,19 @@
    "paese": "DE",
    "nome": "Sony-DE",
    "url": "https://www.sony.de/search?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Philips-DE",
    "url": "https://www.philips.de/c-w/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Panasonic-DE",
    "url": "https://store.eu.panasonic.com/de-de/catalogsearch/result/?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T14:38:31.552Z"
+ "aggiornato": "2026-11-26T14:38:41.676Z"
 }
