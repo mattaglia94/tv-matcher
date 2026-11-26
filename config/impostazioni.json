@@ -232,13 +232,13 @@
    "paese": "FR",
    "nome": "Hisense-FR",
    "url": "https://hisense.fr/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
    "nome": "Xiaomi-FR",
    "url": "https://www.mi.com/fr/search/{q20}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T15:00:16.851Z"
+ "aggiornato": "2026-11-26T15:00:25.900Z"
 }
