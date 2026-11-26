@@ -334,7 +334,7 @@
    "paese": "IT",
    "nome": "Sony-IT",
    "url": "https://www.sony.it/search?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
@@ -346,7 +346,7 @@
    "paese": "IT",
    "nome": "Panasonic-IT",
    "url": "https://store.eu.panasonic.com/it-it/catalogsearch/result/?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T21:12:59.474Z"
+ "aggiornato": "2026-11-26T21:13:02.675Z"
 }
