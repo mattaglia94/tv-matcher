@@ -58,31 +58,31 @@
    "paese": "DE",
    "nome": "Euronics-DE",
    "url": "https://www.euronics.de/search?sSearch={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "MediaMarkt",
    "url": "https://www.mediamarkt.de/de/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Saturn",
    "url": "https://www.saturn.de/de/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Otto",
    "url": "https://www.otto.de/suche/{q}/",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Joybuy-DE",
    "url": "https://www.joybuy.de/search?keyword={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "UK",
@@ -196,25 +196,25 @@
    "paese": "DE",
    "nome": "Samsung-DE",
    "url": "https://www.samsung.com/de/search/?searchvalue={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "LG-DE",
    "url": "https://www.lg.com/de/search/?search={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Hisense-DE",
    "url": "https://de.hisense.com/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Xiaomi-DE",
    "url": "https://www.mi.com/de/search/{q20}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
@@ -298,19 +298,19 @@
    "paese": "DE",
    "nome": "Sony-DE",
    "url": "https://www.sony.de/search?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Philips-DE",
    "url": "https://www.philips.de/c-w/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
    "nome": "Panasonic-DE",
    "url": "https://store.eu.panasonic.com/de-de/catalogsearch/result/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T13:56:09.969Z"
+ "aggiornato": "2026-11-26T13:56:14.769Z"
 }
