@@ -136,7 +136,7 @@
    "paese": "FR",
    "nome": "Carrefour-FR",
    "url": "https://www.carrefour.fr/s?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "FR",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T14:59:46.347Z"
+ "aggiornato": "2026-11-26T14:59:54.057Z"
 }
