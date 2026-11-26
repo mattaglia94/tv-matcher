@@ -16,7 +16,7 @@
    "paese": "IT",
    "nome": "Unieuro",
    "url": "https://www.unieuro.it/online/?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T21:12:55.844Z"
+ "aggiornato": "2026-11-26T21:12:57.494Z"
 }
