@@ -244,19 +244,19 @@
    "paese": "IT",
    "nome": "Samsung-IT",
    "url": "https://www.samsung.com/it/search/?searchvalue={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "LG-IT",
    "url": "https://www.lg.com/it/search/?search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
    "nome": "Xiaomi-IT",
    "url": "https://www.mi.com/it/search/{q20}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "ES",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T15:41:21.548Z"
+ "aggiornato": "2026-11-26T15:41:24.890Z"
 }
