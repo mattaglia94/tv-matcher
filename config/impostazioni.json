@@ -4,25 +4,25 @@
    "paese": "IT",
    "nome": "MediaWorld",
    "url": "https://www.mediaworld.it/it/search.html?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Euronics",
    "url": "https://www.euronics.it/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Unieuro",
    "url": "https://www.unieuro.it/online/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Expert",
    "url": "https://www.expert.it/it/it/exp/shop/search?terms={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -244,19 +244,19 @@
    "paese": "IT",
    "nome": "Samsung-IT",
    "url": "https://www.samsung.com/it/search/?searchvalue={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "LG-IT",
    "url": "https://www.lg.com/it/search/?search={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Xiaomi-IT",
    "url": "https://www.mi.com/it/search/{q20}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -334,19 +334,19 @@
    "paese": "IT",
    "nome": "Sony-IT",
    "url": "https://www.sony.it/search?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Philips-IT",
    "url": "https://www.philips.it/c-w/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "IT",
    "nome": "Panasonic-IT",
    "url": "https://store.eu.panasonic.com/it-it/catalogsearch/result/?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T15:41:19.310Z"
+ "aggiornato": "2026-11-26T15:41:21.548Z"
 }
