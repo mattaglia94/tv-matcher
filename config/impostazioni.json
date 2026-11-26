@@ -58,67 +58,67 @@
    "paese": "DE",
    "nome": "Euronics-DE",
    "url": "https://www.euronics.de/search?sSearch={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "MediaMarkt",
    "url": "https://www.mediamarkt.de/de/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Saturn",
    "url": "https://www.saturn.de/de/search.html?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Otto",
    "url": "https://www.otto.de/suche/{q}/",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
    "nome": "Joybuy-DE",
    "url": "https://www.joybuy.de/search?keyword={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "AO.com",
    "url": "https://ao.com/search?search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Currys",
    "url": "https://www.currys.co.uk/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Very",
    "url": "https://www.very.co.uk/e/q/{q}.end",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Argos",
    "url": "https://www.argos.co.uk/search/{q}/",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "John Lewis",
    "url": "https://www.johnlewis.com/search?search-term={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Joybuy-UK",
    "url": "https://www.joybuy.co.uk/search?keyword={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "FR",
@@ -178,19 +178,19 @@
    "paese": "UK",
    "nome": "Samsung-UK",
    "url": "https://www.samsung.com/uk/search/?searchvalue={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "LG-UK",
    "url": "https://www.lg.com/uk/search/?search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Xiaomi-UK",
    "url": "https://www.mi.com/uk/search/{q20}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
@@ -280,19 +280,19 @@
    "paese": "UK",
    "nome": "Sony-UK",
    "url": "https://www.sony.co.uk/search?query={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Philips-UK",
    "url": "https://www.philips.co.uk/c-w/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "UK",
    "nome": "Panasonic-UK",
    "url": "https://store.eu.panasonic.com/uk/catalogsearch/result/?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T13:55:55.823Z"
+ "aggiornato": "2026-11-26T13:56:09.969Z"
 }
