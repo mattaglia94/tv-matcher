@@ -340,7 +340,7 @@
    "paese": "IT",
    "nome": "Philips-IT",
    "url": "https://www.philips.it/c-w/search?q={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "IT",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T15:41:24.890Z"
+ "aggiornato": "2026-11-26T15:41:29.255Z"
 }
