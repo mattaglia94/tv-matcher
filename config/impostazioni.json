@@ -202,7 +202,7 @@
    "paese": "DE",
    "nome": "LG-DE",
    "url": "https://www.lg.com/de/search/?search={q}",
-   "attivo": true
+   "attivo": false
   },
   {
    "paese": "DE",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-26T13:56:44.345Z"
+ "aggiornato": "2026-11-26T13:56:45.475Z"
 }
