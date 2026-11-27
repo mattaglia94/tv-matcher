@@ -364,9 +364,9 @@
    "paese": "ES",
    "nome": "Panasonic-ES",
    "url": "https://store.eu.panasonic.com/es-es/catalogsearch/result/?q={q}",
-   "attivo": false
+   "attivo": true
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-27T07:32:44.451Z"
+ "aggiornato": "2026-11-27T07:32:47.328Z"
 }
