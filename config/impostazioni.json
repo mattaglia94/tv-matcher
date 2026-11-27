@@ -52,7 +52,7 @@
    "paese": "ES",
    "nome": "Alcampo",
    "url": "https://www.compraonline.alcampo.es/search?q={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "DE",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-27T07:32:48.726Z"
+ "aggiornato": "2026-11-27T07:32:51.330Z"
 }
