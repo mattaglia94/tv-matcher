@@ -352,7 +352,7 @@
    "paese": "ES",
    "nome": "Sony-ES",
    "url": "https://www.sony.es/search?query={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-27T07:32:47.328Z"
+ "aggiornato": "2026-11-27T07:32:48.726Z"
 }
