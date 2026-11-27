@@ -34,7 +34,7 @@
    "paese": "ES",
    "nome": "El Corte Inglés",
    "url": "https://www.elcorteingles.es/search-nwx/1/?s={q}",
-   "attivo": false
+   "attivo": true
   },
   {
    "paese": "ES",
@@ -368,5 +368,5 @@
   }
  ],
  "preset": [],
- "aggiornato": "2026-11-27T07:32:51.330Z"
+ "aggiornato": "2026-11-27T07:32:54.321Z"
 }
